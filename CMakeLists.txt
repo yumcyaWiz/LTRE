@@ -19,4 +19,7 @@ add_subdirectory("examples")
 
 # tests
 if(BUILD_TESTS)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(tests)
 endif()
