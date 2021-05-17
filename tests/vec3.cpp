@@ -22,3 +22,11 @@ TEST(Vec3Length, BasicAssertions) {
   EXPECT_EQ(length(Vec3(1, 2, 2)), 3);
   EXPECT_EQ(length2(Vec3(1, 2, 2)), 9);
 }
+
+TEST(Vec3Dot, BasicAssertions) {
+  EXPECT_EQ(dot(Vec3(1, 2, 3), Vec3(4, 5, 6)), 32);
+}
+
+TEST(Vec3Cross, BasicAssertions) {
+  EXPECT_EQ(cross(Vec3(1, 0, 0), Vec3(0, 1, 0)), Vec3(0, 0, 1));
+}
