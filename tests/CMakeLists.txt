@@ -28,4 +28,5 @@ macro(package_add_test TESTNAME)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
+package_add_test(vec2 vec2.cpp)
 package_add_test(vec3 vec3.cpp)
