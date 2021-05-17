@@ -3,8 +3,12 @@ project(LTRE LANGUAGES C CXX)
 
 option(BUILD_TESTS "build tests" ON)
 
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "The C++ standard to use")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# LTRE
 add_library(LTRE INTERFACE)
-target_compile_features(LTRE INTERFACE cxx_std_20)
 target_include_directories(LTRE INTERFACE "include")
 
 # externals
