@@ -6,13 +6,14 @@
 
 namespace LTRE {
 
+class Primitive;
+
 struct IntersectInfo {
   float t;
   Vec3 hitPos;
   Vec3 hitNormal;
   Vec2 uv;
-  unsigned int primID;
-  unsigned int geomID;
+  const Primitive* hitPrimitive;
 };
 
 }  // namespace LTRE
