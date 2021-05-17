@@ -12,6 +12,10 @@ struct Vec3 {
   explicit constexpr Vec3(float x) : v{x, x, x} {}
   explicit constexpr Vec3(float x, float y, float z) : v{x, y, z} {}
 
+  constexpr bool operator==(const Vec3& v) const {
+    return this->v[0] == v[0] && this->v[1] == v[1] && this->v[2] == v[2];
+  }
+
   constexpr const float& operator[](int i) const {
     assert(i >= 0 && i <= 3);
     return v[i];
