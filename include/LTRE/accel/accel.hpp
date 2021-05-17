@@ -7,7 +7,7 @@
 namespace LTRE {
 
 class Accel {
- private:
+ protected:
   std::vector<Primitive> primitives;
 
  public:
