@@ -1,9 +1,9 @@
+#include "LTRE/camera/pinhole-camera.hpp"
 #include "LTRE/core/film.hpp"
 #include "LTRE/core/ray.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
-#include "LTRE/shape/sphere.hpp"
 
 using namespace LTRE;
 
