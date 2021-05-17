@@ -8,6 +8,7 @@ class PinholeCamera : public Camera {
  private:
   float f;
 
+ public:
   PinholeCamera(const Vec3& camPos, const Vec3& camForward)
       : Camera(camPos, camForward), f(1.0f) {}
 
