@@ -1,17 +1,17 @@
-#ifndef _LTRE_ACCEL_H
-#define _LTRE_ACCEL_H
+#ifndef _LTRE_INTERSECTOR_H
+#define _LTRE_INTERSECTOR_H
 #include <vector>
 
 #include "LTRE/core/primitive.hpp"
 
 namespace LTRE {
 
-class Accel {
+class Intersector {
  protected:
   std::vector<Primitive> primitives;
 
  public:
-  Accel() {}
+  Intersector() {}
 
   void addPrimitive(const Primitive& primitive) {
     primitives.push_back(primitive);

@@ -1,11 +1,11 @@
-#ifndef _LTRE_LINEAR_H
-#define _LTRE_LINEAR_H
-#include "LTRE/accel/accel.hpp"
+#ifndef _LTRE_LINEAR_INTERSECTOR_H
+#define _LTRE_LINEAR_INTERSECTOR_H
+#include "LTRE/intersector/intersector.hpp"
 
 namespace LTRE {
 
-class Linear : public Accel {
-  Linear() {}
+class LinearIntersector : public Intersector {
+  LinearIntersector() {}
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     bool hit = false;
