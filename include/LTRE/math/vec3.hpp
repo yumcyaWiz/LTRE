@@ -17,11 +17,11 @@ struct Vec3 {
   }
 
   constexpr const float& operator[](int i) const {
-    assert(i >= 0 && i <= 3);
+    assert(i >= 0 && i < 3);
     return v[i];
   }
   constexpr float& operator[](int i) {
-    assert(i >= 0 && i <= 3);
+    assert(i >= 0 && i < 3);
     return v[i];
   }
 
