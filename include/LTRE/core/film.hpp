@@ -56,10 +56,11 @@ class Film {
     file << "255" << std::endl;
     for (int j = 0; j < height; ++j) {
       for (int i = 0; i < width; ++i) {
-        file << pixels[3 * i + 3 * width * j] << " ";
-        file << pixels[3 * i + 3 * width * j + 1] << " ";
-        file << pixels[3 * i + 3 * width * j + 2] << " ";
-        file << std::endl;
+        const Vec3 c = getPixel(i, j);
+        file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
+        file << std::clamp(static_cast<int>(255.0f * c[1]), 0, 255) << " ";
+        file << std::clamp(static_cast<int>(255.0f * c[2]), 0, 255)
+             << std::endl;
       }
     }
     file.close();
