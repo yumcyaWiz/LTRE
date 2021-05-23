@@ -6,7 +6,7 @@ namespace LTRE {
 
 class PinholeCamera : public Camera {
  private:
-  float f;
+  const float f;
 
  public:
   PinholeCamera(const Vec3& camPos, const Vec3& camForward)

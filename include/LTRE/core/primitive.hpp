@@ -7,7 +7,7 @@
 namespace LTRE {
 
 struct Primitive {
-  std::shared_ptr<Shape> shape;
+  const std::shared_ptr<Shape> shape;
 
   Primitive(const std::shared_ptr<Shape>& shape) : shape(shape) {}
 

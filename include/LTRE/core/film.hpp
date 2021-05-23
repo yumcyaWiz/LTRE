@@ -10,8 +10,8 @@ namespace LTRE {
 
 class Film {
  private:
-  unsigned int width;
-  unsigned int height;
+  const unsigned int width;
+  const unsigned int height;
   float* pixels;
 
  public:
