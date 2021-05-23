@@ -1,8 +1,10 @@
+#include "LTRE/bsdf/lambert.hpp"
 #include "LTRE/camera/pinhole-camera.hpp"
 #include "LTRE/core/film.hpp"
 #include "LTRE/core/primitive.hpp"
 #include "LTRE/core/ray.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
+#include "LTRE/sampling/sampling.hpp"
 #include "LTRE/shape/sphere.hpp"
 
 using namespace LTRE;
@@ -24,10 +26,11 @@ int main() {
     for (int i = 0; i < width; ++i) {
       const float u = (2.0f * i - width) / height;
       const float v = (2.0f * j - height) / height;
+      const Vec2 uv(u, v);
 
       Ray ray;
       float pdf;
-      if (camera.sampleRay(u, v, ray, pdf)) {
+      if (camera.sampleRay(uv, ray, pdf)) {
         IntersectInfo info;
         if (intersector.intersect(ray, info)) {
           film.setPixel(i, j, 0.5f * info.hitNormal + 0.5f);
