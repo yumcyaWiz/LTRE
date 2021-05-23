@@ -11,10 +11,19 @@ int main() {
   const int width = 512;
   const int height = 512;
 
+  PinholeCamera camera(Vec3(0, 0, 3), Vec3(0, 0, -1));
+
   Film film(width, height);
   for (int j = 0; j < height; ++j) {
     for (int i = 0; i < width; ++i) {
-      film.setPixel(i, j, Vec3(i / 512.0f, j / 512.0f, 1.0f));
+      const float u = (2.0f * i - width) / height;
+      const float v = (2.0f * j - height) / height;
+
+      Ray ray;
+      float pdf;
+      if (camera.sampleRay(u, v, ray, pdf)) {
+        film.setPixel(i, j, 0.5f * ray.direction + 0.5f);
+      }
     }
   }
 
