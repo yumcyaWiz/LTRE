@@ -9,6 +9,7 @@ class Sphere : public Shape {
   const Vec3 center;
   const float radius;
 
+ public:
   Sphere(const Vec3& center, float radius) : center(center), radius(radius) {}
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {

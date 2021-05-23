@@ -5,6 +5,7 @@
 namespace LTRE {
 
 class LinearIntersector : public Intersector {
+ public:
   LinearIntersector() {}
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
