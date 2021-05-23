@@ -19,7 +19,7 @@ class Camera {
     camUp = normalize(cross(camRight, camForward));
   }
 
-  virtual bool sampleRay(float u, float v, Ray& ray, float& pdf) const = 0;
+  virtual bool sampleRay(const Vec2& uv, Ray& ray, float& pdf) const = 0;
 };
 
 }  // namespace LTRE
