@@ -13,7 +13,8 @@ class Camera {
   Vec3 camUp;
 
  public:
-  Camera(const Vec3& camPos, const Vec3& camForward) {
+  Camera(const Vec3& camPos, const Vec3& camForward)
+      : camPos(camPos), camForward(camForward) {
     camRight = normalize(cross(camForward, Vec3(0, 1, 0)));
     camUp = normalize(cross(camRight, camForward));
   }
