@@ -9,6 +9,8 @@ namespace LTRE {
 struct Primitive {
   std::shared_ptr<Shape> shape;
 
+  Primitive(const std::shared_ptr<Shape>& shape) : shape(shape) {}
+
   bool intersect(const Ray& ray, IntersectInfo& info) const {
     if (shape->intersect(ray, info)) {
       info.hitPrimitive = this;
