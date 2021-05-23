@@ -12,6 +12,10 @@ struct Ray {
   mutable float tmin;
   mutable float tmax;
 
+  Ray()
+      : tmin(std::numeric_limits<float>::min()),
+        tmax(std::numeric_limits<float>::max()) {}
+
   Ray(const Vec3& origin, const Vec3& direction)
       : origin(origin),
         direction(direction),
