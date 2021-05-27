@@ -2,6 +2,7 @@
 #define _LTRE_VEC2_H
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 namespace LTRE {
 
@@ -151,6 +152,11 @@ inline constexpr float dot(const Vec2& v1, const Vec2& v2) {
 
 inline constexpr float length(const Vec2& v) { return std::sqrt(dot(v, v)); }
 inline constexpr float length2(const Vec2& v) { return dot(v, v); }
+
+inline std::ostream& operator<<(std::ostream& stream, const Vec2& v) {
+  stream << "(" << v[0] << ", " << v[1] << ")";
+  return stream;
+}
 
 }  // namespace LTRE
 

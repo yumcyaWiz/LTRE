@@ -2,6 +2,7 @@
 #define _LTRE_VEC3_H
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 namespace LTRE {
 
@@ -157,6 +158,11 @@ inline constexpr float length(const Vec3& v) { return std::sqrt(dot(v, v)); }
 inline constexpr float length2(const Vec3& v) { return dot(v, v); }
 
 inline constexpr Vec3 normalize(const Vec3& v) { return v / length(v); }
+
+inline std::ostream& operator<<(std::ostream& stream, const Vec3& v) {
+  stream << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
+  return stream;
+}
 
 }  // namespace LTRE
 
