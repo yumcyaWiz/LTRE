@@ -1,5 +1,7 @@
 #ifndef _LTRE_SAMPLING_H
 #define _LTRE_SAMPLING_H
+#include <algorithm>
+
 #include "LTRE/core/constant.hpp"
 #include "LTRE/math/vec2.hpp"
 
