@@ -11,7 +11,8 @@ class Scene {
   std::shared_ptr<Intersector> intersector;
 
  public:
-  Scene() {}
+  Scene(const std::shared_ptr<Intersector>& intersector)
+      : intersector(intersector) {}
 
   void addPrimitive(const Primitive& primitive) {
     intersector->addPrimitive(primitive);

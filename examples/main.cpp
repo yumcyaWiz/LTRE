@@ -3,8 +3,10 @@
 #include "LTRE/core/film.hpp"
 #include "LTRE/core/primitive.hpp"
 #include "LTRE/core/ray.hpp"
+#include "LTRE/core/scene.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/sampling/sampling.hpp"
+#include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/sphere.hpp"
 
 using namespace LTRE;
@@ -18,9 +20,13 @@ int main() {
 
   const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
-  auto intersector = LinearIntersector();
-  intersector.addPrimitive(Primitive(sphere1));
-  intersector.addPrimitive(Primitive(sphere2));
+  const auto prim1 = Primitive(sphere1);
+  const auto prim2 = Primitive(sphere2);
+
+  auto intersector = std::make_shared<LinearIntersector>();
+  Scene scene(intersector);
+  scene.addPrimitive(prim1);
+  scene.addPrimitive(prim2);
 
   for (int j = 0; j < height; ++j) {
     for (int i = 0; i < width; ++i) {
@@ -32,7 +38,7 @@ int main() {
       float pdf;
       if (camera.sampleRay(uv, ray, pdf)) {
         IntersectInfo info;
-        if (intersector.intersect(ray, info)) {
+        if (scene.intersect(ray, info)) {
           film.setPixel(i, j, 0.5f * info.hitNormal + 0.5f);
         } else {
           film.setPixel(i, j, Vec3(0));
