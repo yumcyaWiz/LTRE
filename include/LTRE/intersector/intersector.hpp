@@ -11,8 +11,6 @@ class Intersector {
   std::vector<Primitive> primitives;
 
  public:
-  Intersector() {}
-
   void addPrimitive(const Primitive& primitive) {
     primitives.push_back(primitive);
   }
