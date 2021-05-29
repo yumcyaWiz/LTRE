@@ -1,5 +1,6 @@
 #ifndef _LTRE_TRIANGLE_H
 #define _LTRE_TRIANGLE_H
+#include "LTRE/core/aabb.hpp"
 #include "LTRE/core/polygon.hpp"
 #include "LTRE/shape/shape.hpp"
 
