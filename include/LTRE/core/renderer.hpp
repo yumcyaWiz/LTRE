@@ -45,7 +45,7 @@ class Renderer {
           float pdf;
           if (camera->sampleRay(uv, ray, pdf)) {
             // integrate light transport equation
-            radiance += integrator->integrate(ray, scene);
+            radiance += integrator->integrate(ray, scene, *sampler);
           }
         }
         // take average

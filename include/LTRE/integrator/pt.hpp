@@ -10,7 +10,8 @@ class PT : public Integrator {
 
   PT(int maxDepth = 100) : maxDepth(maxDepth) {}
 
-  Vec3 integrate(const Ray& ray_in, const Scene& scene) const override {
+  Vec3 integrate(const Ray& ray_in, const Scene& scene,
+                 Sampler& sampler) const override {
     Vec3 throughput(1);
     Ray ray = ray_in;
     Vec3 radiance(0);
@@ -19,7 +20,7 @@ class PT : public Integrator {
       const float russianRouletteProb = std::min(
           std::max(throughput[0], std::max(throughput[1], throughput[2])),
           1.0f);
-      if (sampler->getNext1D() < russianRouletteProb) break;
+      if (sampler.getNext1D() < russianRouletteProb) break;
       throughput /= russianRouletteProb;
 
       IntersectInfo info;
@@ -30,7 +31,7 @@ class PT : public Integrator {
         Vec3 wi;
         float pdf;
         const Vec3 bsdf =
-            prim.sampleBSDF(-ray.direction, info, *sampler, wi, pdf);
+            prim.sampleBSDF(-ray.direction, info, sampler, wi, pdf);
 
         const float cos = std::abs(dot(wi, info.hitNormal));
 

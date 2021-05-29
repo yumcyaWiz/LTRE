@@ -9,11 +9,9 @@
 namespace LTRE {
 
 class Integrator {
- protected:
-  std::shared_ptr<Sampler> sampler;
-
  public:
-  virtual Vec3 integrate(const Ray& ray, const Scene& scene) const = 0;
+  virtual Vec3 integrate(const Ray& ray, const Scene& scene,
+                         Sampler& sampler) const = 0;
 };
 
 };  // namespace LTRE
