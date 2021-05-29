@@ -12,15 +12,15 @@ class PT : public Integrator {
 
   Vec3 integrate(const Ray& ray_in, const Scene& scene,
                  Sampler& sampler) const override {
-    Vec3 throughput(1);
     Ray ray = ray_in;
+    Vec3 throughput(1);
     Vec3 radiance(0);
     for (int i = 0; i < maxDepth; ++i) {
       // russian roulette
       const float russianRouletteProb = std::min(
           std::max(throughput[0], std::max(throughput[1], throughput[2])),
           1.0f);
-      if (sampler.getNext1D() < russianRouletteProb) break;
+      if (sampler.getNext1D() > russianRouletteProb) break;
       throughput /= russianRouletteProb;
 
       IntersectInfo info;
@@ -37,10 +37,14 @@ class PT : public Integrator {
 
         // update throughput
         throughput *= bsdf * cos / pdf;
+
+        // update ray
+        ray.origin = info.hitPos;
+        ray.direction = wi;
       }
       // sky
       else {
-        radiance = throughput * Vec3(1);
+        radiance += throughput * Vec3(1);
         break;
       }
     }
