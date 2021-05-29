@@ -55,7 +55,10 @@ class Renderer {
     }
   }
 
-  void writePPM(const std::string& filename) const { film.writePPM(filename); }
+  void writePPM(const std::string& filename) const {
+    film.gammaCorrection();
+    film.writePPM(filename);
+  }
 };
 
 }  // namespace LTRE
