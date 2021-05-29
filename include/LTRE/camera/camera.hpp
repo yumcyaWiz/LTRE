@@ -2,6 +2,7 @@
 #define _LTRE_CAMERA_H
 #include "LTRE/core/ray.hpp"
 #include "LTRE/math/vec3.hpp"
+#include "LTRE/sampling/sampler.hpp"
 
 namespace LTRE {
 
@@ -19,7 +20,8 @@ class Camera {
     camUp = normalize(cross(camRight, camForward));
   }
 
-  virtual bool sampleRay(const Vec2& uv, Ray& ray, float& pdf) const = 0;
+  virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
+                         float& pdf) const = 0;
 };
 
 }  // namespace LTRE

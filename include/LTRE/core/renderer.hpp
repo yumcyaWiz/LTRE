@@ -43,7 +43,7 @@ class Renderer {
           // generate camera ray
           Ray ray;
           float pdf;
-          if (camera->sampleRay(uv, ray, pdf)) {
+          if (camera->sampleRay(uv, *sampler, ray, pdf)) {
             // integrate light transport equation
             radiance += integrator->integrate(ray, scene, *sampler);
           }
