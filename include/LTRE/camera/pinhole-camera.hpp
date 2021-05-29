@@ -12,7 +12,7 @@ class PinholeCamera : public Camera {
   PinholeCamera(const Vec3& camPos, const Vec3& camForward)
       : Camera(camPos, camForward), f(1.0f) {}
 
-  bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
+  bool sampleRay(const Vec2& uv, [[maybe_unused]] Sampler& sampler, Ray& ray,
                  float& pdf) const override {
     const Vec3 sensorPos = camPos + uv[0] * camRight + uv[1] * camUp;
     const Vec3 pinholePos = camPos + f * camForward;

@@ -23,6 +23,6 @@ class Sampler {
   virtual Vec2 getNext2D() = 0;
 };
 
-};  // namespace LTRE
+}  // namespace LTRE
 
 #endif

@@ -14,6 +14,6 @@ class Integrator {
                          Sampler& sampler) const = 0;
 };
 
-};  // namespace LTRE
+}  // namespace LTRE
 
 #endif

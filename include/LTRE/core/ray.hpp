@@ -24,6 +24,6 @@ struct Ray {
   Vec3 operator()(float t) const { return origin + t * direction; }
 };
 
-};  // namespace LTRE
+}  // namespace LTRE
 
 #endif

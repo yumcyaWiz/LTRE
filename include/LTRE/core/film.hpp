@@ -40,7 +40,7 @@ class Film {
   }
 
   void gammaCorrection() const {
-    for (int i = 0; i < 3 * width * height; ++i) {
+    for (unsigned int i = 0; i < 3 * width * height; ++i) {
       pixels[i] = std::pow(pixels[i], 1.0f / 2.2f);
     }
   }
@@ -54,8 +54,8 @@ class Film {
     file << "P3" << std::endl;
     file << width << " " << height << std::endl;
     file << "255" << std::endl;
-    for (int j = 0; j < height; ++j) {
-      for (int i = 0; i < width; ++i) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
         const Vec3 c = getPixel(i, j);
         file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
         file << std::clamp(static_cast<int>(255.0f * c[1]), 0, 255) << " ";

@@ -34,8 +34,8 @@ class Renderer {
     unsigned int height = film.getHeight();
 
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
-    for (int j = 0; j < width; ++j) {
-      for (int i = 0; i < height; ++i) {
+    for (unsigned int j = 0; j < width; ++j) {
+      for (unsigned int i = 0; i < height; ++i) {
         // setup sampler
         std::unique_ptr<Sampler> sampler = this->sampler->clone();
         sampler->setSeed(i + width * j);

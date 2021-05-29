@@ -78,6 +78,6 @@ inline std::ostream& operator<<(std::ostream& stream, const AABB& bbox) {
   return stream;
 }
 
-};  // namespace LTRE
+}  // namespace LTRE
 
 #endif

@@ -131,6 +131,6 @@ class Triangle : public Shape {
   }
 };
 
-};  // namespace LTRE
+}  // namespace LTRE
 
 #endif

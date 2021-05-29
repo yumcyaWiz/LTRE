@@ -11,7 +11,8 @@ class Lambert : public BSDF {
 
   Lambert(const Vec3& rho) : rho(rho) {}
 
-  Vec3 bsdf(const IntersectInfo& info, const Vec3& wi) const override {
+  Vec3 bsdf([[maybe_unused]] const IntersectInfo& info,
+            [[maybe_unused]] const Vec3& wi) const override {
     return rho / PI;
   }
   Vec3 sample(const IntersectInfo& info, Sampler& sampler, Vec3& wi,
