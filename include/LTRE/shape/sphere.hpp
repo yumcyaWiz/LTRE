@@ -31,6 +31,11 @@ class Sphere : public Shape {
     info.hitNormal = normalize(info.hitPos - center);
     return true;
   }
+
+  AABB aabb() const override {
+    constexpr float EPS = 1e-6f;
+    return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
+  }
 };
 
 }  // namespace LTRE

@@ -15,7 +15,7 @@ class Triangle : public Shape {
   Triangle(const Polygon* polygon, unsigned int faceID)
       : polygon(polygon), faceID(faceID) {}
 
-  AABB calcAABB() const {
+  AABB aabb() const {
     const auto indices = polygon->getIndices(faceID);
     const Vec3 v1 = polygon->getVertex(indices[0]);
     const Vec3 v2 = polygon->getVertex(indices[1]);
