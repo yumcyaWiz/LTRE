@@ -17,6 +17,7 @@ endif()
 add_library(LTRE INTERFACE)
 target_include_directories(LTRE INTERFACE "include")
 target_link_libraries(LTRE INTERFACE OpenMP::OpenMP_CXX)
+target_link_libraries(LTRE INTERFACE assimp::assimp)
 
 # externals
 add_subdirectory("externals")
