@@ -190,6 +190,15 @@ inline constexpr Vec3 localToWorld(const Vec3& v, const Vec3& lx,
   return ret;
 }
 
+inline void orthonormalBasis(const Vec3& n, Vec3& t, Vec3& b) {
+  if (std::abs(n[1]) < 0.9f) {
+    t = normalize(cross(n, Vec3(0, 1, 0)));
+  } else {
+    t = normalize(cross(n, Vec3(0, 0, -1)));
+  }
+  b = normalize(cross(t, n));
+}
+
 }  // namespace LTRE
 
 #endif
