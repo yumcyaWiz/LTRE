@@ -13,6 +13,7 @@ struct IntersectInfo {
   Vec3 hitPos;
   Vec3 hitNormal;
   Vec2 uv;
+  float barycentric[2];
   const Primitive* hitPrimitive;
 };
 
