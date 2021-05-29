@@ -46,9 +46,21 @@ struct Vec3 {
     }
     return *this;
   }
+  constexpr Vec3& operator*=(float k) {
+    for (int i = 0; i < 3; ++i) {
+      this->v[i] *= k;
+    }
+    return *this;
+  }
   constexpr Vec3& operator/=(const Vec3& v) {
     for (int i = 0; i < 3; ++i) {
       this->v[i] /= v[i];
+    }
+    return *this;
+  }
+  constexpr Vec3& operator/=(float k) {
+    for (int i = 0; i < 3; ++i) {
+      this->v[i] /= k;
     }
     return *this;
   }
