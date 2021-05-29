@@ -20,6 +20,9 @@ class Film {
   }
   ~Film() { delete[] pixels; }
 
+  unsigned int getWidth() const { return width; }
+  unsigned int getHeight() const { return height; }
+
   Vec3 getPixel(unsigned int i, unsigned int j) const {
     assert(i >= 0 && i < width);
     assert(j >= 0 && j < height);

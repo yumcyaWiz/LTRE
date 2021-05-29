@@ -3,6 +3,7 @@
 #include "LTRE/core/film.hpp"
 #include "LTRE/core/primitive.hpp"
 #include "LTRE/core/ray.hpp"
+#include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
