@@ -2,6 +2,11 @@
 
 header only montecarlo raytracer for my research
 
+## Requirements
+
+* C++20
+* OpenMP
+
 ## Build
 
 ```
