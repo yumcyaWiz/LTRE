@@ -15,6 +15,8 @@ struct Primitive {
             const std::shared_ptr<BSDF>& bsdf)
       : shape(shape), bsdf(bsdf) {}
 
+  AABB aabb() const { return shape->aabb(); }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const {
     if (shape->intersect(ray, info)) {
       info.hitPrimitive = this;
