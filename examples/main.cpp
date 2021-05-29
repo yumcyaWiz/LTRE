@@ -1,5 +1,6 @@
 #include "LTRE/bsdf/lambert.hpp"
 #include "LTRE/camera/pinhole-camera.hpp"
+#include "LTRE/core/polygon.hpp"
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/pt.hpp"
