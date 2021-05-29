@@ -4,7 +4,7 @@ header only montecarlo raytracer for my research
 
 ## Requirements
 
-* C++20
+* C++17
 * OpenMP
 
 ## Build
@@ -18,4 +18,5 @@ cmake --build .
 
 ## Externals
 
+* [assimp](https://github.com/assimp/assimp)
 * [GoogleTest](https://github.com/google/googletest)
