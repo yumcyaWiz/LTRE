@@ -18,6 +18,7 @@ add_library(LTRE INTERFACE)
 target_include_directories(LTRE INTERFACE "include")
 target_link_libraries(LTRE INTERFACE OpenMP::OpenMP_CXX)
 target_link_libraries(LTRE INTERFACE assimp::assimp)
+target_link_libraries(LTRE INTERFACE spdlog::spdlog)
 target_compile_options(LTRE INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>:/W4>
   $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
