@@ -40,11 +40,8 @@ class Film {
   }
 
   void gammaCorrection() const {
-    for (int j = 0; j < height; ++j) {
-      for (int i = 0; i < width; ++i) {
-        pixels[3 * i + 3 * width * j] =
-            std::pow(pixels[3 * i + 3 * width * j], 1.0f / 2.2f);
-      }
+    for (int i = 0; i < 3 * width * height; ++i) {
+      pixels[i] = std::pow(pixels[i], 1.0f / 2.2f);
     }
   }
 
