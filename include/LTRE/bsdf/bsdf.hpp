@@ -9,8 +9,8 @@ namespace LTRE {
 class BSDF {
  public:
   virtual Vec3 bsdf(const IntersectInfo& info, const Vec3& wi) const = 0;
-  virtual Vec3 sample(const IntersectInfo& info, Sampler& sampler, Vec3& wi,
-                      float& pdf) const = 0;
+  virtual Vec3 sample(const Vec3& wo, const IntersectInfo& info,
+                      Sampler& sampler, Vec3& wi, float& pdf) const = 0;
 };
 
 }  // namespace LTRE

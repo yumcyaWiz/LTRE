@@ -15,8 +15,8 @@ class Lambert : public BSDF {
             [[maybe_unused]] const Vec3& wi) const override {
     return rho / PI;
   }
-  Vec3 sample(const IntersectInfo& info, Sampler& sampler, Vec3& wi,
-              float& pdf) const {
+  Vec3 sample([[maybe_unused]] const Vec3& wo, const IntersectInfo& info,
+              Sampler& sampler, Vec3& wi, float& pdf) const {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return bsdf(info, wi);
   }
