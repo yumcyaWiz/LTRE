@@ -176,6 +176,20 @@ inline std::ostream& operator<<(std::ostream& stream, const Vec3& v) {
   return stream;
 }
 
+inline constexpr Vec3 worldToLocal(const Vec3& v, const Vec3& lx,
+                                   const Vec3& ly, const Vec3& lz) {
+  return Vec3(dot(v, lx), dot(v, ly), dot(v, lz));
+}
+
+inline constexpr Vec3 localToWorld(const Vec3& v, const Vec3& lx,
+                                   const Vec3& ly, const Vec3& lz) {
+  Vec3 ret;
+  for (int i = 0; i < 3; ++i) {
+    ret[i] = v[i] * lx[i] + v[i] * ly[i] + v[i] * lz[i];
+  }
+  return ret;
+}
+
 }  // namespace LTRE
 
 #endif
