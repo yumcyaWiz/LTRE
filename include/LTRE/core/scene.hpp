@@ -18,6 +18,8 @@ class Scene {
     intersector->addPrimitive(primitive);
   }
 
+  void build() { intersector->build(); }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const {
     return intersector->intersect(ray, info);
   }

@@ -3,7 +3,7 @@
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/pt.hpp"
-#include "LTRE/intersector/linear-intersector.hpp"
+#include "LTRE/intersector/bvh.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/sphere.hpp"
 #include "LTRE/shape/triangle.hpp"
@@ -20,10 +20,11 @@ int main() {
   const auto prim1 = Primitive(sphere1, mat1);
   const auto prim2 = Primitive(sphere2, mat1);
 
-  const auto intersector = std::make_shared<LinearIntersector>();
+  const auto intersector = std::make_shared<BVH>();
   Scene scene(intersector);
   scene.addPrimitive(prim1);
   scene.addPrimitive(prim2);
+  scene.build();
 
   const auto camera =
       std::make_shared<PinholeCamera>(Vec3(0, 1, 5), Vec3(0, 0, -1));
@@ -31,6 +32,6 @@ int main() {
   const auto sampler = std::make_shared<UniformSampler>();
 
   Renderer renderer(width, height, camera, integrator, sampler);
-  renderer.render(scene, 1000);
+  renderer.render(scene, 100);
   renderer.writePPM("output.ppm");
 }

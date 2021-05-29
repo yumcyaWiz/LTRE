@@ -11,7 +11,7 @@ struct Ray {
   Vec3 direction;
   mutable float tmin;
   mutable float tmax;
-  static constexpr float RAY_EPS = 0.001f;
+  static constexpr float RAY_EPS = 1e-3f;
 
   Ray() : tmin(RAY_EPS), tmax(std::numeric_limits<float>::max()) {}
 
