@@ -1,5 +1,7 @@
 #ifndef _LTRE_RENDERER_H
 #define _LTRE_RENDERER_H
+#include <omp.h>
+
 #include <memory>
 
 #include "LTRE/camera/camera.hpp"
@@ -31,8 +33,13 @@ class Renderer {
     unsigned int width = film.getWidth();
     unsigned int height = film.getHeight();
 
+#pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (int j = 0; j < width; ++j) {
       for (int i = 0; i < height; ++i) {
+        // setup sampler
+        std::unique_ptr<Sampler> sampler = this->sampler->clone();
+        sampler->setSeed(i + width * j);
+
         Vec3 radiance(0);
         for (int k = 0; k < samples; ++k) {
           // compute (u, v) with SSAA

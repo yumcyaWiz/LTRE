@@ -15,7 +15,7 @@ int main() {
 
   const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
-  const auto mat1 = std::make_shared<Lambert>(Vec3(0.9));
+  const auto mat1 = std::make_shared<Lambert>(Vec3(0.8));
   const auto prim1 = Primitive(sphere1, mat1);
   const auto prim2 = Primitive(sphere2, mat1);
 
@@ -30,6 +30,6 @@ int main() {
   const auto sampler = std::make_shared<UniformSampler>();
 
   Renderer renderer(width, height, camera, integrator, sampler);
-  renderer.render(scene, 1);
+  renderer.render(scene, 1000);
   renderer.writePPM("output.ppm");
 }
