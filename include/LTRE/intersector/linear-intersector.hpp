@@ -8,6 +8,11 @@ class LinearIntersector : public Intersector {
  public:
   LinearIntersector() {}
 
+  bool build() override {
+    std::cout << "nPrimitives: " << primitives.size() << std::endl;
+    return true;
+  }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     bool hit = false;
 
