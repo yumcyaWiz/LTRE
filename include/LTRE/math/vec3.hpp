@@ -185,7 +185,7 @@ inline constexpr Vec3 localToWorld(const Vec3& v, const Vec3& lx,
                                    const Vec3& ly, const Vec3& lz) {
   Vec3 ret;
   for (int i = 0; i < 3; ++i) {
-    ret[i] = v[i] * lx[i] + v[i] * ly[i] + v[i] * lz[i];
+    ret[i] = v[0] * lx[i] + v[1] * ly[i] + v[2] * lz[i];
   }
   return ret;
 }
