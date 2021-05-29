@@ -3,6 +3,7 @@
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/pt.hpp"
+#include "LTRE/intersector/aabb.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/sphere.hpp"
