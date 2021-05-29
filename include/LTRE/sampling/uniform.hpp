@@ -8,6 +8,10 @@ class UniformSampler : public Sampler {
   UniformSampler() : Sampler() {}
   UniformSampler(uint64_t seed) : Sampler(seed) {}
 
+  std::unique_ptr<Sampler> clone() const override {
+    return std::make_unique<UniformSampler>();
+  }
+
   float getNext1D() override { return rng.getNext(); }
   Vec2 getNext2D() override { return Vec2(rng.getNext(), rng.getNext()); }
 };
