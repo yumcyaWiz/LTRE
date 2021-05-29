@@ -4,6 +4,7 @@
 #include "LTRE/core/primitive.hpp"
 #include "LTRE/core/ray.hpp"
 #include "LTRE/core/scene.hpp"
+#include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/sampling/sampling.hpp"
 #include "LTRE/sampling/uniform.hpp"
@@ -20,8 +21,9 @@ int main() {
 
   const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
-  const auto prim1 = Primitive(sphere1);
-  const auto prim2 = Primitive(sphere2);
+  const auto mat1 = std::make_shared<Lambert>(Vec3(0.9));
+  const auto prim1 = Primitive(sphere1, mat1);
+  const auto prim2 = Primitive(sphere2, mat1);
 
   auto intersector = std::make_shared<LinearIntersector>();
   Scene scene(intersector);
