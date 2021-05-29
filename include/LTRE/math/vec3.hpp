@@ -190,6 +190,12 @@ inline constexpr Vec3 localToWorld(const Vec3& v, const Vec3& lx,
   return ret;
 }
 
+inline constexpr Vec3 sphericalToCartesian(float theta, float phi) {
+  const float cosTheta = std::cos(theta);
+  const float sinTheta = std::sin(theta);
+  return Vec3(std::cos(phi) * sinTheta, cosTheta, std::sin(phi) * sinTheta);
+}
+
 inline void orthonormalBasis(const Vec3& n, Vec3& t, Vec3& b) {
   if (std::abs(n[1]) < 0.9f) {
     t = normalize(cross(n, Vec3(0, 1, 0)));

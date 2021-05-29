@@ -11,15 +11,14 @@ struct Ray {
   Vec3 direction;
   mutable float tmin;
   mutable float tmax;
+  static constexpr float RAY_EPS = 0.001f;
 
-  Ray()
-      : tmin(std::numeric_limits<float>::min()),
-        tmax(std::numeric_limits<float>::max()) {}
+  Ray() : tmin(RAY_EPS), tmax(std::numeric_limits<float>::max()) {}
 
   Ray(const Vec3& origin, const Vec3& direction)
       : origin(origin),
         direction(direction),
-        tmin(std::numeric_limits<float>::min()),
+        tmin(RAY_EPS),
         tmax(std::numeric_limits<float>::max()) {}
 
   Vec3 operator()(float t) const { return origin + t * direction; }
