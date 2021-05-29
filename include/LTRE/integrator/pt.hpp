@@ -24,29 +24,25 @@ class PT : public Integrator {
       throughput /= russianRouletteProb;
 
       IntersectInfo info;
-      if (scene.intersect(ray, info)) {
-        const Primitive& prim = *info.hitPrimitive;
-
-        // BRDF Sampling
-        Vec3 wi;
-        float pdf;
-        const Vec3 bsdf =
-            prim.sampleBSDF(-ray.direction, info, sampler, wi, pdf);
-
-        const float cos = std::abs(dot(wi, info.hitNormal));
-
-        // update throughput
-        throughput *= bsdf * cos / pdf;
-
-        // update ray
-        ray.origin = info.hitPos;
-        ray.direction = wi;
-      }
-      // sky
-      else {
+      if (!scene.intersect(ray, info)) {
+        // sky
         radiance += throughput * Vec3(1);
         break;
       }
+
+      const Primitive& prim = *info.hitPrimitive;
+
+      // BRDF Sampling
+      Vec3 wi;
+      float pdf;
+      const Vec3 bsdf = prim.sampleBSDF(-ray.direction, info, sampler, wi, pdf);
+
+      // update throughput
+      const float cos = std::abs(dot(wi, info.hitNormal));
+      throughput *= bsdf * cos / pdf;
+
+      // update ray
+      ray = Ray(info.hitPos, wi);
     }
     return radiance;
   }
