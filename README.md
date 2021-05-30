@@ -18,6 +18,7 @@ cmake --build .
 
 ## Externals
 
+* [stb](https://github.com/nothings/stb)
 * [assimp](https://github.com/assimp/assimp)
 * [spdlog](https://github.com/gabime/spdlog)
 * [GoogleTest](https://github.com/google/googletest)
