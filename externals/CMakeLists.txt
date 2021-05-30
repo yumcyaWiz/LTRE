@@ -7,3 +7,7 @@ add_subdirectory(assimp)
 # spdlog
 SET(SPDLOG_MASTER_PROJECT ON CACHE BOOL "" FORCE)
 add_subdirectory(spdlog)
+
+# stb
+add_library(stb INTERFACE)
+target_include_directories(stb SYSTEM INTERFACE stb)
