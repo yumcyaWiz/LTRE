@@ -205,6 +205,10 @@ inline void orthonormalBasis(const Vec3& n, Vec3& t, Vec3& b) {
   b = normalize(cross(t, n));
 }
 
+inline constexpr Vec3 pow(const Vec3& v, float k) {
+  return Vec3(std::pow(v[0], k), std::pow(v[1], k), std::pow(v[2], k));
+}
+
 }  // namespace LTRE
 
 #endif
