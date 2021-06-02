@@ -12,10 +12,23 @@
 
 namespace LTRE {
 
+enum class AOVType { BEAUTY, POSITION, DEPTH, NORMAL, BARYCENTRIC, TEXCOORDS };
+
 struct AOV {
   Image<Vec3> beauty;
+  Image<Vec3> position;
+  Image<float> depth;
+  Image<Vec3> normal;
+  Image<Vec2> barycentric;
+  Image<Vec2> texcoords;
 
-  AOV(unsigned int width, unsigned int height) : beauty{width, height} {}
+  AOV(unsigned int width, unsigned int height)
+      : beauty{width, height},
+        position{width, height},
+        depth{width, height},
+        normal{width, height},
+        barycentric{width, height},
+        texcoords{width, height} {}
 };
 
 class Renderer {
@@ -48,6 +61,26 @@ class Renderer {
         std::unique_ptr<Sampler> sampler = this->sampler->clone();
         sampler->setSeed(i + width * j);
 
+        // set aov
+        {
+          Vec2 uv;
+          uv[0] = (2.0f * i - width) / height;
+          uv[0] = (2.0f * j - height) / height;
+          Ray ray;
+          float pdf;
+          if (camera->sampleRay(uv, *sampler, ray, pdf)) {
+            IntersectInfo info;
+            if (scene.intersect(ray, info)) {
+              aov.depth.setPixel(i, j, info.t);
+              aov.position.setPixel(i, j, info.hitPos);
+              aov.normal.setPixel(i, j, info.hitNormal);
+              aov.barycentric.setPixel(i, j, info.barycentric);
+              aov.texcoords.setPixel(i, j, info.uv);
+            }
+          }
+        }
+
+        // compute radiance
         Vec3 radiance(0);
         for (int k = 0; k < samples; ++k) {
           // compute (u, v) with SSAA
@@ -63,6 +96,7 @@ class Renderer {
             radiance += integrator->integrate(ray, scene, *sampler) / pdf;
           }
         }
+
         // take average
         radiance /= samples;
         aov.beauty.setPixel(i, j, radiance);
@@ -70,96 +104,34 @@ class Renderer {
     }
   }
 
-  void renderNormal(const Scene& scene) {
-#pragma omp parallel for schedule(dynamic, 1) collapse(2)
-    for (unsigned int j = 0; j < width; ++j) {
-      for (unsigned int i = 0; i < height; ++i) {
-        // setup sampler
-        std::unique_ptr<Sampler> sampler = this->sampler->clone();
-        sampler->setSeed(i + width * j);
-
-        Vec3 radiance(0);
-        // compute (u, v) with SSAA
-        Vec2 uv;
-        uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / width;
-        uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
-
-        // generate camera ray
-        Ray ray;
-        float pdf;
-        if (camera->sampleRay(uv, *sampler, ray, pdf)) {
-          // set normal color
-          IntersectInfo info;
-          if (scene.intersect(ray, info)) {
-            radiance = 0.5f * (info.hitNormal + 1.0f);
-          }
-        }
-        aov.beauty.setPixel(i, j, radiance);
+  void writePPM(const std::string& filename, const AOVType& aovType) {
+    switch (aovType) {
+      case AOVType::BEAUTY: {
+        gammaCorrection(aov.beauty);
+        aov.beauty.writePPM(filename);
+        break;
+      }
+      case AOVType::POSITION: {
+        aov.position.writePPM(filename);
+        break;
+      }
+      case AOVType::DEPTH: {
+        aov.depth.writePPM(filename);
+        break;
+      }
+      case AOVType::NORMAL: {
+        aov.normal.writePPM(filename);
+        break;
+      }
+      case AOVType::BARYCENTRIC: {
+        aov.barycentric.writePPM(filename);
+        break;
+      }
+      case AOVType::TEXCOORDS: {
+        aov.texcoords.writePPM(filename);
+        break;
       }
     }
-  }
-
-  void renderUV(const Scene& scene) {
-#pragma omp parallel for schedule(dynamic, 1) collapse(2)
-    for (unsigned int j = 0; j < width; ++j) {
-      for (unsigned int i = 0; i < height; ++i) {
-        // setup sampler
-        std::unique_ptr<Sampler> sampler = this->sampler->clone();
-        sampler->setSeed(i + width * j);
-
-        Vec3 radiance(0);
-        // compute (u, v) with SSAA
-        Vec2 uv;
-        uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / width;
-        uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
-
-        // generate camera ray
-        Ray ray;
-        float pdf;
-        if (camera->sampleRay(uv, *sampler, ray, pdf)) {
-          // set uv color
-          IntersectInfo info;
-          if (scene.intersect(ray, info)) {
-            radiance = Vec3(info.uv[0], info.uv[1], 0.0f);
-          }
-        }
-        aov.beauty.setPixel(i, j, radiance);
-      }
-    }
-  }
-
-  void renderBaseColor(const Scene& scene) {
-#pragma omp parallel for schedule(dynamic, 1) collapse(2)
-    for (unsigned int j = 0; j < width; ++j) {
-      for (unsigned int i = 0; i < height; ++i) {
-        // setup sampler
-        std::unique_ptr<Sampler> sampler = this->sampler->clone();
-        sampler->setSeed(i + width * j);
-
-        Vec3 radiance(0);
-        // compute (u, v) with SSAA
-        Vec2 uv;
-        uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / width;
-        uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
-
-        // generate camera ray
-        Ray ray;
-        float pdf;
-        if (camera->sampleRay(uv, *sampler, ray, pdf)) {
-          // set diffuse color
-          IntersectInfo info;
-          if (scene.intersect(ray, info)) {
-            radiance = info.hitPrimitive->bsdf->baseColor(info);
-          }
-        }
-        aov.beauty.setPixel(i, j, radiance);
-      }
-    }
-  }
-
-  void writePPM(const std::string& filename) {
-    gammaCorrection(aov.beauty);
-    aov.beauty.writePPM(filename);
   }
 };
 
