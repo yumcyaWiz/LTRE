@@ -275,6 +275,20 @@ class Model {
 
   Model() {}
   Model(const std::filesystem::path& filepath) { loadModel(filepath); }
+
+  std::shared_ptr<BSDF> createBSDF(unsigned int idx) const {
+    const Material& material = materials[idx];
+
+    // diffuse
+    std::shared_ptr<Texture<Vec3>> rho;
+    if (material.diffuseMap) {
+      rho = textures[material.diffuseMap.value()];
+    } else {
+      rho = std::make_shared<UniformTexture<Vec3>>(material.kd);
+    }
+
+    return std::make_shared<Lambert>(rho);
+  }
 };
 
 }  // namespace LTRE

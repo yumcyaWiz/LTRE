@@ -12,10 +12,6 @@ class Scene {
  private:
   std::shared_ptr<Intersector<Primitive>> intersector;
 
-  std::shared_ptr<BSDF> createBSDF(const Model::Material& material) {
-    return std::make_shared<Lambert>(material.kd);
-  }
-
  public:
   Scene(const std::shared_ptr<Intersector<Primitive>>& intersector)
       : intersector(intersector) {}
@@ -29,7 +25,7 @@ class Scene {
     for (unsigned int i = 0; i < model.meshes.size(); ++i) {
       // create Primitive
       const std::shared_ptr<Mesh> shape = model.meshes[i];
-      const auto bsdf = createBSDF(model.materials[i]);
+      const auto bsdf = model.createBSDF(i);
       const Primitive prim = Primitive(shape, bsdf);
 
       // add Primitive to intersector
