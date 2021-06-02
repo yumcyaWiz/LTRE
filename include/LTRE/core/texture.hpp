@@ -32,6 +32,7 @@ class ImageTexture : public Texture<Vec3> {
   int width;
   int height;
   unsigned char* image;
+  std::filesystem::path filepath;
 
   void loadImage(const std::filesystem::path& filepath) {
     // load image with stb_image
@@ -45,13 +46,17 @@ class ImageTexture : public Texture<Vec3> {
   }
 
  public:
-  ImageTexture(const std::filesystem::path& filepath) { loadImage(filepath); }
+  ImageTexture(const std::filesystem::path& filepath) : filepath(filepath) {
+    loadImage(filepath);
+  }
 
   ~ImageTexture() override {
     if (image) {
       stbi_image_free(image);
     }
   }
+
+  std::filesystem::path getFilepath() const { return filepath; }
 
   Vec3 sample(const IntersectInfo& info) const override {
     const int i = std::clamp(static_cast<int>(width * info.uv[0]), 0, width);
