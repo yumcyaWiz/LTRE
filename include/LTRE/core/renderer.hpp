@@ -65,7 +65,7 @@ class Renderer {
         {
           Vec2 uv;
           uv[0] = (2.0f * i - width) / height;
-          uv[0] = (2.0f * j - height) / height;
+          uv[1] = (2.0f * j - height) / height;
           Ray ray;
           float pdf;
           if (camera->sampleRay(uv, *sampler, ray, pdf)) {
@@ -73,7 +73,7 @@ class Renderer {
             if (scene.intersect(ray, info)) {
               aov.depth.setPixel(i, j, info.t);
               aov.position.setPixel(i, j, info.hitPos);
-              aov.normal.setPixel(i, j, info.hitNormal);
+              aov.normal.setPixel(i, j, 0.5f * (info.hitNormal + 1.0f));
               aov.barycentric.setPixel(i, j, info.barycentric);
               aov.texcoords.setPixel(i, j, info.uv);
             }
