@@ -157,21 +157,7 @@ class Mesh : public Shape {
 
   BVH<MeshTriangle> intersector;
 
- public:
-  Mesh(const std::vector<Vec3>& positions,
-       const std::vector<unsigned int>& indices,
-       const std::optional<std::vector<Vec3>>& normals = std::nullopt,
-       const std::optional<std::vector<Vec2>>& texcoords = std::nullopt,
-       const std::optional<std::vector<Vec3>>& tangents = std::nullopt,
-       const std::optional<std::vector<Vec3>>& dndus = std::nullopt,
-       const std::optional<std::vector<Vec3>>& dndvs = std::nullopt)
-      : positions(positions),
-        indices(indices),
-        normals(normals),
-        texcoords(texcoords),
-        tangents(tangents),
-        dndus(dndus),
-        dndvs(dndvs) {
+  void setupIntersector() {
     // populate intersector
     for (unsigned int i = 0; i < positions.size(); i += 3) {
       // make MeshTriangle
@@ -201,6 +187,24 @@ class Mesh : public Shape {
 
     // build intersector
     intersector.build();
+  }
+
+ public:
+  Mesh(const std::vector<Vec3>& positions,
+       const std::vector<unsigned int>& indices,
+       const std::optional<std::vector<Vec3>>& normals = std::nullopt,
+       const std::optional<std::vector<Vec2>>& texcoords = std::nullopt,
+       const std::optional<std::vector<Vec3>>& tangents = std::nullopt,
+       const std::optional<std::vector<Vec3>>& dndus = std::nullopt,
+       const std::optional<std::vector<Vec3>>& dndvs = std::nullopt)
+      : positions(positions),
+        indices(indices),
+        normals(normals),
+        texcoords(texcoords),
+        tangents(tangents),
+        dndus(dndus),
+        dndvs(dndvs) {
+    setupIntersector();
   }
 
   int nVertices() const { return positions.size(); }
