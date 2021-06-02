@@ -19,25 +19,6 @@ namespace LTRE {
 
 class Model {
  private:
-  struct Material {
-    Vec3 kd;  // diffuse color
-    Vec3 ks;  // specular color
-    Vec3 ka;  // ambient color
-    Vec3 ke;  // emissive color
-    float shininess;
-
-    std::optional<unsigned int> diffuseMap;    // index of diffuse map texture
-    std::optional<unsigned int> specularMap;   // index of specular map texture
-    std::optional<unsigned int> ambientMap;    // index of ambient map texture
-    std::optional<unsigned int> emissiveMap;   // index of emissive map texture
-    std::optional<unsigned int> heightMap;     // index of height map texture
-    std::optional<unsigned int> normalMap;     // index of normal map texture
-    std::optional<unsigned int> shininessMap;  // index of shininess map texture
-    std::optional<unsigned int>
-        displacementMap;                   // index of displacement map texture
-    std::optional<unsigned int> lightMap;  // index of light map textur
-  };
-
   void loadModel(const std::filesystem::path& filepath) {
     // load model with assimp
     Assimp::Importer importer;
@@ -108,22 +89,27 @@ class Model {
 
       // normal
       if (mesh->mNormals) {
+        if (!normals) {
+          normals = std::vector<Vec3>();
+        }
         normals.value().emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y,
                                      mesh->mNormals[i].z);
-      } else {
-        normals.value().emplace_back(0.0f, 0.0f, 0.0f);
       }
 
       // texcoords
       if (mesh->mTextureCoords[0]) {
+        if (!texcoords) {
+          texcoords = std::vector<Vec2>();
+        }
         texcoords.value().emplace_back(mesh->mTextureCoords[0][i].x,
                                        mesh->mTextureCoords[0][i].y);
-      } else {
-        texcoords.value().emplace_back(0.0f, 0.0f);
       }
 
       // tangent
       if (mesh->mTangents) {
+        if (!tangents) {
+          tangents = std::vector<Vec3>();
+        }
         tangents.value().emplace_back(
             mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
       }
@@ -273,6 +259,25 @@ class Model {
   }
 
  public:
+  struct Material {
+    Vec3 kd;  // diffuse color
+    Vec3 ks;  // specular color
+    Vec3 ka;  // ambient color
+    Vec3 ke;  // emissive color
+    float shininess;
+
+    std::optional<unsigned int> diffuseMap;    // index of diffuse map texture
+    std::optional<unsigned int> specularMap;   // index of specular map texture
+    std::optional<unsigned int> ambientMap;    // index of ambient map texture
+    std::optional<unsigned int> emissiveMap;   // index of emissive map texture
+    std::optional<unsigned int> heightMap;     // index of height map texture
+    std::optional<unsigned int> normalMap;     // index of normal map texture
+    std::optional<unsigned int> shininessMap;  // index of shininess map texture
+    std::optional<unsigned int>
+        displacementMap;                   // index of displacement map texture
+    std::optional<unsigned int> lightMap;  // index of light map textur
+  };
+
   std::vector<std::shared_ptr<Mesh>> meshes;
   std::vector<Material> materials;
   std::vector<std::shared_ptr<ImageTexture>> textures;
