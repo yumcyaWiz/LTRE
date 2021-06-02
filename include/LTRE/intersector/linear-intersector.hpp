@@ -15,6 +15,7 @@ class LinearIntersector : public Intersector<T> {
   bool build() override {
     spdlog::info("[LinearIntersector] nPrimitives: " +
                  std::to_string(this->primitives.size()));
+    return true;
   }
 
   AABB aabb() const {
