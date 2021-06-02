@@ -81,12 +81,14 @@ class Mesh : public Shape {
 
     AABB aabb() const {
       const auto [v1, v2, v3] = getPositions();
+
+      constexpr float EPS = 1e-8f;
       Vec3 pMin, pMax;
       for (int i = 0; i < 3; ++i) {
         pMin[i] = std::min(std::min(v1[i], v2[i]), v3[i]);
         pMax[i] = std::max(std::max(v1[i], v2[i]), v3[i]);
       }
-      return AABB(pMin, pMax);
+      return AABB(pMin - EPS, pMax + EPS);
     }
 
     bool intersect(const Ray& ray, IntersectInfo& info) const {
