@@ -203,7 +203,7 @@ class Mesh : public Shape {
         tangents(tangents),
         dndus(dndus),
         dndvs(dndvs) {
-    if (positions.size() % 3 != 0) {
+    if (indices.size() % 3 != 0) {
       spdlog::error("[Mesh] untriangulated mesh detected.");
       std::exit(EXIT_FAILURE);
     }
