@@ -11,6 +11,7 @@ class AreaLight : public Light {
   const std::shared_ptr<Texture<Vec3>> le;
   const std::shared_ptr<Shape> shape;
 
+ public:
   AreaLight(const std::shared_ptr<Texture<Vec3>>& le,
             const std::shared_ptr<Shape>& shape)
       : le(le), shape(shape) {}
