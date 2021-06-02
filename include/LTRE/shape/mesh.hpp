@@ -173,11 +173,12 @@ class Mesh : public Shape {
         dndus(dndus),
         dndvs(dndvs) {
     // populate intersector
-    for (unsigned int i = 0; i < positions.size(); ++i) {
+    for (unsigned int i = 0; i < positions.size(); i += 3) {
       // make MeshTriangle
       MeshTriangle triangle;
       triangle.positions = positions.data();
       triangle.indices = indices.data();
+      triangle.faceID = i / 3;
       if (normals) {
         triangle.normals = normals.value().data();
       }
