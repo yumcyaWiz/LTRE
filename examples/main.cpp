@@ -3,13 +3,13 @@
 #include "LTRE/core/model.hpp"
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
-#include "LTRE/core/texture.hpp"
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/mesh.hpp"
 #include "LTRE/shape/sphere.hpp"
+#include "LTRE/sky/uniform-sky.hpp"
 
 using namespace LTRE;
 
@@ -18,7 +18,8 @@ int main() {
   const int height = 512;
 
   const auto intersector = std::make_shared<BVH<Primitive>>();
-  Scene scene(intersector);
+  const auto sky = std::make_shared<UniformSky>(Vec3(5));
+  Scene scene(intersector, sky);
 
   // const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
   // const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);

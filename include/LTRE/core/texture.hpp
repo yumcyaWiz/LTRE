@@ -44,7 +44,9 @@ class UniformTexture : public Texture<T> {
  public:
   UniformTexture(const T& value) : value(value) {}
 
-  T sample(const IntersectInfo& info) const override { return value; };
+  T sample([[maybe_unused]] const IntersectInfo& info) const override {
+    return value;
+  };
 };
 
 class ImageTexture : public Texture<Vec3> {

@@ -5,16 +5,19 @@
 #include "LTRE/bsdf/lambert.hpp"
 #include "LTRE/core/model.hpp"
 #include "LTRE/intersector/intersector.hpp"
+#include "LTRE/sky/sky.hpp"
 
 namespace LTRE {
 
 class Scene {
  private:
   std::shared_ptr<Intersector<Primitive>> intersector;
+  const std::shared_ptr<Sky> sky;
 
  public:
-  Scene(const std::shared_ptr<Intersector<Primitive>>& intersector)
-      : intersector(intersector) {}
+  Scene(const std::shared_ptr<Intersector<Primitive>>& intersector,
+        const std::shared_ptr<Sky>& sky)
+      : intersector(intersector), sky(sky) {}
 
   void addPrimitive(const Primitive& primitive) {
     intersector->addPrimitive(primitive);
@@ -38,6 +41,8 @@ class Scene {
   bool intersect(const Ray& ray, IntersectInfo& info) const {
     return intersector->intersect(ray, info);
   }
+
+  Vec3 getSkyRadiance(const Ray& ray) { return sky->radiance(ray); }
 };
 
 }  // namespace LTRE
