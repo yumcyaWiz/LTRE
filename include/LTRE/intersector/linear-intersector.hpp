@@ -16,15 +16,21 @@ class LinearIntersector : public Intersector<T> {
     return true;
   }
 
+  AABB aabb() const {
+    AABB ret;
+    for (const auto& prim : this->primitives) {
+      ret = mergeAABB(ret, prim.aabb());
+    }
+    return ret;
+  }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     bool hit = false;
 
     for (const auto& prim : this->primitives) {
-      IntersectInfo temp;
-      if (prim.intersect(ray, temp)) {
-        ray.tmax = temp.t;
+      if (prim.intersect(ray, info)) {
+        ray.tmax = info.t;
         hit = true;
-        info = temp;
       }
     }
 
