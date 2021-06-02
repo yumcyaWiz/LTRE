@@ -99,8 +99,16 @@ class Renderer {
           Ray ray;
           float pdf;
           if (camera->sampleRay(uv, *sampler, ray, pdf)) {
+            // evaluate We
+            const Vec3 We = camera->We(uv, ray.direction);
+
+            // evaluate cos
+            const float cos =
+                std::abs(dot(ray.direction, camera->getCamForward()));
+
             // integrate light transport equation
-            radiance += integrator->integrate(ray, scene, *sampler) / pdf;
+            radiance +=
+                We * integrator->integrate(ray, scene, *sampler) * cos / pdf;
           }
         }
 

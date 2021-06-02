@@ -29,6 +29,11 @@ class Camera {
     camUp = normalize(cross(camRight, camForward));
   }
 
+  Vec3 getCamPos() const { return camPos; }
+  Vec3 getCamForward() const { return camForward; }
+
+  virtual Vec3 We(const Vec2& uv, const Vec3& wi) const = 0;
+
   virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
                          float& pdf) const = 0;
 };
