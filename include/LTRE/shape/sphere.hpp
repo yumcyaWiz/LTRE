@@ -33,7 +33,7 @@ class Sphere : public Shape {
   }
 
   AABB aabb() const override {
-    constexpr float EPS = 1e-6f;
+    constexpr float EPS = 1e-8f;
     return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
   }
 };
