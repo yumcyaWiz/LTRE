@@ -5,7 +5,8 @@
 
 namespace LTRE {
 
-class BVH : public Intersector {
+template <Intersectable T>
+class BVH : public Intersector<T> {
   // NOTE: 32Byte alighment to make node cache conscious
   struct alignas(32) BVHNode {
     AABB bbox;
@@ -41,7 +42,7 @@ class BVH : public Intersector {
     // compute AABB
     AABB bbox;
     for (int i = primStart; i < primEnd; ++i) {
-      bbox = mergeAABB(bbox, primitives[i].aabb());
+      bbox = mergeAABB(bbox, this->primitives[i].aabb());
     }
 
     // if there are only few primitives, make leaf node
@@ -55,16 +56,16 @@ class BVH : public Intersector {
     // NOTE: using bbox for splitting will cause splitting failed
     AABB splitAABB;
     for (int i = primStart; i < primEnd; ++i) {
-      splitAABB = mergeAABB(splitAABB, primitives[i].aabb().center());
+      splitAABB = mergeAABB(splitAABB, this->primitives[i].aabb().center());
     }
 
     const int splitAxis = splitAABB.longestAxis();
 
     // splitting AABB(equal number splitting)
     const int splitIdx = primStart + nPrims / 2;
-    std::nth_element(primitives.begin() + primStart,
-                     primitives.begin() + splitIdx,
-                     primitives.begin() + primEnd,
+    std::nth_element(this->primitives.begin() + primStart,
+                     this->primitives.begin() + splitIdx,
+                     this->primitives.begin() + primEnd,
                      [&](const auto& prim1, const auto& prim2) {
                        return prim1.aabb().center()[splitAxis] <
                               prim2.aabb().center()[splitAxis];
@@ -115,7 +116,7 @@ class BVH : public Intersector {
         // test intersection with all primitives in this node
         const int primEnd = node.primIndicesOffset + node.nPrimitives;
         for (int i = node.primIndicesOffset; i < primEnd; ++i) {
-          if (primitives[i].intersect(ray, info)) {
+          if (this->primitives[i].intersect(ray, info)) {
             hit = true;
             ray.tmax = info.t;
           }
@@ -145,10 +146,10 @@ class BVH : public Intersector {
 
   bool build() override {
     // start building bvh from root node
-    buildBVHNode(0, primitives.size());
+    buildBVHNode(0, this->primitives.size());
     stats.nNodes = stats.nInternalNodes + stats.nLeafNodes;
 
-    std::cout << "nPrimitives: " << primitives.size() << std::endl;
+    std::cout << "nPrimitives: " << this->primitives.size() << std::endl;
     std::cout << "nNodes: " << stats.nNodes << std::endl;
     std::cout << "nInternalNodes: " << stats.nInternalNodes << std::endl;
     std::cout << "nLeafNodes: " << stats.nLeafNodes << std::endl;
