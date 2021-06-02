@@ -8,11 +8,13 @@
 
 namespace LTRE {
 
-struct Primitive {
+class Primitive {
+ private:
   std::shared_ptr<Shape> shape;
   std::shared_ptr<BSDF> bsdf;
   std::shared_ptr<AreaLight> areaLight;
 
+ public:
   Primitive(const std::shared_ptr<Shape>& shape,
             const std::shared_ptr<BSDF>& bsdf,
             const std::shared_ptr<AreaLight>& areaLight = nullptr)
@@ -47,6 +49,10 @@ struct Primitive {
 
     return bsdf;
   }
+
+  bool hasArealight() const { return areaLight != nullptr; }
+
+  Vec3 Le(const IntersectInfo& info) const { return areaLight->radiance(info); }
 };
 
 }  // namespace LTRE

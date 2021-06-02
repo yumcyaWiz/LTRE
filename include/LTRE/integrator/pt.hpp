@@ -32,6 +32,12 @@ class PT : public Integrator {
 
       const Primitive& prim = *info.hitPrimitive;
 
+      // Le
+      if (prim.hasArealight()) {
+        radiance += throughput * prim.Le(info);
+        break;
+      }
+
       // BRDF Sampling
       Vec3 wi;
       float pdf;
