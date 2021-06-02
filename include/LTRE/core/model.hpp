@@ -78,8 +78,6 @@ class Model {
     Material material;
 
     spdlog::info("[Mesh] Processing " + std::string(mesh->mName.C_Str()));
-    spdlog::info("[Mesh] number of vertices " +
-                 std::to_string(mesh->mNumVertices));
 
     // vertices
     for (std::size_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -106,8 +104,6 @@ class Model {
       }
     }
 
-    spdlog::info("[Mesh] number of faces " + std::to_string(mesh->mNumFaces));
-
     // indices
     for (std::size_t i = 0; i < mesh->mNumFaces; ++i) {
       const aiFace& face = mesh->mFaces[i];
@@ -115,6 +111,10 @@ class Model {
         indices.push_back(face.mIndices[j]);
       }
     }
+
+    spdlog::info("[Mesh] number of vertices " + std::to_string(indices.size()));
+    spdlog::info("[Mesh] number of faces " +
+                 std::to_string(indices.size() / 3));
 
     // add mesh
     const auto mesh_ptr = std::make_shared<Mesh>(
