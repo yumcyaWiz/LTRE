@@ -202,6 +202,9 @@ class Mesh : public Shape {
     intersector.build();
   }
 
+  int nVertices() const { return 3 * positions.size(); }
+  int nFaces() const { return positions.size(); }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     return intersector.intersect(ray, info);
   }
