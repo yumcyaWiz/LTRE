@@ -31,18 +31,28 @@ class ImageTexture : public Texture<Vec3> {
  private:
   int width;
   int height;
-  unsigned char* image;
+  float* image;
   std::filesystem::path filepath;
 
   void loadImage(const std::filesystem::path& filepath) {
     // load image with stb_image
     int width, height, channels;
-    unsigned char* image = stbi_load(filepath.generic_string().c_str(), &width,
-                                     &height, &channels, 3);
-    if (!image) {
+    unsigned char* img = stbi_load(filepath.generic_string().c_str(), &width,
+                                   &height, &channels, 3);
+    if (!img) {
       spdlog::error("failed to open " + filepath.string());
       return;
     }
+
+    // make float image
+    this->image = new float[3 * width * height];
+    for (int i = 0; i < 3 * width * height; ++i) {
+      constexpr float divider = 1.0f / 255.0f;
+      this->image[i] = img[i] * divider;
+    }
+
+    // free stb image
+    stbi_image_free(img);
   }
 
  public:
@@ -50,11 +60,7 @@ class ImageTexture : public Texture<Vec3> {
     loadImage(filepath);
   }
 
-  ~ImageTexture() override {
-    if (image) {
-      stbi_image_free(image);
-    }
-  }
+  ~ImageTexture() override { delete[] image; }
 
   std::filesystem::path getFilepath() const { return filepath; }
 
@@ -62,8 +68,7 @@ class ImageTexture : public Texture<Vec3> {
     const int i = std::clamp(static_cast<int>(width * info.uv[0]), 0, width);
     const int j = std::clamp(static_cast<int>(height * info.uv[1]), 0, height);
     const int idx = 3 * i + 3 * width * j;
-    return Vec3(image[idx] / 255.0f, image[idx + 1] / 255.0f,
-                image[idx + 2] / 255.0f);
+    return Vec3(image[idx], image[idx + 1], image[idx + 2]);
   }
 };
 
