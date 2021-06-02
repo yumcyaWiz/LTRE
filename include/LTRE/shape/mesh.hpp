@@ -3,8 +3,9 @@
 #include <memory>
 #include <vector>
 
+#include "spdlog/spdlog.h"
+//
 #include "LTRE/intersector/bvh.hpp"
-#include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/shape/shape.hpp"
 
 namespace LTRE {
@@ -155,7 +156,7 @@ class Mesh : public Shape {
   const std::vector<Vec3> dndus;      // differential of normal by texcoords
   const std::vector<Vec3> dndvs;      // differential of normal by texcoords
 
-  LinearIntersector<MeshTriangle> intersector;
+  BVH<MeshTriangle> intersector;
 
   void setupIntersector() {
     // populate intersector
@@ -202,6 +203,11 @@ class Mesh : public Shape {
         tangents(tangents),
         dndus(dndus),
         dndvs(dndvs) {
+    if (positions.size() % 3 != 0) {
+      spdlog::error("[Mesh] untriangulated mesh detected.");
+      std::exit(EXIT_FAILURE);
+    }
+
     setupIntersector();
   }
 

@@ -61,7 +61,7 @@ class Model {
       processMesh(mesh, scene, parentPath);
     }
 
-    for (std::size_t i = 0; i < node->mNumChildren; i++) {
+    for (std::size_t i = 0; i < node->mNumChildren; ++i) {
       processNode(node->mChildren[i], scene, parentPath);
     }
   }
@@ -112,7 +112,7 @@ class Model {
     for (std::size_t i = 0; i < mesh->mNumFaces; ++i) {
       const aiFace& face = mesh->mFaces[i];
       for (std::size_t j = 0; j < face.mNumIndices; ++j) {
-        indices.emplace_back(face.mIndices[j]);
+        indices.push_back(face.mIndices[j]);
       }
     }
 
