@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "LTRE/bsdf/bsdf.hpp"
-#include "LTRE/light/light.hpp"
+#include "LTRE/light/area-light.hpp"
 #include "LTRE/shape/shape.hpp"
 
 namespace LTRE {
@@ -11,12 +11,12 @@ namespace LTRE {
 struct Primitive {
   std::shared_ptr<Shape> shape;
   std::shared_ptr<BSDF> bsdf;
-  std::shared_ptr<Light> light;
+  std::shared_ptr<AreaLight> areaLight;
 
   Primitive(const std::shared_ptr<Shape>& shape,
             const std::shared_ptr<BSDF>& bsdf,
-            const std::shared_ptr<Light>& light = nullptr)
-      : shape(shape), bsdf(bsdf), light(light) {}
+            const std::shared_ptr<AreaLight>& areaLight = nullptr)
+      : shape(shape), bsdf(bsdf), areaLight(areaLight) {}
 
   AABB aabb() const { return shape->aabb(); }
 
