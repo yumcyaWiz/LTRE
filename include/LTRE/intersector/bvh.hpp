@@ -73,13 +73,12 @@ class BVH : public Intersector<T> {
 
     // if splitting failed, make leaf node
     if (splitIdx == primStart || splitIdx == primEnd) {
-      std::cout << "splitting failed" << std::endl;
-      std::cout << "nPrimitives: " << nPrims << std::endl;
-      std::cout << "splitAxis: " << splitAxis << std::endl;
-      std::cout << "primStart: " << primStart << std::endl;
-      std::cout << "splitIdx: " << splitIdx << std::endl;
-      std::cout << "primEnd: " << primEnd << std::endl;
-      std::cout << std::endl;
+      spdlog::warn("[BVH] splitting failed");
+      spdlog::warn("[BVH] nPrimitives: " + std::to_string(nPrims));
+      spdlog::warn("[BVH] splitAxis: " + std::to_string(splitAxis));
+      spdlog::warn("[BVH] primStart: " + std::to_string(primStart));
+      spdlog::warn("[BVH] splitIdx: " + std::to_string(splitIdx));
+      spdlog::warn("[BVH] primEnd: " + std::to_string(primEnd));
       addLeafNode(bbox, primStart, nPrims);
       return;
     }
@@ -150,10 +149,12 @@ class BVH : public Intersector<T> {
     buildBVHNode(0, this->primitives.size());
     stats.nNodes = stats.nInternalNodes + stats.nLeafNodes;
 
-    std::cout << "nPrimitives: " << this->primitives.size() << std::endl;
-    std::cout << "nNodes: " << stats.nNodes << std::endl;
-    std::cout << "nInternalNodes: " << stats.nInternalNodes << std::endl;
-    std::cout << "nLeafNodes: " << stats.nLeafNodes << std::endl;
+    spdlog::info("[BVH] nPrimitives: " +
+                 std::to_string(this->primitives.size()));
+    spdlog::info("[BVH] nNodes: " + std::to_string(stats.nNodes));
+    spdlog::info("[BVH] nInternalNodes: " +
+                 std::to_string(stats.nInternalNodes));
+    spdlog::info("[BVH] nInternalNodes: " + std::to_string(stats.nLeafNodes));
 
     return true;
   }

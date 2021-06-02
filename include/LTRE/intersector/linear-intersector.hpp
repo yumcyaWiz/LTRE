@@ -1,6 +1,7 @@
 #ifndef _LTRE_LINEAR_INTERSECTOR_H
 #define _LTRE_LINEAR_INTERSECTOR_H
 #include "LTRE/intersector/intersector.hpp"
+#include "spdlog/spdlog.h"
 
 namespace LTRE {
 
@@ -12,8 +13,8 @@ class LinearIntersector : public Intersector<T> {
       : Intersector<T>(primitives) {}
 
   bool build() override {
-    std::cout << "nPrimitives: " << this->primitives.size() << std::endl;
-    return true;
+    spdlog::info("[LinearIntersector] nPrimitives: " +
+                 std::to_string(this->primitives.size()));
   }
 
   AABB aabb() const {
