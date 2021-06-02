@@ -27,17 +27,19 @@ int main() {
   // const auto prim2 = Primitive(sphere2, mat1);
   // scene.addPrimitive(prim1);
   // scene.addPrimitive(prim2);
+  // scene.build();
 
-  const auto model = Model("../assets/sponza/sponza.obj");
+  // const auto model = Model("../assets/sponza/sponza.obj");
+  const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
   scene.addModel(model);
   scene.build();
 
   const auto camera =
-      std::make_shared<PinholeCamera>(Vec3(-10, 7, 0), Vec3(1, 0, 0));
+      std::make_shared<PinholeCamera>(Vec3(0, 1, 3), Vec3(0, 0, -1));
   const auto integrator = std::make_shared<PT>();
   const auto sampler = std::make_shared<UniformSampler>();
 
   Renderer renderer(width, height, camera, integrator, sampler);
-  renderer.render(scene, 10);
+  renderer.render(scene, 100);
   renderer.writePPM("output.ppm");
 }

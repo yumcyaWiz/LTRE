@@ -160,12 +160,12 @@ class Mesh : public Shape {
 
   void setupIntersector() {
     // populate intersector
-    for (unsigned int i = 0; i < positions.size(); i += 3) {
+    for (unsigned int i = 0; i < nFaces(); i++) {
       // make MeshTriangle
       MeshTriangle triangle;
       triangle.positions = positions.data();
       triangle.indices = indices.data();
-      triangle.faceID = i / 3;
+      triangle.faceID = i;
       if (normals.size() > 0) {
         triangle.normals = normals.data();
       }
@@ -211,8 +211,8 @@ class Mesh : public Shape {
     setupIntersector();
   }
 
-  int nVertices() const { return indices.size(); }
-  int nFaces() const { return indices.size() / 3; }
+  unsigned int nVertices() const { return indices.size(); }
+  unsigned int nFaces() const { return indices.size() / 3; }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     return intersector.intersect(ray, info);
