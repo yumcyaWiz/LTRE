@@ -8,6 +8,8 @@ template <Intersectable T>
 class LinearIntersector : public Intersector<T> {
  public:
   LinearIntersector() {}
+  LinearIntersector(const std::vector<T>& primitives)
+      : Intersector<T>(primitives) {}
 
   bool build() override {
     std::cout << "nPrimitives: " << this->primitives.size() << std::endl;

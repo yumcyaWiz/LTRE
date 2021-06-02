@@ -143,6 +143,7 @@ class BVH : public Intersector<T> {
 
  public:
   BVH() {}
+  BVH(const std::vector<T>& primitives) : Intersector<T>(primitives) {}
 
   bool build() override {
     // start building bvh from root node

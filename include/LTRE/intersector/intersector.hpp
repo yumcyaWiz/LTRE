@@ -17,6 +17,9 @@ class Intersector {
  protected:
   std::vector<T> primitives;
 
+  Intersector() {}
+  Intersector(const std::vector<T>& primitives) : primitives(primitives) {}
+
  public:
   void addPrimitive(const T& primitive) { primitives.push_back(primitive); }
 
