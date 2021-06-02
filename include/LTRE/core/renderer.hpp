@@ -85,7 +85,7 @@ class Renderer {
         for (int k = 0; k < samples; ++k) {
           // compute (u, v) with SSAA
           Vec2 uv;
-          uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / width;
+          uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / height;
           uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
 
           // generate camera ray
