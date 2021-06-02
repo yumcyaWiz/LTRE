@@ -8,6 +8,7 @@ namespace LTRE {
 
 struct Vec2 {
   float v[2];
+  static constexpr unsigned int nComponents = 2;
 
   explicit constexpr Vec2() : v{0, 0} {}
   explicit constexpr Vec2(float x) : v{x, x} {}

@@ -8,6 +8,7 @@ namespace LTRE {
 
 struct Vec3 {
   float v[3];
+  static constexpr unsigned int nComponents = 3;
 
   explicit constexpr Vec3() : v{0, 0, 0} {}
   explicit constexpr Vec3(float x) : v{x, x, x} {}

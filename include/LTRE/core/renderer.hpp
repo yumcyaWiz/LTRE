@@ -5,34 +5,42 @@
 #include <memory>
 
 #include "LTRE/camera/camera.hpp"
-#include "LTRE/core/film.hpp"
+#include "LTRE/core/image.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/integrator.hpp"
 #include "LTRE/sampling/sampler.hpp"
 
 namespace LTRE {
 
+struct AOV {
+  Image<Vec3> beauty;
+
+  AOV(unsigned int width, unsigned int height) : beauty{width, height} {}
+};
+
 class Renderer {
  private:
-  Film film;
+  unsigned int width;
+  unsigned int height;
   std::shared_ptr<Camera> camera;
   std::shared_ptr<Integrator> integrator;
   std::shared_ptr<Sampler> sampler;
+
+  AOV aov;
 
  public:
   Renderer(unsigned int width, unsigned int height,
            const std::shared_ptr<Camera>& camera,
            const std::shared_ptr<Integrator>& integrator,
            const std::shared_ptr<Sampler>& sampler)
-      : film{width, height},
+      : width(width),
+        height(height),
         camera{camera},
         integrator{integrator},
-        sampler{sampler} {}
+        sampler{sampler},
+        aov{width, height} {}
 
   void render(const Scene& scene, int samples) {
-    unsigned int width = film.getWidth();
-    unsigned int height = film.getHeight();
-
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < width; ++j) {
       for (unsigned int i = 0; i < height; ++i) {
@@ -57,15 +65,12 @@ class Renderer {
         }
         // take average
         radiance /= samples;
-        film.setPixel(i, j, radiance);
+        aov.beauty.setPixel(i, j, radiance);
       }
     }
   }
 
   void renderNormal(const Scene& scene) {
-    unsigned int width = film.getWidth();
-    unsigned int height = film.getHeight();
-
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < width; ++j) {
       for (unsigned int i = 0; i < height; ++i) {
@@ -89,15 +94,12 @@ class Renderer {
             radiance = 0.5f * (info.hitNormal + 1.0f);
           }
         }
-        film.setPixel(i, j, radiance);
+        aov.beauty.setPixel(i, j, radiance);
       }
     }
   }
 
   void renderUV(const Scene& scene) {
-    unsigned int width = film.getWidth();
-    unsigned int height = film.getHeight();
-
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < width; ++j) {
       for (unsigned int i = 0; i < height; ++i) {
@@ -121,15 +123,12 @@ class Renderer {
             radiance = Vec3(info.uv[0], info.uv[1], 0.0f);
           }
         }
-        film.setPixel(i, j, radiance);
+        aov.beauty.setPixel(i, j, radiance);
       }
     }
   }
 
   void renderBaseColor(const Scene& scene) {
-    unsigned int width = film.getWidth();
-    unsigned int height = film.getHeight();
-
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < width; ++j) {
       for (unsigned int i = 0; i < height; ++i) {
@@ -153,14 +152,14 @@ class Renderer {
             radiance = info.hitPrimitive->bsdf->baseColor(info);
           }
         }
-        film.setPixel(i, j, radiance);
+        aov.beauty.setPixel(i, j, radiance);
       }
     }
   }
 
-  void writePPM(const std::string& filename) const {
-    film.gammaCorrection();
-    film.writePPM(filename);
+  void writePPM(const std::string& filename) {
+    gammaCorrection(aov.beauty);
+    aov.beauty.writePPM(filename);
   }
 };
 

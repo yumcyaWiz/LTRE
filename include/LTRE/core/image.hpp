@@ -2,6 +2,7 @@
 #define _LTRE_IMAGE_H
 #include <fstream>
 #include <iostream>
+#include <type_traits>
 
 namespace LTRE {
 
@@ -45,7 +46,8 @@ class Image {
       for (unsigned int i = 0; i < width; ++i) {
         const T c = getPixel(i, j);
 
-        if constexpr (std::is_floating_point_v<T>()) {
+        // TODO: use concept to restrict template parameter?
+        if constexpr (std::is_floating_point_v<T>) {
           file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
           file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
           file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255)
