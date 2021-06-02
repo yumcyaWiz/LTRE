@@ -4,19 +4,20 @@
 
 namespace LTRE {
 
-class LinearIntersector : public Intersector {
+template <Intersectable T>
+class LinearIntersector : public Intersector<T> {
  public:
   LinearIntersector() {}
 
   bool build() override {
-    std::cout << "nPrimitives: " << primitives.size() << std::endl;
+    std::cout << "nPrimitives: " << this->primitives.size() << std::endl;
     return true;
   }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     bool hit = false;
 
-    for (const auto& prim : primitives) {
+    for (const auto& prim : this->primitives) {
       IntersectInfo temp;
       if (prim.intersect(ray, temp)) {
         ray.tmax = temp.t;
