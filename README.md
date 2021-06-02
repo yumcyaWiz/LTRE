@@ -4,7 +4,7 @@ header only montecarlo raytracer for my research
 
 ## Requirements
 
-* C++17
+* C++20
 * OpenMP
 
 ## Build
