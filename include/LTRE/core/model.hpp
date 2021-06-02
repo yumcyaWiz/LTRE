@@ -178,6 +178,23 @@ class Model {
       // shininess
       mat->Get(AI_MATKEY_SHININESS, material.shininess);
 
+      // reflectivity
+      mat->Get(AI_MATKEY_REFLECTIVITY, material.reflectivity);
+
+      // ior
+      mat->Get(AI_MATKEY_REFRACTI, material.ior);
+
+      // show material info
+      spdlog::info("[Model] kd: " + material.kd.toString());
+      spdlog::info("[Model] ks: " + material.ks.toString());
+      spdlog::info("[Model] ka: " + material.ka.toString());
+      spdlog::info("[Model] ke: " + material.ke.toString());
+      spdlog::info("[Model] shininess: " + std::to_string(material.shininess));
+      spdlog::info("[Model] reflectivity: " +
+                   std::to_string(material.reflectivity));
+      spdlog::info("[Model] ior: " + std::to_string(material.ior));
+
+      // load textures
       // diffuse map
       material.diffuseMap = loadTexture(mat, aiTextureType_DIFFUSE, parentPath);
 
@@ -256,7 +273,10 @@ class Model {
     Vec3 ks;  // specular color
     Vec3 ka;  // ambient color
     Vec3 ke;  // emissive color
+
     float shininess;
+    float reflectivity;
+    float ior;
 
     std::optional<unsigned int> diffuseMap;    // index of diffuse map texture
     std::optional<unsigned int> specularMap;   // index of specular map texture
@@ -268,6 +288,8 @@ class Model {
     std::optional<unsigned int>
         displacementMap;                   // index of displacement map texture
     std::optional<unsigned int> lightMap;  // index of light map textur
+
+    Material() : shininess(0), reflectivity(0), ior(0) {}
   };
 
   std::vector<std::shared_ptr<Mesh>> meshes;

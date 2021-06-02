@@ -54,6 +54,10 @@ struct Vec2 {
     }
     return *this;
   }
+
+  std::string toString() const {
+    return "(" + std::to_string(v[0]) + ", " + std::to_string(v[1]) + ")";
+  }
 };
 
 inline constexpr Vec2 operator+(const Vec2& v1, const Vec2& v2) {
