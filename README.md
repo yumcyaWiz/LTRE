@@ -2,6 +2,14 @@
 
 header only montecarlo raytracer for my research
 
+![](img/sponza.png)
+
+## Features
+
+* Unidirectional Path Tracing
+* BVH
+* Model Loading
+
 ## Requirements
 
 * C++20

@@ -29,13 +29,13 @@ int main() {
   // scene.addPrimitive(prim2);
   // scene.build();
 
-  // const auto model = Model("../assets/sponza/sponza.obj");
-  const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
+  const auto model = Model("../assets/sponza/sponza.obj");
+  // const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
   scene.addModel(model);
   scene.build();
 
   const auto camera =
-      std::make_shared<PinholeCamera>(Vec3(0, 1, 3), Vec3(0, 0, -1));
+      std::make_shared<PinholeCamera>(Vec3(0, 100, 0), Vec3(1, 0, 0));
   const auto integrator = std::make_shared<PT>();
   const auto sampler = std::make_shared<UniformSampler>();
 
