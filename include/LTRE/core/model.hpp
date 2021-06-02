@@ -69,12 +69,12 @@ class Model {
   void processMesh(const aiMesh* mesh, const aiScene* scene,
                    const std::filesystem::path& parentPath) {
     std::vector<Vec3> positions;
-    std::optional<std::vector<Vec3>> normals;
-    std::optional<std::vector<Vec2>> texcoords;
-    std::optional<std::vector<Vec3>> tangents;
-    std::optional<std::vector<Vec3>> dndus;
-    std::optional<std::vector<Vec3>> dndvs;
     std::vector<unsigned int> indices;
+    std::vector<Vec3> normals;
+    std::vector<Vec2> texcoords;
+    std::vector<Vec3> tangents;
+    std::vector<Vec3> dndus;
+    std::vector<Vec3> dndvs;
     Material material;
 
     spdlog::info("[Mesh] Processing " + std::string(mesh->mName.C_Str()));
@@ -89,29 +89,20 @@ class Model {
 
       // normal
       if (mesh->mNormals) {
-        if (!normals) {
-          normals = std::vector<Vec3>();
-        }
-        normals.value().emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y,
-                                     mesh->mNormals[i].z);
+        normals.emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y,
+                             mesh->mNormals[i].z);
       }
 
       // texcoords
       if (mesh->mTextureCoords[0]) {
-        if (!texcoords) {
-          texcoords = std::vector<Vec2>();
-        }
-        texcoords.value().emplace_back(mesh->mTextureCoords[0][i].x,
-                                       mesh->mTextureCoords[0][i].y);
+        texcoords.emplace_back(mesh->mTextureCoords[0][i].x,
+                               mesh->mTextureCoords[0][i].y);
       }
 
       // tangent
       if (mesh->mTangents) {
-        if (!tangents) {
-          tangents = std::vector<Vec3>();
-        }
-        tangents.value().emplace_back(
-            mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+        tangents.emplace_back(mesh->mTangents[i].x, mesh->mTangents[i].y,
+                              mesh->mTangents[i].z);
       }
     }
 
@@ -126,8 +117,8 @@ class Model {
     }
 
     // add mesh
-    const auto mesh_ptr = std::make_shared<Mesh>(positions, indices, normals,
-                                                 texcoords, tangents);
+    const auto mesh_ptr = std::make_shared<Mesh>(
+        positions, indices, normals, texcoords, tangents, dndus, dndvs);
     meshes.push_back(mesh_ptr);
 
     // materials

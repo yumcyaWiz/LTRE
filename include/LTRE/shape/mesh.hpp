@@ -1,10 +1,10 @@
 #ifndef _LTRE_MESH_H
 #define _LTRE_MESH_H
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include "LTRE/intersector/bvh.hpp"
+#include "LTRE/intersector/linear-intersector.hpp"
 #include "LTRE/shape/shape.hpp"
 
 namespace LTRE {
@@ -149,15 +149,13 @@ class Mesh : public Shape {
 
   const std::vector<Vec3> positions;  // vertex position
   const std::vector<unsigned int> indices;
-  const std::optional<std::vector<Vec3>> normals;    // vertex normal
-  const std::optional<std::vector<Vec2>> texcoords;  // texture coordinates
-  const std::optional<std::vector<Vec3>> tangents;   // tangent vector(dp/du)
-  const std::optional<std::vector<Vec3>>
-      dndus;  // differential of normal by texcoords
-  const std::optional<std::vector<Vec3>>
-      dndvs;  // differential of normal by texcoords
+  const std::vector<Vec3> normals;    // vertex normal
+  const std::vector<Vec2> texcoords;  // texture coordinates
+  const std::vector<Vec3> tangents;   // tangent vector(dp/du)
+  const std::vector<Vec3> dndus;      // differential of normal by texcoords
+  const std::vector<Vec3> dndvs;      // differential of normal by texcoords
 
-  BVH<MeshTriangle> intersector;
+  LinearIntersector<MeshTriangle> intersector;
 
   void setupIntersector() {
     // populate intersector
@@ -167,20 +165,20 @@ class Mesh : public Shape {
       triangle.positions = positions.data();
       triangle.indices = indices.data();
       triangle.faceID = i / 3;
-      if (normals) {
-        triangle.normals = normals.value().data();
+      if (normals.size() > 0) {
+        triangle.normals = normals.data();
       }
-      if (texcoords) {
-        triangle.texcoords = texcoords.value().data();
+      if (texcoords.size() > 0) {
+        triangle.texcoords = texcoords.data();
       }
-      if (tangents) {
-        triangle.tangents = tangents.value().data();
+      if (tangents.size() > 0) {
+        triangle.tangents = tangents.data();
       }
-      if (dndus) {
-        triangle.dndus = dndus.value().data();
+      if (dndus.size() > 0) {
+        triangle.dndus = dndus.data();
       }
-      if (dndvs) {
-        triangle.dndvs = dndvs.value().data();
+      if (dndvs.size() > 0) {
+        triangle.dndvs = dndvs.data();
       }
 
       // add MeshTriangle to intersector
@@ -194,11 +192,9 @@ class Mesh : public Shape {
  public:
   Mesh(const std::vector<Vec3>& positions,
        const std::vector<unsigned int>& indices,
-       const std::optional<std::vector<Vec3>>& normals = std::nullopt,
-       const std::optional<std::vector<Vec2>>& texcoords = std::nullopt,
-       const std::optional<std::vector<Vec3>>& tangents = std::nullopt,
-       const std::optional<std::vector<Vec3>>& dndus = std::nullopt,
-       const std::optional<std::vector<Vec3>>& dndvs = std::nullopt)
+       const std::vector<Vec3>& normals, const std::vector<Vec2>& texcoords,
+       const std::vector<Vec3>& tangents, const std::vector<Vec3>& dndus,
+       const std::vector<Vec3>& dndvs)
       : positions(positions),
         indices(indices),
         normals(normals),
