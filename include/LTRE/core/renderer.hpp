@@ -2,8 +2,11 @@
 #define _LTRE_RENDERER_H
 #include <omp.h>
 
+#include <chrono>
 #include <memory>
 
+#include "spdlog/spdlog.h"
+//
 #include "LTRE/camera/camera.hpp"
 #include "LTRE/core/image.hpp"
 #include "LTRE/core/scene.hpp"
@@ -54,6 +57,10 @@ class Renderer {
         aov{width, height} {}
 
   void render(const Scene& scene, int samples) {
+    spdlog::info("[Renderer] samples: " + std::to_string(samples));
+
+    spdlog::info("[Renderer] rendering started...");
+    const auto startTime = std::chrono::steady_clock::now();
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < width; ++j) {
       for (unsigned int i = 0; i < height; ++i) {
@@ -102,6 +109,12 @@ class Renderer {
         aov.beauty.setPixel(i, j, radiance);
       }
     }
+    const auto endTime = std::chrono::steady_clock::now();
+    const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        endTime - startTime)
+                        .count();
+    spdlog::info("[Renderer] rendering finished in " + std::to_string(ms) +
+                 " ms");
   }
 
   void writePPM(const std::string& filename, const AOVType& aovType) {
