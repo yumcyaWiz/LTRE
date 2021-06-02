@@ -48,10 +48,9 @@ class Image {
 
         // TODO: use concept to restrict template parameter?
         if constexpr (std::is_floating_point_v<T>) {
-          file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255)
-               << std::endl;
+          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << " ";
+          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << " ";
+          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << std::endl;
         } else if constexpr (T::nComponents == 2) {
           file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
           file << std::clamp(static_cast<int>(255.0f * c[1]), 0, 255) << " ";
