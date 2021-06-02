@@ -36,9 +36,9 @@ class ImageTexture : public Texture<Vec3> {
 
   void loadImage(const std::filesystem::path& filepath) {
     // load image with stb_image
-    int width, height, channels;
+    int _channels;
     unsigned char* img = stbi_load(filepath.generic_string().c_str(), &width,
-                                   &height, &channels, 3);
+                                   &height, &_channels, 3);
     if (!img) {
       spdlog::error("failed to open " + filepath.string());
       return;
