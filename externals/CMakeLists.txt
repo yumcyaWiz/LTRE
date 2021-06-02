@@ -10,4 +10,5 @@ add_subdirectory(spdlog)
 
 # stb
 add_library(stb INTERFACE)
+target_compile_definitions(stb INTERFACE STB_IMAGE_IMPLEMENTATION)
 target_include_directories(stb SYSTEM INTERFACE stb)
