@@ -26,7 +26,7 @@ class PT : public Integrator {
       IntersectInfo info;
       if (!scene.intersect(ray, info)) {
         // sky
-        radiance += throughput * Vec3(1);
+        radiance += throughput * scene.getSkyRadiance(ray);
         break;
       }
 

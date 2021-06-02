@@ -42,7 +42,7 @@ class Scene {
     return intersector->intersect(ray, info);
   }
 
-  Vec3 getSkyRadiance(const Ray& ray) { return sky->radiance(ray); }
+  Vec3 getSkyRadiance(const Ray& ray) const { return sky->radiance(ray); }
 };
 
 }  // namespace LTRE
