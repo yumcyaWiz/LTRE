@@ -24,16 +24,16 @@ class Film {
   unsigned int getHeight() const { return height; }
 
   Vec3 getPixel(unsigned int i, unsigned int j) const {
-    assert(i >= 0 && i < width);
-    assert(j >= 0 && j < height);
+    assert(i < width);
+    assert(j < height);
     return Vec3(pixels[3 * i + 3 * width * j],
                 pixels[3 * i + 3 * width * j + 1],
                 pixels[3 * i + 3 * width * j + 2]);
   }
 
   void setPixel(unsigned int i, unsigned int j, const Vec3& c) {
-    assert(i >= 0 && i < width);
-    assert(j >= 0 && j < height);
+    assert(i < width);
+    assert(j < height);
     for (int k = 0; k < 3; ++k) {
       pixels[3 * i + 3 * width * j + k] = c[k];
     }
