@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 project(LTRE LANGUAGES C CXX)
 
 option(BUILD_TESTS "build tests" ON)
-
-set(CMAKE_CXX_STANDARD 20 CACHE STRING "The C++ standard to use")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # OpenMP
 find_package(OpenMP)
@@ -19,6 +15,8 @@ add_subdirectory("externals")
 # LTRE
 add_library(LTRE INTERFACE)
 target_include_directories(LTRE INTERFACE "include")
+target_compile_features(LTRE INTERFACE cxx_std_20)
+set_target_properties(LTRE PROPERTIES CXX_EXTENSIONS OFF)
 target_link_libraries(LTRE INTERFACE OpenMP::OpenMP_CXX)
 target_link_libraries(LTRE INTERFACE assimp::assimp)
 target_link_libraries(LTRE INTERFACE spdlog::spdlog)

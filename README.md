@@ -5,6 +5,7 @@ header only montecarlo raytracer for my research
 ## Requirements
 
 * C++20
+* CMake 3.20
 * OpenMP
 
 ## Build
