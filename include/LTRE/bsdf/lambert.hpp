@@ -12,6 +12,10 @@ class Lambert : public BSDF {
 
   Lambert(const std::shared_ptr<Texture<Vec3>>& rho) : rho(rho) {}
 
+  Vec3 baseColor(const IntersectInfo& info) const override {
+    return rho->sample(info);
+  }
+
   Vec3 bsdf(const IntersectInfo& info,
             [[maybe_unused]] const Vec3& wi) const override {
     return rho->sample(info) / PI;
