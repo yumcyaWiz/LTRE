@@ -11,6 +11,26 @@ namespace LTRE {
 
 template <typename T>
 class Texture {
+ protected:
+  Vec2 calcTexCoords(const IntersectInfo& info) const {
+    // GL_REPEAT
+    float u = info.uv[0];
+    if (u > 1) {
+      u = std::fmod(u, 1.0f);
+    } else if (u < 0) {
+      u = 1.0f + std::fmod(u, 1.0f);
+    }
+
+    float v = info.uv[1];
+    if (v > 1) {
+      v = std::fmod(v, 1.0f);
+    } else if (v < 0) {
+      v = 1.0f + std::fmod(v, 1.0f);
+    }
+
+    return Vec2(u, v);
+  }
+
  public:
   virtual ~Texture() {}
   virtual T sample(const IntersectInfo& info) const = 0;
@@ -65,8 +85,9 @@ class ImageTexture : public Texture<Vec3> {
   std::filesystem::path getFilepath() const { return filepath; }
 
   Vec3 sample(const IntersectInfo& info) const override {
-    const int i = std::clamp(static_cast<int>(width * info.uv[0]), 0, width);
-    const int j = std::clamp(static_cast<int>(height * info.uv[1]), 0, height);
+    const Vec2 uv = calcTexCoords(info);
+    const int i = std::clamp(static_cast<int>(width * uv[0]), 0, width);
+    const int j = std::clamp(static_cast<int>(height * uv[1]), 0, height);
     const int idx = 3 * i + 3 * width * j;
     return Vec3(image[idx], image[idx + 1], image[idx + 2]);
   }

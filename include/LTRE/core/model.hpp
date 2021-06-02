@@ -92,21 +92,8 @@ class Model {
 
       // texcoords
       if (mesh->mTextureCoords[0]) {
-        // handle case for (u, v) outside [0, 1]
-        float u = mesh->mTextureCoords[0][i].x;
-        if (u > 1) {
-          u = std::fmod(u, 1.0f);
-        } else if (u < 0) {
-          u = 1.0f + std::fmod(u, 1.0f);
-        }
-
-        float v = mesh->mTextureCoords[0][i].y;
-        if (v > 1) {
-          v = std::fmod(v, 1.0f);
-        } else if (v < 0) {
-          v = 1.0f + std::fmod(v, 1.0f);
-        }
-
+        const float u = mesh->mTextureCoords[0][i].x;
+        const float v = mesh->mTextureCoords[0][i].y;
         texcoords.emplace_back(u, v);
       }
 
