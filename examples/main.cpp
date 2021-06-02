@@ -2,6 +2,7 @@
 #include "LTRE/camera/pinhole-camera.hpp"
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
+#include "LTRE/core/texture.hpp"
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/sampling/uniform.hpp"
@@ -20,7 +21,7 @@ int main() {
   const auto prim1 = Primitive(sphere1, mat1);
   const auto prim2 = Primitive(sphere2, mat1);
 
-  const auto intersector = std::make_shared<BVH>();
+  const auto intersector = std::make_shared<BVH<Primitive>>();
   Scene scene(intersector);
   scene.addPrimitive(prim1);
   scene.addPrimitive(prim2);
