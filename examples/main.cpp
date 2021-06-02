@@ -18,7 +18,7 @@ int main() {
   const int height = 512;
 
   const auto intersector = std::make_shared<BVH<Primitive>>();
-  const auto sky = std::make_shared<UniformSky>(Vec3(5));
+  const auto sky = std::make_shared<UniformSky>(Vec3(10));
   Scene scene(intersector, sky);
 
   // const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
