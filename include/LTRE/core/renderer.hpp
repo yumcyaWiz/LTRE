@@ -94,6 +94,38 @@ class Renderer {
     }
   }
 
+  void renderUV(const Scene& scene) {
+    unsigned int width = film.getWidth();
+    unsigned int height = film.getHeight();
+
+#pragma omp parallel for schedule(dynamic, 1) collapse(2)
+    for (unsigned int j = 0; j < width; ++j) {
+      for (unsigned int i = 0; i < height; ++i) {
+        // setup sampler
+        std::unique_ptr<Sampler> sampler = this->sampler->clone();
+        sampler->setSeed(i + width * j);
+
+        Vec3 radiance(0);
+        // compute (u, v) with SSAA
+        Vec2 uv;
+        uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / width;
+        uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
+
+        // generate camera ray
+        Ray ray;
+        float pdf;
+        if (camera->sampleRay(uv, *sampler, ray, pdf)) {
+          // set normal color
+          IntersectInfo info;
+          if (scene.intersect(ray, info)) {
+            radiance = Vec3(info.uv[0], info.uv[1], 0.0f);
+          }
+        }
+        film.setPixel(i, j, radiance);
+      }
+    }
+  }
+
   void writePPM(const std::string& filename) const {
     film.gammaCorrection();
     film.writePPM(filename);
