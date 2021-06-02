@@ -29,7 +29,8 @@ class Scene {
       // create Primitive
       const std::shared_ptr<Mesh> shape = model.meshes[i];
       const auto bsdf = model.createBSDF(i);
-      const Primitive prim = Primitive(shape, bsdf);
+      const auto areaLight = model.createAreaLight(i);
+      const Primitive prim = Primitive(shape, bsdf, areaLight);
 
       // add Primitive to intersector
       intersector->addPrimitive(prim);

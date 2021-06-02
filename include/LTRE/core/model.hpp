@@ -11,6 +11,7 @@
 #include "spdlog/spdlog.h"
 //
 #include "LTRE/core/texture.hpp"
+#include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
 #include "LTRE/shape/mesh.hpp"
@@ -288,6 +289,26 @@ class Model {
     }
 
     return std::make_shared<Lambert>(rho);
+  }
+
+  std::shared_ptr<AreaLight> createAreaLight(unsigned int idx) const {
+    const Material& material = materials[idx];
+
+    bool hasLight = false;
+    std::shared_ptr<Texture<Vec3>> le;
+    if (material.emissiveMap) {
+      le = textures[material.emissiveMap.value()];
+      hasLight = true;
+    } else if (material.ke) {
+      le = std::make_shared<UniformTexture<Vec3>>(material.ke);
+      hasLight = true;
+    }
+
+    if (hasLight) {
+      return std::make_shared<AreaLight>(le, meshes[idx]);
+    } else {
+      return nullptr;
+    }
   }
 };
 
