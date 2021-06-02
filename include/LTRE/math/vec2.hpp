@@ -14,6 +14,7 @@ struct Vec2 {
   explicit constexpr Vec2(float x) : v{x, x} {}
   explicit constexpr Vec2(float x, float y) : v{x, y} {}
 
+  explicit constexpr operator bool() const { return v[0] != 0 && v[1] != 0; }
   constexpr bool operator==(const Vec2& v) const {
     return this->v[0] == v[0] && this->v[1] == v[1];
   }
