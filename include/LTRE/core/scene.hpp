@@ -13,7 +13,7 @@ class Scene {
   std::shared_ptr<Intersector<Primitive>> intersector;
 
   std::shared_ptr<BSDF> createBSDF(const Model::Material& material) {
-    return std::make_shared<Lambert>(Vec3(0.8));
+    return std::make_shared<Lambert>(material.kd);
   }
 
  public:
