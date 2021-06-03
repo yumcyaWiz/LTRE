@@ -24,10 +24,9 @@ class PinholeCamera : public Camera {
     f = computeDistanceFromFOV(FOV);
   }
 
-  Vec3 We(const Vec2& uv, [[maybe_unused]] const Vec3& wi) const override {
-    const Vec3 sensorPos = this->sensorPos(uv);
-    const Vec3 pinholePos = this->pinholePos();
-    return Vec3(length2(pinholePos - sensorPos));
+  Vec3 We([[maybe_unused]] const Vec2& uv,
+          [[maybe_unused]] const Vec3& wi) const override {
+    return Vec3(f * f);
   }
 
   bool sampleRay(const Vec2& uv, [[maybe_unused]] Sampler& sampler, Ray& ray,
