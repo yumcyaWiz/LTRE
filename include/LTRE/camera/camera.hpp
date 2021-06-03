@@ -36,6 +36,8 @@ class Camera {
 
   virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
                          float& pdf) const = 0;
+
+  virtual void focus([[maybe_unused]] const Vec3& p) {}
 };
 
 }  // namespace LTRE

@@ -31,7 +31,7 @@ class ThinLensCamera : public Camera {
     return Vec3(b * b / (lensRadius * lensRadius));
   }
 
-  void focus(const Vec3& p) {
+  void focus(const Vec3& p) override {
     // NOTE: lens equation
     a = dot(p - camPos, camForward) - b;
     b = 1.0f / (1.0f / focalLength - 1.0f / a);
