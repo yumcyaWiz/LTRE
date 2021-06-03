@@ -29,8 +29,8 @@ class Camera {
     camUp = normalize(cross(camRight, camForward));
   }
 
-  Vec3 getCamPos() const { return camPos; }
-  Vec3 getCamForward() const { return camForward; }
+  Vec3 getCameraPosition() const { return camPos; }
+  Vec3 getCameraForward() const { return camForward; }
 
   virtual Vec3 We(const Vec2& uv, const Vec3& wi) const = 0;
 

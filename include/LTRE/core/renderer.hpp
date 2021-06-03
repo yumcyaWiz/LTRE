@@ -56,6 +56,24 @@ class Renderer {
         sampler{sampler},
         aov{width, height} {}
 
+  // focus at specified point
+  void focus(const Vec3& p) { camera->focus(p); }
+  // focus at specified direction
+  void focus(const Ray& ray, const Scene& scene) {
+    IntersectInfo info;
+    if (scene.intersect(ray, info)) {
+      focus(info.hitPos);
+    }
+  }
+  // focus at camera direction
+  void focus(const Scene& scene) {
+    Ray ray(camera->getCameraPosition(), camera->getCameraForward());
+    IntersectInfo info;
+    if (scene.intersect(ray, info)) {
+      focus(info.hitPos);
+    }
+  }
+
   void render(const Scene& scene, int samples) {
     spdlog::info("[Renderer] samples: " + std::to_string(samples));
 
@@ -104,7 +122,7 @@ class Renderer {
 
             // evaluate cos
             const float cos =
-                std::abs(dot(ray.direction, camera->getCamForward()));
+                std::abs(dot(ray.direction, camera->getCameraForward()));
 
             // integrate light transport equation
             radiance +=
