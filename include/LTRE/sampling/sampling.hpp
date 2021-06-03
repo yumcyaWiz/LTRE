@@ -23,10 +23,10 @@ inline Vec3 sampleCosineHemisphere(const Vec2& uv, float& pdf) {
   return sphericalToCartesian(theta, phi);
 }
 
-inline Vec2 sampleDisk(const Vec2& uv, float& pdf) {
-  const float r = std::sqrt(std::max(uv[0], 0.0f));
+inline Vec2 sampleDisk(const Vec2& uv, float R, float& pdf) {
+  const float r = R * std::sqrt(std::max(uv[0], 0.0f));
   const float theta = PI_MUL_2 * uv[1];
-  pdf = PI_INV;
+  pdf = 1.0f / (R * R) * PI_INV;
   return Vec2(r * std::cos(theta), r * std::sin(theta));
 }
 
