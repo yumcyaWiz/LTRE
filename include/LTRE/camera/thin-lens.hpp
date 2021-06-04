@@ -22,8 +22,9 @@ class ThinLensCamera : public Camera {
     // set lens radius
     lensRadius = 2.0f * focalLength / FNumber;
 
-    spdlog::info("[PinholeCamera] focalLength: " + std::to_string(focalLength));
-    spdlog::info("[PinholeCamera] lensRadius: " + std::to_string(lensRadius));
+    spdlog::info("[ThinLensCamera] focalLength: " +
+                 std::to_string(focalLength));
+    spdlog::info("[ThinLensCamera] lensRadius: " + std::to_string(lensRadius));
 
     // init a, b
     // focus inf
@@ -46,9 +47,9 @@ class ThinLensCamera : public Camera {
     b = b + delta;
     a = a - delta;
 
-    spdlog::info("[PinholeCamera] focusing at : " + p.toString());
-    spdlog::info("[PinholeCamera] a: " + std::to_string(a));
-    spdlog::info("[PinholeCamera] b: " + std::to_string(b));
+    spdlog::info("[ThinLensCamera] focusing at : " + p.toString());
+    spdlog::info("[ThinLensCamera] a: " + std::to_string(a));
+    spdlog::info("[ThinLensCamera] b: " + std::to_string(b));
   }
 
   bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray, Vec3& wi,
