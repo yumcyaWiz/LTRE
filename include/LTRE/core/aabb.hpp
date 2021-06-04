@@ -32,6 +32,12 @@ struct AABB {
     }
   }
 
+  float surfaceArea() const {
+    const Vec3 length = bounds[1] - bounds[0];
+    return 2.0f * length[0] * length[1] + 2.0f * length[0] * length[2] +
+           2.0f * length[1] * length[2];
+  }
+
   bool intersect(const Ray& ray, const Vec3& dirInv,
                  const int dirInvSign[3]) const {
     // https://dl.acm.org/doi/abs/10.1145/1198555.1198748
