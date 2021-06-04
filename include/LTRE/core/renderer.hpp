@@ -92,8 +92,9 @@ class Renderer {
           uv[0] = (2.0f * i - width) / height;
           uv[1] = (2.0f * j - height) / height;
           Ray ray;
+          Vec3 wi;
           float pdf;
-          if (camera->sampleRay(uv, *sampler, ray, pdf)) {
+          if (camera->sampleRay(uv, *sampler, ray, wi, pdf)) {
             IntersectInfo info;
             if (scene.intersect(ray, info)) {
               aov.depth.setPixel(i, j, info.t);
@@ -115,14 +116,14 @@ class Renderer {
 
           // generate camera ray
           Ray ray;
+          Vec3 wi;
           float pdf;
-          if (camera->sampleRay(uv, *sampler, ray, pdf)) {
+          if (camera->sampleRay(uv, *sampler, ray, wi, pdf)) {
             // evaluate We
-            const Vec3 We = camera->We(uv, ray.direction);
+            const Vec3 We = camera->We(uv, wi);
 
             // evaluate cos
-            const float cos =
-                std::abs(dot(ray.direction, camera->getCameraForward()));
+            const float cos = std::abs(dot(wi, camera->getCameraForward()));
 
             // integrate light transport equation
             radiance +=

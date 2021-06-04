@@ -10,18 +10,15 @@ class PinholeCamera : public Camera {
  private:
   float f;
 
-  float computeDistanceFromFOV(float FOV) const {
-    return (0.5f * filmSize[0]) / std::tan(0.5f * FOV);
-  }
-
-  Vec3 pinholePos() const { return camPos + f * camForward; }
-
  public:
   PinholeCamera(const Vec3& camPos, const Vec3& camForward,
                 const Vec2& filmSize = Vec2(0.025, 0.025),
                 float FOV = PI_MUL_2_INV)
       : Camera(camPos, camForward, filmSize) {
-    f = computeDistanceFromFOV(FOV);
+    // compute focal length from FOV
+    f = (0.5f * filmSize[0]) / std::tan(0.5f * FOV);
+
+    spdlog::info("[PinholeCamera] f: " + std::to_string(f));
   }
 
   Vec3 We([[maybe_unused]] const Vec2& uv,
@@ -30,10 +27,11 @@ class PinholeCamera : public Camera {
   }
 
   bool sampleRay(const Vec2& uv, [[maybe_unused]] Sampler& sampler, Ray& ray,
-                 float& pdf) const override {
+                 Vec3& wi, float& pdf) const override {
     const Vec3 sensorPos = this->sensorPos(uv);
-    const Vec3 pinholePos = this->pinholePos();
+    const Vec3 pinholePos = camPos + f * camForward;
     ray = Ray(sensorPos, normalize(pinholePos - sensorPos));
+    wi = ray.direction;
     pdf = length2(pinholePos - sensorPos) / dot(ray.direction, camForward);
     return true;
   }

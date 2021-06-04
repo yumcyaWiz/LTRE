@@ -1,5 +1,7 @@
 #ifndef _LTRE_CAMERA_H
 #define _LTRE_CAMERA_H
+#include "spdlog/spdlog.h"
+//
 #include "LTRE/core/ray.hpp"
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
@@ -27,6 +29,11 @@ class Camera {
       : camPos(camPos), camForward(camForward), filmSize(filmSize) {
     camRight = normalize(cross(camForward, Vec3(0, 1, 0)));
     camUp = normalize(cross(camRight, camForward));
+
+    spdlog::info("[Camera] camPos: " + camPos.toString());
+    spdlog::info("[Camera] camForward: " + camForward.toString());
+    spdlog::info("[Camera] camRight: " + camRight.toString());
+    spdlog::info("[Camera] camUp: " + camUp.toString());
   }
 
   Vec3 getCameraPosition() const { return camPos; }
@@ -34,7 +41,7 @@ class Camera {
 
   virtual Vec3 We(const Vec2& uv, const Vec3& wi) const = 0;
 
-  virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
+  virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray, Vec3& wi,
                          float& pdf) const = 0;
 
   virtual void focus([[maybe_unused]] const Vec3& p) {}

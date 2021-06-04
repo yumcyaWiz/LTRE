@@ -20,24 +20,38 @@ class ThinLensCamera : public Camera {
     focalLength = 0.5f * filmSize[0] / std::tan(0.5f * FOV);
 
     // set lens radius
-    lensRadius = focalLength / FNumber;
+    lensRadius = 2.0f * focalLength / FNumber;
 
+    spdlog::info("[PinholeCamera] focalLength: " + std::to_string(focalLength));
+    spdlog::info("[PinholeCamera] lensRadius: " + std::to_string(lensRadius));
+
+    // init a, b
     // focus inf
-    focus(camPos + 1e9f * camForward);
+    a = 10000.0f;
+    b = focalLength;
   }
 
   Vec3 We([[maybe_unused]] const Vec2& uv,
           [[maybe_unused]] const Vec3& wi) const override {
-    return Vec3(b * b / (lensRadius * lensRadius));
+    const float cos = std::abs(dot(camForward, wi));
+    return Vec3(b * b / (PI * lensRadius * lensRadius * std::pow(cos, 4.0f)));
   }
 
   void focus(const Vec3& p) override {
-    // NOTE: lens equation
+    // https://www.pbr-book.org/3ed-2018/Camera_Models/Realistic_Cameras#Focusing
     a = dot(p - camPos, camForward) - b;
-    b = 1.0f / (1.0f / focalLength - 1.0f / a);
+    const float delta =
+        0.5f * (a - b - std::sqrt(a + b) * std::sqrt(a + b - 4 * focalLength));
+    // shift lens by delta
+    b = b + delta;
+    a = a - delta;
+
+    spdlog::info("[PinholeCamera] focusing at : " + p.toString());
+    spdlog::info("[PinholeCamera] a: " + std::to_string(a));
+    spdlog::info("[PinholeCamera] b: " + std::to_string(b));
   }
 
-  bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray,
+  bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray, Vec3& wi,
                  float& pdf) const override {
     const Vec3 sensorPos = this->sensorPos(uv);
     const Vec3 lensCenter = camPos + b * camForward;
@@ -55,6 +69,7 @@ class ThinLensCamera : public Camera {
         ((a + b) / dot(sensorToLensCenter, camForward)) * sensorToLensCenter;
 
     ray = Ray(pLens, normalize(pObject - pLens));
+    wi = sensorToLens;
     pdf = length2(pLens - sensorPos) / dot(sensorToLens, camForward) * pdf_area;
     return true;
   }
