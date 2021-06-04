@@ -11,7 +11,7 @@ struct AABB {
 
   explicit AABB()
       : bounds{Vec3(std::numeric_limits<float>::max()),
-               Vec3(std::numeric_limits<float>::min())} {}
+               Vec3(std::numeric_limits<float>::lowest())} {}
   explicit AABB(const Vec3& pMin, const Vec3& pMax) : bounds{pMin, pMax} {}
 
   Vec3 center() const { return 0.5f * (bounds[0] + bounds[1]); }
@@ -33,7 +33,7 @@ struct AABB {
   }
 
   float surfaceArea() const {
-    const Vec3 length = bounds[1] - bounds[0];
+    Vec3 length = bounds[1] - bounds[0];
     return 2.0f * length[0] * length[1] + 2.0f * length[0] * length[2] +
            2.0f * length[1] * length[2];
   }
