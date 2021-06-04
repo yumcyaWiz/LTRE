@@ -64,8 +64,9 @@ class BVH : public Intersector<T> {
     const int splitAxis = splitAABB.longestAxis();
 
     // splitting AABB(equal number splitting)
-    int splitIdx = primStart + nPrims / 2;
+    int splitIdx = primStart;
     if constexpr (strategy == BVHSplitStrategy::EQUAL) {
+      splitIdx = primStart + nPrims / 2;
       std::nth_element(this->primitives.begin() + primStart,
                        this->primitives.begin() + splitIdx,
                        this->primitives.begin() + primEnd,
@@ -74,11 +75,30 @@ class BVH : public Intersector<T> {
                                 prim2.aabb().center()[splitAxis];
                        });
     } else if constexpr (strategy == BVHSplitStrategy::CENTER) {
+      const float center = splitAABB.center()[splitAxis];
+      splitIdx =
+          std::partition(this->primitives.begin() + primStart,
+                         this->primitives.begin() + primEnd,
+                         [&](const auto& prim) {
+                           return prim.aabb().center()[splitAxis] < center;
+                         }) -
+          this->primitives.begin();
     } else if constexpr (strategy == BVHSplitStrategy::SAH) {
     }
 
-    // if splitting failed, make leaf node
+    // if splitting failed, fall back to equal number splitting
     if (splitIdx == primStart || splitIdx == primEnd) {
+      spdlog::warn("[BVH] splitting failed, fallback to equal splitting.");
+
+      splitIdx = primStart + nPrims / 2;
+      std::nth_element(this->primitives.begin() + primStart,
+                       this->primitives.begin() + splitIdx,
+                       this->primitives.begin() + primEnd,
+                       [&](const auto& prim1, const auto& prim2) {
+                         return prim1.aabb().center()[splitAxis] <
+                                prim2.aabb().center()[splitAxis];
+                       });
+      /*
       spdlog::warn("[BVH] splitting failed");
       spdlog::warn("[BVH] nPrimitives: " + std::to_string(nPrims));
       spdlog::warn("[BVH] splitAxis: " + std::to_string(splitAxis));
@@ -87,6 +107,7 @@ class BVH : public Intersector<T> {
       spdlog::warn("[BVH] primEnd: " + std::to_string(primEnd));
       addLeafNode(bbox, primStart, nPrims);
       return;
+      */
     }
 
     // add node to node array, remember index of current node(parent node)
