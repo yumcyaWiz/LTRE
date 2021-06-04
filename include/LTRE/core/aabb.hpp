@@ -33,9 +33,13 @@ struct AABB {
   }
 
   float surfaceArea() const {
-    Vec3 length = bounds[1] - bounds[0];
-    return 2.0f * length[0] * length[1] + 2.0f * length[0] * length[2] +
-           2.0f * length[1] * length[2];
+    const Vec3 length = bounds[1] - bounds[0];
+    float area = 2.0f * length[0] * length[1] + 2.0f * length[0] * length[2] +
+                 2.0f * length[1] * length[2];
+    // handle null AABB case
+    if (std::isinf(area)) area = 0;
+
+    return area;
   }
 
   bool intersect(const Ray& ray, const Vec3& dirInv,
