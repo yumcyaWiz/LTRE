@@ -42,15 +42,15 @@ class BVH : public Intersector<T> {
   // build bvh node recursively
   void buildBVHNode(int primStart, int primEnd) {
     // compute AABB
-    AABB bbox;
+    AABB nodeAABB;
     for (int i = primStart; i < primEnd; ++i) {
-      bbox = mergeAABB(bbox, this->primitives[i].aabb());
+      nodeAABB = mergeAABB(nodeAABB, this->primitives[i].aabb());
     }
 
     // if there are only few primitives, make leaf node
     const int nPrims = primEnd - primStart;
-    if (nPrims <= 4) {
-      addLeafNode(bbox, primStart, nPrims);
+    if (nPrims <= 2) {
+      addLeafNode(nodeAABB, primStart, nPrims);
       return;
     }
 
@@ -63,7 +63,7 @@ class BVH : public Intersector<T> {
 
     const int splitAxis = splitAABB.longestAxis();
 
-    // splitting AABB(equal number splitting)
+    // splitting AABB
     int splitIdx = primStart;
     if constexpr (strategy == BVHSplitStrategy::EQUAL) {
       splitIdx = primStart + nPrims / 2;
@@ -84,12 +84,92 @@ class BVH : public Intersector<T> {
                          }) -
           this->primitives.begin();
     } else if constexpr (strategy == BVHSplitStrategy::SAH) {
+      constexpr int SAH_NUM_BINS = 36;
+
+      struct SAHBin {
+        int nPrimitives;
+        AABB bounds;
+        SAHBin() : nPrimitives{0}, bounds{} {}
+      };
+      SAHBin bins[SAH_NUM_BINS];
+
+      // populate SAHBin
+      for (int i = primStart; i < primEnd; ++i) {
+        // compute SAH bin index
+        const float primPos = this->primitives[i].aabb().center()[splitAxis];
+        const float parentStartPos = nodeAABB.bounds[0][splitAxis];
+        const float parentEndPos = nodeAABB.bounds[1][splitAxis];
+        int binIdx = SAH_NUM_BINS * (primPos - parentStartPos) /
+                     (parentEndPos - parentStartPos);
+        if (binIdx == SAH_NUM_BINS) binIdx--;
+
+        bins[binIdx].nPrimitives++;
+        bins[binIdx].bounds =
+            mergeAABB(bins[binIdx].bounds, this->primitives[i].aabb());
+      }
+
+      // compute SAH cost
+      constexpr float traverseCost = 0.125f;
+      constexpr float intersectCost = 1.0f;
+      float costs[SAH_NUM_BINS];
+      for (int i = 0; i < SAH_NUM_BINS; ++i) {
+        int nPrimitives1 = 0;
+        AABB bounds1;
+        for (int j = 0; j <= i; ++j) {
+          nPrimitives1 += bins[j].nPrimitives;
+          bounds1 = mergeAABB(bounds1, bins[j].bounds);
+        }
+
+        int nPrimitives2 = 0;
+        AABB bounds2;
+        for (int j = i + 1; j < SAH_NUM_BINS; ++j) {
+          nPrimitives2 += bins[j].nPrimitives;
+          bounds2 = mergeAABB(bounds2, bins[j].bounds);
+        }
+
+        costs[i] = traverseCost +
+                   (nPrimitives1 * intersectCost * bounds1.surfaceArea() +
+                    nPrimitives2 * intersectCost * bounds2.surfaceArea()) /
+                       nodeAABB.surfaceArea();
+      }
+
+      // find minimum SAH cost
+      int minCostIdx = 0;
+      float minCost = costs[0];
+      for (int i = 1; i < SAH_NUM_BINS; ++i) {
+        if (costs[i] < minCost) {
+          minCostIdx = i;
+          minCost = costs[i];
+        }
+      }
+
+      const float leafCost = nPrims * intersectCost;
+      if (minCost < leafCost) {
+        // split AABB
+        const float parentStartPos = nodeAABB.bounds[0][splitAxis];
+        const float parentEndPos = nodeAABB.bounds[1][splitAxis];
+        splitIdx = std::partition(
+                       this->primitives.begin() + primStart,
+                       this->primitives.begin() + primEnd,
+                       [&](const auto& prim) {
+                         const float primPos = prim.aabb().center()[splitAxis];
+                         int binIdx = SAH_NUM_BINS *
+                                      (primPos - parentStartPos) /
+                                      (parentEndPos - parentStartPos);
+                         if (binIdx == SAH_NUM_BINS) binIdx--;
+                         return binIdx <= minCostIdx;
+                       }) -
+                   this->primitives.begin();
+      } else {
+        // make leaf node
+        addLeafNode(nodeAABB, primStart, nPrims);
+        return;
+      }
     }
 
     // if splitting failed, fall back to equal number splitting
     if (splitIdx == primStart || splitIdx == primEnd) {
       spdlog::warn("[BVH] splitting failed, fallback to equal splitting.");
-
       splitIdx = primStart + nPrims / 2;
       std::nth_element(this->primitives.begin() + primStart,
                        this->primitives.begin() + splitIdx,
@@ -98,22 +178,12 @@ class BVH : public Intersector<T> {
                          return prim1.aabb().center()[splitAxis] <
                                 prim2.aabb().center()[splitAxis];
                        });
-      /*
-      spdlog::warn("[BVH] splitting failed");
-      spdlog::warn("[BVH] nPrimitives: " + std::to_string(nPrims));
-      spdlog::warn("[BVH] splitAxis: " + std::to_string(splitAxis));
-      spdlog::warn("[BVH] primStart: " + std::to_string(primStart));
-      spdlog::warn("[BVH] splitIdx: " + std::to_string(splitIdx));
-      spdlog::warn("[BVH] primEnd: " + std::to_string(primEnd));
-      addLeafNode(bbox, primStart, nPrims);
-      return;
-      */
     }
 
     // add node to node array, remember index of current node(parent node)
     const int parentOffset = nodes.size();
     BVHNode node;
-    node.bbox = bbox;
+    node.bbox = nodeAABB;
     node.primIndicesOffset = primStart;
     node.axis = splitAxis;
     nodes.push_back(node);
