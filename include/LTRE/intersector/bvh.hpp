@@ -5,7 +5,9 @@
 
 namespace LTRE {
 
-template <Intersectable T>
+enum class BVHSplitStrategy { CENTER, EQUAL, SAH };
+
+template <Intersectable T, BVHSplitStrategy strategy>
 class BVH : public Intersector<T> {
   // NOTE: 32Byte alighment to make node cache conscious
   struct alignas(32) BVHNode {
@@ -62,14 +64,18 @@ class BVH : public Intersector<T> {
     const int splitAxis = splitAABB.longestAxis();
 
     // splitting AABB(equal number splitting)
-    const int splitIdx = primStart + nPrims / 2;
-    std::nth_element(this->primitives.begin() + primStart,
-                     this->primitives.begin() + splitIdx,
-                     this->primitives.begin() + primEnd,
-                     [&](const auto& prim1, const auto& prim2) {
-                       return prim1.aabb().center()[splitAxis] <
-                              prim2.aabb().center()[splitAxis];
-                     });
+    int splitIdx = primStart + nPrims / 2;
+    if constexpr (strategy == BVHSplitStrategy::EQUAL) {
+      std::nth_element(this->primitives.begin() + primStart,
+                       this->primitives.begin() + splitIdx,
+                       this->primitives.begin() + primEnd,
+                       [&](const auto& prim1, const auto& prim2) {
+                         return prim1.aabb().center()[splitAxis] <
+                                prim2.aabb().center()[splitAxis];
+                       });
+    } else if constexpr (strategy == BVHSplitStrategy::CENTER) {
+    } else if constexpr (strategy == BVHSplitStrategy::SAH) {
+    }
 
     // if splitting failed, make leaf node
     if (splitIdx == primStart || splitIdx == primEnd) {

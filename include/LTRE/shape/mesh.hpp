@@ -156,7 +156,7 @@ class Mesh : public Shape {
   const std::vector<Vec3> dndus;      // differential of normal by texcoords
   const std::vector<Vec3> dndvs;      // differential of normal by texcoords
 
-  BVH<MeshTriangle> intersector;
+  BVH<MeshTriangle, BVHSplitStrategy::EQUAL> intersector;
 
   void setupIntersector() {
     // populate intersector
