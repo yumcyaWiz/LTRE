@@ -9,25 +9,12 @@ enum class BVHSplitStrategy { CENTER, EQUAL, SAH };
 
 template <Intersectable T, BVHSplitStrategy strategy>
 class BVH : public Intersector<T> {
-  // NOTE: 32Byte alighment to make node cache conscious
-  struct alignas(32) BVHNode {
-    AABB bbox;
-    union {
-      uint32_t primIndicesOffset;  // index of primIndices
-      uint32_t secondChildOffset;  // index of second child
-    };
-    uint16_t nPrimitives{0};  // number of primitives in this node
-    uint8_t axis{0};          // splitting axis(x=0, y=1, z=2)
-  };
-
+ public:
   struct BVHStatistics {
     int nNodes{0};          // number of nodes
     int nInternalNodes{0};  // number of internal nodes
     int nLeafNodes{0};      // number of leaf nodes
   };
-
-  std::vector<BVHNode> nodes;  // node array(depth-first order)
-  BVHStatistics stats;
 
   static AABB computeAABB(const std::vector<T>& primitives, int primStart,
                           int primEnd) {
@@ -52,10 +39,11 @@ class BVH : public Intersector<T> {
                         int& splitIdx, bool& makeLeaf) {
     // if there are only few primitives, make leaf node
     const int nPrims = primEnd - primStart;
-    if (nPrims <= 2) {
+    if (nPrims <= 4) {
       makeLeaf = true;
       return;
     }
+    std::cout << nPrims << std::endl;
 
     // compute split axis
     const AABB splitAABB = computeCentroidAABB(primitives, primStart, primEnd);
@@ -177,6 +165,21 @@ class BVH : public Intersector<T> {
 
     makeLeaf = false;
   }
+
+ private:
+  // NOTE: 32Byte alighment to make node cache conscious
+  struct alignas(32) BVHNode {
+    AABB bbox;
+    union {
+      uint32_t primIndicesOffset;  // index of primIndices
+      uint32_t secondChildOffset;  // index of second child
+    };
+    uint16_t nPrimitives{0};  // number of primitives in this node
+    uint8_t axis{0};          // splitting axis(x=0, y=1, z=2)
+  };
+
+  std::vector<BVHNode> nodes;  // node array(depth-first order)
+  BVHStatistics stats;
 
   // add leaf node to node array
   void addLeafNode(const AABB& bbox, int primStart, int nPrims) {
