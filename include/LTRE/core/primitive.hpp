@@ -53,6 +53,10 @@ class Primitive {
   bool hasArealight() const { return areaLight != nullptr; }
 
   Vec3 Le(const IntersectInfo& info) const { return areaLight->radiance(info); }
+
+  Vec3 baseColor(const IntersectInfo& info) const {
+    return bsdf->baseColor(info);
+  }
 };
 
 }  // namespace LTRE

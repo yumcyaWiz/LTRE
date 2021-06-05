@@ -15,7 +15,15 @@
 
 namespace LTRE {
 
-enum class AOVType { BEAUTY, POSITION, DEPTH, NORMAL, BARYCENTRIC, TEXCOORDS };
+enum class AOVType {
+  BEAUTY,
+  POSITION,
+  DEPTH,
+  NORMAL,
+  BARYCENTRIC,
+  TEXCOORDS,
+  BASECOLOR
+};
 
 struct AOV {
   Image<Vec3> beauty;
@@ -24,6 +32,7 @@ struct AOV {
   Image<Vec3> normal;
   Image<Vec2> barycentric;
   Image<Vec2> texcoords;
+  Image<Vec3> baseColor;
 
   AOV(unsigned int width, unsigned int height)
       : beauty{width, height},
@@ -31,7 +40,8 @@ struct AOV {
         depth{width, height},
         normal{width, height},
         barycentric{width, height},
-        texcoords{width, height} {}
+        texcoords{width, height},
+        baseColor{width, height} {}
 };
 
 class Renderer {
@@ -102,6 +112,7 @@ class Renderer {
               aov.normal.setPixel(i, j, 0.5f * (info.hitNormal + 1.0f));
               aov.barycentric.setPixel(i, j, info.barycentric);
               aov.texcoords.setPixel(i, j, info.uv);
+              aov.baseColor.setPixel(i, j, info.hitPrimitive->baseColor(info));
             }
           }
         }
@@ -169,6 +180,10 @@ class Renderer {
       }
       case AOVType::TEXCOORDS: {
         aov.texcoords.writePPM(filename);
+        break;
+      }
+      case AOVType::BASECOLOR: {
+        aov.baseColor.writePPM(filename);
         break;
       }
     }
