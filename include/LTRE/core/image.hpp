@@ -2,7 +2,10 @@
 #define _LTRE_IMAGE_H
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <type_traits>
+
+#include "spdlog/spdlog.h"
 
 namespace LTRE {
 
@@ -23,13 +26,19 @@ class Image {
   unsigned int getHeight() const { return height; }
 
   T getPixel(unsigned int i, unsigned int j) const {
-    assert(i < width);
-    assert(j < height);
+    using namespace std::string_literals;
+    if (i > width || j > height) {
+      spdlog::error("[Image] pixel index out of bounds "s + "(" +
+                    std::to_string(i) + ", " + std::to_string(j) + ")");
+    }
     return image[i + width * j];
   }
   void setPixel(unsigned int i, unsigned int j, const T& value) {
-    assert(i < width);
-    assert(j < height);
+    using namespace std::string_literals;
+    if (i > width || j > height) {
+      spdlog::error("[Image] pixel index out of bounds "s + "(" +
+                    std::to_string(i) + ", " + std::to_string(j) + ")");
+    }
     image[i + width * j] = value;
   }
 
