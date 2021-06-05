@@ -36,10 +36,11 @@ class BVH : public Intersector<T> {
 
   static void splitAABB(const AABB& nodeAABB, std::vector<T>& primitives,
                         int primStart, int primEnd, int& splitAxis,
-                        int& splitIdx, bool& makeLeaf) {
+                        int& splitIdx, bool& makeLeaf,
+                        bool forceInternal = false) {
     // if there are only few primitives, make leaf node
     const int nPrims = primEnd - primStart;
-    if (nPrims <= 4) {
+    if (nPrims <= 4 && !forceInternal) {
       makeLeaf = true;
       return;
     }
@@ -127,7 +128,7 @@ class BVH : public Intersector<T> {
       }
 
       const float leafCost = nPrims * intersectCost;
-      if (minCost < leafCost) {
+      if (minCost < leafCost || forceInternal) {
         // split AABB
         const float parentStartPos = nodeAABB.bounds[0][splitAxis];
         const float parentEndPos = nodeAABB.bounds[1][splitAxis];
