@@ -43,7 +43,6 @@ class BVH : public Intersector<T> {
       makeLeaf = true;
       return;
     }
-    std::cout << nPrims << std::endl;
 
     // compute split axis
     const AABB splitAABB = computeCentroidAABB(primitives, primStart, primEnd);

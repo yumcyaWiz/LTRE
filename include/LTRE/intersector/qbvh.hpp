@@ -1,5 +1,7 @@
 #ifndef _LTRE_QBVH_H
 #define _LTRE_QBVH_H
+#include <immintrin.h>
+
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/intersector/intersector.hpp"
 
@@ -160,6 +162,90 @@ class QBVH : public Intersector<T> {
     }
   }
 
+  // intersect 4 aabb with SIMD
+  static int intersectAABB(const __m128 orig[3], const __m128 dirInv[3],
+                           const int dirInvSign[3], const __m128 raytmin,
+                           const __m128 raytmax, const __m128 bounds[2][3]) {
+    // SIMD version of https://dl.acm.org/doi/abs/10.1145/1198555.1198748
+    __m128 tmin =
+        _mm_mul_ps(_mm_sub_ps(bounds[dirInvSign[0]][0], orig[0]), dirInv[0]);
+    __m128 tmax = _mm_mul_ps(_mm_sub_ps(bounds[1 - dirInvSign[0]][0], orig[0]),
+                             dirInv[0]);
+
+    tmin = _mm_min_ps(
+        tmin,
+        _mm_mul_ps(_mm_sub_ps(bounds[dirInvSign[1]][1], orig[1]), dirInv[1]));
+    tmax = _mm_max_ps(
+        tmax, _mm_mul_ps(_mm_sub_ps(bounds[1 - dirInvSign[1]][1], orig[1]),
+                         dirInv[1]));
+
+    tmin = _mm_min_ps(
+        tmin,
+        _mm_mul_ps(_mm_sub_ps(bounds[dirInvSign[2]][2], orig[2]), dirInv[2]));
+    tmax = _mm_max_ps(
+        tmax, _mm_mul_ps(_mm_sub_ps(bounds[1 - dirInvSign[2]][2], orig[2]),
+                         dirInv[2]));
+
+    const __m128 comp1 = _mm_cmp_ps(tmax, tmin, _CMP_GT_OQ);
+    const __m128 comp2 = _mm_and_ps(_mm_cmp_ps(tmin, raytmax, _CMP_LT_OQ),
+                                    _mm_cmp_ps(tmax, raytmin, _CMP_GT_OQ));
+    return _mm_movemask_ps(_mm_and_ps(comp1, comp2));
+  }
+
+  // traverse QBVH recursively
+  bool intersectNode(int nodeIdx, const Ray& ray, const Vec3& dirInv,
+                     const int dirInvSign[3], IntersectInfo& info) const {
+    bool hit = false;
+    const BVHNode& node = nodes[nodeIdx];
+
+    // prepare SIMD data
+    const __m128 orig[3] = {_mm_set_ps1(ray.origin[0]),
+                            _mm_set_ps1(ray.origin[1]),
+                            _mm_set_ps1(ray.origin[2])};
+    const __m128 _dirInv[3] = {_mm_set_ps1(dirInv[0]), _mm_set_ps1(dirInv[1]),
+                               _mm_set_ps1(dirInv[2])};
+    const __m128 raytmin = _mm_set_ps1(ray.tmin);
+    const __m128 raytmax = _mm_set_ps1(ray.tmax);
+    const __m128 bounds[2][3] = {
+        {_mm_load_ps(&node.bounds[0]), _mm_load_ps(&node.bounds[4]),
+         _mm_load_ps(&node.bounds[8])},
+        {_mm_load_ps(&node.bounds[12]), _mm_load_ps(&node.bounds[16]),
+         _mm_load_ps(&node.bounds[20])}};
+
+    // intersect AABB
+    const int hitMask =
+        intersectAABB(orig, _dirInv, dirInvSign, raytmin, raytmax, bounds);
+    const int hitChild[4] = {hitMask & 0b1, hitMask & 0b10, hitMask & 0b100,
+                             hitMask & 0b1000};
+
+    for (int i = 0; i < 4; ++i) {
+      if (hitChild[i]) {
+        const int child = node.child[i];
+        // leaf node
+        if (isLeaf(child)) {
+          // unpack leaf data
+          int nPrims, primitivesOffset;
+          decodeLeaf(child, nPrims, primitivesOffset);
+
+          // test intersection with all primitives in this node
+          for (int j = primitivesOffset; j < primitivesOffset + nPrims; ++j) {
+            if (this->primitives[j].intersect(ray, info)) {
+              hit = true;
+              ray.tmax = info.t;
+            }
+          }
+        }
+        // internal node
+        else {
+          // test intersection with child node
+          hit |= intersectNode(child, ray, dirInv, dirInvSign, info);
+        }
+      }
+    }
+
+    return hit;
+  }
+
  public:
   QBVH() {}
   QBVH(const std::vector<T>& primitives) : Intersector<T>(primitives) {}
@@ -177,9 +263,19 @@ class QBVH : public Intersector<T> {
 
     return true;
   }
+
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
-    return false;
+    // precompute ray's inversed direction, sign of direction
+    const Vec3 dirInv = 1.0f / ray.direction;
+    int dirInvSign[3];
+    for (int i = 0; i < 3; ++i) {
+      dirInvSign[i] = dirInv[i] > 0 ? 0 : 1;
+    }
+
+    // traverse from root node
+    return intersectNode(0, ray, dirInv, dirInvSign, info);
   }
+
   AABB aabb() const override {
     if (nodes.size() > 0) {
       const AABB bbox0 = AABB(
