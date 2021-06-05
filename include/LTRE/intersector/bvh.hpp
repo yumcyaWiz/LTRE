@@ -293,7 +293,7 @@ class BVH : public Intersector<T> {
   // number of leaf nodes
   int nLeafNodes() const { return stats.nLeafNodes; }
 
-  AABB aabb() const {
+  AABB aabb() const override {
     if (nodes.size() > 0) {
       return nodes[0].bbox;
     } else {

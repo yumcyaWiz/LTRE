@@ -180,7 +180,7 @@ class QBVH : public Intersector<T> {
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     return false;
   }
-  AABB aabb() const {
+  AABB aabb() const override {
     if (nodes.size() > 0) {
       const AABB bbox0 = AABB(
           Vec3(nodes[0].bounds[0], nodes[0].bounds[4], nodes[0].bounds[8]),

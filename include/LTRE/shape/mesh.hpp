@@ -6,6 +6,7 @@
 #include "spdlog/spdlog.h"
 //
 #include "LTRE/intersector/bvh.hpp"
+#include "LTRE/intersector/qbvh.hpp"
 #include "LTRE/shape/shape.hpp"
 
 namespace LTRE {
@@ -156,9 +157,18 @@ class Mesh : public Shape {
   const std::vector<Vec3> dndus;      // differential of normal by texcoords
   const std::vector<Vec3> dndvs;      // differential of normal by texcoords
 
-  BVH<MeshTriangle, BVHSplitStrategy::SAH> intersector;
+  std::shared_ptr<Intersector<MeshTriangle>> intersector;
 
   void setupIntersector() {
+    // choose intersector
+    if (nFaces() > 4) {
+      intersector =
+          std::make_shared<QBVH<MeshTriangle, BVHSplitStrategy::EQUAL>>();
+    } else {
+      intersector =
+          std::make_shared<BVH<MeshTriangle, BVHSplitStrategy::SAH>>();
+    }
+
     // populate intersector
     for (unsigned int i = 0; i < nFaces(); i++) {
       // make MeshTriangle
@@ -183,11 +193,11 @@ class Mesh : public Shape {
       }
 
       // add MeshTriangle to intersector
-      intersector.addPrimitive(triangle);
+      intersector->addPrimitive(triangle);
     }
 
     // build intersector
-    intersector.build();
+    intersector->build();
   }
 
  public:
@@ -215,10 +225,10 @@ class Mesh : public Shape {
   unsigned int nFaces() const { return indices.size() / 3; }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
-    return intersector.intersect(ray, info);
+    return intersector->intersect(ray, info);
   }
 
-  AABB aabb() const override { return intersector.aabb(); }
+  AABB aabb() const override { return intersector->aabb(); }
 };
 
 }  // namespace LTRE

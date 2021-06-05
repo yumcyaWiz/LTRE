@@ -25,6 +25,7 @@ class Intersector {
 
   virtual bool build() = 0;
   virtual bool intersect(const Ray& ray, IntersectInfo& info) const = 0;
+  virtual AABB aabb() const { return AABB(); }
 };
 
 }  // namespace LTRE
