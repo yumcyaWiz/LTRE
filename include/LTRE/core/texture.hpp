@@ -57,13 +57,14 @@ class ImageTexture : public Texture<Vec3> {
   std::filesystem::path filepath;
 
   void loadImage(const std::filesystem::path& filepath) {
+    spdlog::info("[ImageTexture] loading " + filepath.string());
     // load image with stb_image
     int _channels;
     unsigned char* img = stbi_load(filepath.generic_string().c_str(), &width,
                                    &height, &_channels, 3);
     if (!img) {
-      spdlog::error("failed to open " + filepath.string());
-      return;
+      spdlog::error("[ImageTexture] failed to load " + filepath.string());
+      std::exit(EXIT_FAILURE);
     }
 
     // make float image
