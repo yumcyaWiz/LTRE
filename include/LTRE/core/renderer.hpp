@@ -90,8 +90,8 @@ class Renderer {
     spdlog::info("[Renderer] rendering started...");
     const auto startTime = std::chrono::steady_clock::now();
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
-    for (unsigned int j = 0; j < width; ++j) {
-      for (unsigned int i = 0; i < height; ++i) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
         // setup sampler
         std::unique_ptr<Sampler> sampler = this->sampler->clone();
         sampler->setSeed(i + width * j);
