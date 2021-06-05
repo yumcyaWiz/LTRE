@@ -17,6 +17,7 @@ class Image {
   std::vector<T> image;
 
  public:
+  Image() {}
   Image(unsigned int width, unsigned int height)
       : width(width), height(height) {
     image.resize(width * height);
@@ -25,19 +26,27 @@ class Image {
   unsigned int getWidth() const { return width; }
   unsigned int getHeight() const { return height; }
 
+  void resize(unsigned int width, unsigned int height) {
+    this->width = width;
+    this->height = height;
+    image.resize(width * height);
+  }
+
   T getPixel(unsigned int i, unsigned int j) const {
     using namespace std::string_literals;
-    if (i > width || j > height) {
+    if (i >= width || j >= height) {
       spdlog::error("[Image] pixel index out of bounds "s + "(" +
                     std::to_string(i) + ", " + std::to_string(j) + ")");
+      std::exit(EXIT_FAILURE);
     }
     return image[i + width * j];
   }
   void setPixel(unsigned int i, unsigned int j, const T& value) {
     using namespace std::string_literals;
-    if (i > width || j > height) {
+    if (i >= width || j >= height) {
       spdlog::error("[Image] pixel index out of bounds "s + "(" +
                     std::to_string(i) + ", " + std::to_string(j) + ")");
+      std::exit(EXIT_FAILURE);
     }
     image[i + width * j] = value;
   }
@@ -45,7 +54,7 @@ class Image {
   void writePPM(const std::string& filename) {
     std::ofstream file(filename);
     if (!file) {
-      std::cerr << "failed to open " << filename << std::endl;
+      spdlog::error("[Image] failed to open " + filename);
     }
 
     file << "P3" << std::endl;
