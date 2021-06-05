@@ -23,13 +23,13 @@ target_link_libraries(LTRE INTERFACE spdlog::spdlog)
 target_link_libraries(LTRE INTERFACE stb)
 target_compile_options(LTRE INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>:/W4>
-  $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic
+  $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic -march=native
     $<$<CONFIG:DEBUG>: -O0 -g>
-    $<$<CONFIG:Release>: -O3 -march=native>
+    $<$<CONFIG:Release>: -O3>
   >
   $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -pedantic
     $<$<CONFIG:DEBUG>: -O0 -g>
-    $<$<CONFIG:Release>: -O3 -march=native>
+    $<$<CONFIG:Release>: -O3>
   >
 )
 
