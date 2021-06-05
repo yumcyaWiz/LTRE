@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "stb_image.h"
 //
+#include "LTRE/core/image.hpp"
 #include "LTRE/core/intersect-info.hpp"
 
 namespace LTRE {
@@ -32,7 +33,6 @@ class Texture {
   }
 
  public:
-  virtual ~Texture() {}
   virtual T sample(const IntersectInfo& info) const = 0;
 };
 
@@ -51,27 +51,30 @@ class UniformTexture : public Texture<T> {
 
 class ImageTexture : public Texture<Vec3> {
  private:
-  int width;
-  int height;
-  float* image;
+  Image<Vec3> image;
   std::filesystem::path filepath;
 
   void loadImage(const std::filesystem::path& filepath) {
     spdlog::info("[ImageTexture] loading " + filepath.string());
     // load image with stb_image
-    int _channels;
+    int width, height, channels;
     unsigned char* img = stbi_load(filepath.generic_string().c_str(), &width,
-                                   &height, &_channels, 3);
+                                   &height, &channels, 3);
     if (!img) {
       spdlog::error("[ImageTexture] failed to load " + filepath.string());
       std::exit(EXIT_FAILURE);
     }
 
     // make float image
-    this->image = new float[3 * width * height];
-    for (int i = 0; i < 3 * width * height; ++i) {
-      constexpr float divider = 1.0f / 255.0f;
-      this->image[i] = img[i] * divider;
+    this->image.resize(width, height);
+    for (int j = 0; j < height; ++j) {
+      for (int i = 0; i < width; ++i) {
+        constexpr float divider = 1.0f / 255.0f;
+        const float R = img[3 * i + 3 * width * j] * divider;
+        const float G = img[3 * i + 3 * width * j + 1] * divider;
+        const float B = img[3 * i + 3 * width * j + 2] * divider;
+        this->image.setPixel(i, j, Vec3(R, G, B));
+      }
     }
 
     // free stb image
@@ -83,16 +86,15 @@ class ImageTexture : public Texture<Vec3> {
     loadImage(filepath);
   }
 
-  ~ImageTexture() override { delete[] image; }
-
   std::filesystem::path getFilepath() const { return filepath; }
 
   Vec3 sample(const IntersectInfo& info) const override {
     const Vec2 uv = calcTexCoords(info);
-    const int i = std::clamp(static_cast<int>(width * uv[0]), 0, width);
-    const int j = std::clamp(static_cast<int>(height * uv[1]), 0, height);
-    const int idx = 3 * i + 3 * width * j;
-    return Vec3(image[idx], image[idx + 1], image[idx + 2]);
+    const int width = image.getWidth();
+    const int height = image.getHeight();
+    const int i = std::clamp(static_cast<int>(width * uv[0]), 0, width - 1);
+    const int j = std::clamp(static_cast<int>(height * uv[1]), 0, height - 1);
+    return image.getPixel(i, j);
   }
 };
 
