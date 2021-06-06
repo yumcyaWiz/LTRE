@@ -36,7 +36,8 @@ class BSDF {
   static float sin2Phi(const Vec3& w) { return sinPhi(w) * sinPhi(w); }
 
   virtual Vec3 baseColor(const IntersectInfo& info) const = 0;
-  virtual Vec3 bsdf(const IntersectInfo& info, const Vec3& wi) const = 0;
+  virtual Vec3 bsdf(const Vec3& wo, const IntersectInfo& info,
+                    const Vec3& wi) const = 0;
   virtual Vec3 sample(const Vec3& wo, const IntersectInfo& info,
                       Sampler& sampler, Vec3& wi, float& pdf) const = 0;
 };

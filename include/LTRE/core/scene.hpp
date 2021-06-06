@@ -2,7 +2,7 @@
 #define _LTRE_SCENE_H
 #include <memory>
 
-#include "LTRE/bsdf/lambert.hpp"
+#include "LTRE/bsdf/diffuse.hpp"
 #include "LTRE/core/model.hpp"
 #include "LTRE/intersector/intersector.hpp"
 #include "LTRE/sky/sky.hpp"
