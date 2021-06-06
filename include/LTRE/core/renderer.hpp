@@ -142,6 +142,11 @@ class Renderer {
           }
         }
 
+        if (radiance.isNan()) {
+          spdlog::error("[Renderer] radiance has NaN");
+          std::exit(EXIT_FAILURE);
+        }
+
         // take average
         radiance /= samples;
         aov.beauty.setPixel(i, j, radiance);

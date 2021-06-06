@@ -73,6 +73,10 @@ struct Vec3 {
     return "(" + std::to_string(v[0]) + ", " + std::to_string(v[1]) + ", " +
            std::to_string(v[2]) + ")";
   }
+
+  bool isNan() const {
+    return std::isnan(v[0]) || std::isnan(v[1]) || std::isnan(v[2]);
+  }
 };
 
 inline constexpr Vec3 operator+(const Vec3& v1, const Vec3& v2) {
