@@ -163,7 +163,7 @@ class Mesh : public Shape {
     // choose intersector
     if (nFaces() > 4) {
       intersector =
-          std::make_shared<QBVH<MeshTriangle, BVHSplitStrategy::EQUAL>>();
+          std::make_shared<BVH<MeshTriangle, BVHSplitStrategy::SAH>>();
     } else {
       intersector =
           std::make_shared<BVH<MeshTriangle, BVHSplitStrategy::SAH>>();

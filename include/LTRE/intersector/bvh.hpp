@@ -154,6 +154,8 @@ class BVH : public Intersector<T> {
     if (splitIdx == primStart || splitIdx == primEnd) {
       spdlog::warn("[BVH] splitting failed, fallback to equal splitting.");
       splitIdx = primStart + nPrims / 2;
+      std::cout << splitIdx << ", " << primStart << ", " << primEnd
+                << std::endl;
       std::nth_element(primitives.begin() + primStart,
                        primitives.begin() + splitIdx,
                        primitives.begin() + primEnd,
@@ -243,8 +245,8 @@ class BVH : public Intersector<T> {
         const int primEnd = node.primIndicesOffset + node.nPrimitives;
         for (int i = node.primIndicesOffset; i < primEnd; ++i) {
           if (this->primitives[i].intersect(ray, info)) {
-            hit = true;
             ray.tmax = info.t;
+            hit = true;
           }
         }
       }

@@ -30,3 +30,4 @@ endmacro()
 
 package_add_test(vec2 vec2.cpp)
 package_add_test(vec3 vec3.cpp)
+package_add_test(qbvh qbvh.cpp)
