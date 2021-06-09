@@ -2,8 +2,6 @@
 
 header only montecarlo raytracer for my research
 
-![](img/sponza.png)
-
 ## Features
 
 * Unidirectional Path Tracing
@@ -24,6 +22,11 @@ cd build
 cmake ..
 cmake --build .
 ```
+
+## Gallery
+
+![](img/sponza.png)
+![](img/salle_de_bain.png)
 
 ## Externals
 
