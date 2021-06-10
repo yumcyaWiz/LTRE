@@ -17,9 +17,9 @@ inline Vec3 schlickFresnelR(float cos, const Vec3& f0) {
   return f0 + (1.0f - f0) * pow5(std::max(1.0f - cos, 0.0f));
 }
 
-inline float schlickFresnelT(const Vec3& w, const Vec3& h, float f90) {
+inline float schlickFresnelT(float cos, float f90) {
   constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
-  return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - std::abs(dot(w, h)), 0.0f));
+  return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
 }
 
 class DisneyDiffuse : public BxDF {
@@ -40,8 +40,8 @@ class DisneyDiffuse : public BxDF {
     const float cosD = std::abs(dot(wh, wi));
     const float f90 = 0.5f + 2.0f * roughness * cosD * cosD;
 
-    return lambert.f(wo, wi) * schlickFresnelT(wi, wh, f90) *
-           schlickFresnelT(wo, wh, f90);
+    return lambert.f(wo, wi) * schlickFresnelT(absCosTheta(wi), f90) *
+           schlickFresnelT(absCosTheta(wo), f90);
   }
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi, float& pdf) const {
@@ -61,20 +61,25 @@ class DisneySubsurface : public BxDF {
       : lambert{baseColor}, roughness(roughness) {}
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
-    const float cosThetaI = cosTheta(wi);
-    const float cosThetaO = cosTheta(wo);
-    if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
+    const float cosThetaI = absCosTheta(wi);
+    const float cosThetaO = absCosTheta(wo);
+    if (cosThetaI == 0 || cosThetaO == 0) {
+      return Vec3(0);
+    }
 
     // compute half-vector
     Vec3 wh = wo + wi;
-    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
+    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) {
+      return Vec3(0);
+    }
     wh = normalize(wh);
 
     const float cosD = std::abs(dot(wh, wi));
     const float f90 = roughness * cosD * cosD;
 
     return lambert.f(wo, wi) * 1.25f *
-           (schlickFresnelT(wi, wh, f90) * schlickFresnelT(wo, wh, f90) *
+           (schlickFresnelT(absCosTheta(wi), f90) *
+                schlickFresnelT(absCosTheta(wo), f90) *
                 (1.0f / (cosThetaI * cosThetaO) - 0.5f) +
             0.5f);
   }
