@@ -10,7 +10,6 @@
 #include "assimp/scene.h"
 #include "spdlog/spdlog.h"
 //
-#include "LTRE/bsdf/disney.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
@@ -303,15 +302,18 @@ class Model {
   std::shared_ptr<BSDF> createBSDF(unsigned int idx) const {
     const Material& material = materials[idx];
 
-    // diffuse
-    std::shared_ptr<Texture<Vec3>> rho;
+    // baseColor
+    std::shared_ptr<Texture<Vec3>> baseColor;
     if (material.diffuseMap) {
-      rho = textures[material.diffuseMap.value()];
+      baseColor = textures[material.diffuseMap.value()];
     } else {
-      rho = std::make_shared<UniformTexture<Vec3>>(material.kd);
+      baseColor = std::make_shared<UniformTexture<Vec3>>(material.kd);
     }
 
-    return std::make_shared<DisneyDiffuse>(rho, 0.2);
+    // create BxDF
+    const auto bxdf = std::make_shared<OrenNayer>();
+
+    return std::make_shared<BSDF>(bxdf, baseColor, 0.2);
   }
 
   std::shared_ptr<AreaLight> createAreaLight(unsigned int idx) const {

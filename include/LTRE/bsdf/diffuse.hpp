@@ -1,78 +1,59 @@
 #ifndef _LTRE_LAMBERT_H
 #define _LTRE_LAMBERT_H
-#include "LTRE/bsdf/bsdf.hpp"
+#include "LTRE/bsdf/bxdf.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/sampling/sampling.hpp"
 
 namespace LTRE {
 
-class Lambert : public BSDF {
- private:
-  const std::shared_ptr<Texture<Vec3>> rho;
-
+class Lambert : public BxDF {
  public:
-  Lambert(const std::shared_ptr<Texture<Vec3>>& rho) : rho(rho) {}
+  Lambert() {}
 
-  Vec3 baseColor(const IntersectInfo& info) const override {
-    return rho->sample(info);
-  }
+  Vec3 f(const BxDFArgs& args) const override { return args.baseColor / PI; }
 
-  Vec3 bsdf([[maybe_unused]] const Vec3& wo, const IntersectInfo& info,
-            [[maybe_unused]] const Vec3& wi) const override {
-    return rho->sample(info) / PI;
-  }
-  Vec3 sample([[maybe_unused]] const Vec3& wo, const IntersectInfo& info,
-              Sampler& sampler, Vec3& wi, float& pdf) const {
-    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
-    return bsdf(wo, info, wi);
+  Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const override {
+    args.wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    return f(args);
   }
 };
 
-class OrenNayer : public BSDF {
- private:
-  const std::shared_ptr<Texture<Vec3>> rho;
-  float A;
-  float B;
-
+class OrenNayer : public BxDF {
  public:
-  OrenNayer(const std::shared_ptr<Texture<Vec3>>& rho, float sigma) : rho(rho) {
+  OrenNayer() {}
+
+  Vec3 f(const BxDFArgs& args) const override {
+    // compute params
+    const float sigma = args.roughness * PI_DIV_4;
     const float sigma2 = sigma * sigma;
-    A = 1.0f - sigma2 / (2.0f * (sigma2 + 0.33f));
-    B = 0.45 * sigma2 / (sigma2 + 0.99f);
-  }
+    const float A = 1.0f - sigma2 / (2.0f * (sigma2 + 0.33f));
+    const float B = 0.45 * sigma2 / (sigma2 + 0.99f);
 
-  Vec3 baseColor(const IntersectInfo& info) const override {
-    return rho->sample(info);
-  }
-
-  Vec3 bsdf(const Vec3& wo, const IntersectInfo& info,
-            const Vec3& wi) const override {
     // compute max(0, cos(phi_i - phi_o))
-    const float sinPhiI = BSDF::sinPhi(wi);
-    const float cosPhiI = BSDF::cosPhi(wi);
-    const float sinPhiO = BSDF::sinPhi(wo);
-    const float cosPhiO = BSDF::cosPhi(wo);
+    const float sinPhiI = sinPhi(args.wi);
+    const float cosPhiI = cosPhi(args.wi);
+    const float sinPhiO = sinPhi(args.wo);
+    const float cosPhiO = cosPhi(args.wo);
     const float maxCos = std::max(0.0f, cosPhiI * cosPhiO + sinPhiI * sinPhiO);
 
     // compute sin(alpha), tan(beta)
-    const float sinThetaI = BSDF::sinTheta(wi);
-    const float sinThetaO = BSDF::sinTheta(wo);
+    const float sinThetaI = sinTheta(args.wi);
+    const float sinThetaO = sinTheta(args.wo);
     float sinAlpha, tanBeta;
-    if (absCosTheta(wi) > absCosTheta(wo)) {
+    if (absCosTheta(args.wi) > absCosTheta(args.wo)) {
       sinAlpha = sinThetaO;
-      tanBeta = sinThetaI / absCosTheta(wi);
+      tanBeta = sinThetaI / absCosTheta(args.wi);
     } else {
       sinAlpha = sinThetaI;
-      tanBeta = sinThetaO / absCosTheta(wo);
+      tanBeta = sinThetaO / absCosTheta(args.wo);
     }
 
-    return rho->sample(info) * PI_INV * (A + B * maxCos * sinAlpha * tanBeta);
+    return args.baseColor * PI_INV * (A + B * maxCos * sinAlpha * tanBeta);
   }
 
-  Vec3 sample(const Vec3& wo, const IntersectInfo& info, Sampler& sampler,
-              Vec3& wi, float& pdf) const {
-    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
-    return bsdf(wo, info, wi);
+  Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const override {
+    args.wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    return f(args);
   }
 };
 
