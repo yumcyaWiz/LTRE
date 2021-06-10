@@ -1,6 +1,6 @@
 #ifndef _LTRE_LAMBERT_H
 #define _LTRE_LAMBERT_H
-#include "LTRE/bsdf/bxdf.hpp"
+#include "LTRE/bsdf/bxdf/bxdf.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/sampling/sampling.hpp"
 

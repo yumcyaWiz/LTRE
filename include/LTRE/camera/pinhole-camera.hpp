@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "LTRE/camera/camera.hpp"
+#include "LTRE/core/constant.hpp"
 
 namespace LTRE {
 

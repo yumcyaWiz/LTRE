@@ -3,8 +3,9 @@
 #include <cmath>
 #include <memory>
 
-#include "LTRE/bsdf/bxdf.hpp"
+#include "LTRE/bsdf/bxdf/bxdf.hpp"
 #include "LTRE/core/intersect-info.hpp"
+#include "LTRE/core/texture.hpp"
 
 namespace LTRE {
 

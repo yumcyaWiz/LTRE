@@ -2,6 +2,7 @@
 #define _LTRE_AABB_H
 #include <limits>
 
+#include "LTRE/core/ray.hpp"
 #include "LTRE/math/vec3.hpp"
 
 namespace LTRE {

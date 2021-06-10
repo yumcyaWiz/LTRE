@@ -1,18 +1,7 @@
+#include "LTRE/intersector/qbvh.hpp"
+
 #include <iostream>
 
-#include "LTRE/bsdf/diffuse.hpp"
-#include "LTRE/camera/pinhole-camera.hpp"
-#include "LTRE/camera/thin-lens.hpp"
-#include "LTRE/core/model.hpp"
-#include "LTRE/core/renderer.hpp"
-#include "LTRE/core/scene.hpp"
-#include "LTRE/integrator/pt.hpp"
-#include "LTRE/intersector/bvh.hpp"
-#include "LTRE/light/area-light.hpp"
-#include "LTRE/sampling/uniform.hpp"
-#include "LTRE/shape/mesh.hpp"
-#include "LTRE/shape/sphere.hpp"
-#include "LTRE/sky/uniform-sky.hpp"
 #include "gtest/gtest.h"
 
 using namespace LTRE;

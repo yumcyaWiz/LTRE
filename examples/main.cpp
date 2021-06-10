@@ -1,4 +1,3 @@
-#include "LTRE/bsdf/diffuse.hpp"
 #include "LTRE/camera/pinhole-camera.hpp"
 #include "LTRE/camera/thin-lens.hpp"
 #include "LTRE/core/model.hpp"
