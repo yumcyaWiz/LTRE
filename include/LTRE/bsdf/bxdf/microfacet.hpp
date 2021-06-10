@@ -3,6 +3,7 @@
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
 #include "LTRE/core/constant.hpp"
 #include "LTRE/math/vec3.hpp"
+#include "LTRE/sampling/sampling.hpp"
 
 namespace LTRE {
 
@@ -78,6 +79,39 @@ class GGX : public MicrofacetDistribution {
                                   BxDF::sin2Phi(w) * alphaY * alphaY);
     const float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
     return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
+  }
+};
+
+class TorranceSparrowBRDF : public BxDF {
+ private:
+  const Vec3 rho;
+  const Fresnel* fresnel;
+  const MicrofacetDistribution* distribution;
+
+ public:
+  TorranceSparrowBRDF(const Vec3& rho, const Fresnel* fresnel,
+                      const MicrofacetDistribution* distribution)
+      : rho(rho), fresnel(fresnel), distribution(distribution) {}
+
+  Vec3 f(const BxDFArgs& args) const override {
+    const float cosThetaO = absCosTheta(args.wo);
+    const float cosThetaI = absCosTheta(args.wi);
+    if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
+
+    // compute half-vector
+    Vec3 wh = args.wo + args.wi;
+    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
+    wh = normalize(wh);
+
+    const float F = fresnel->evaluate(dot(args.wi, wh));
+    const float D = distribution->D(wh);
+    const float G = distribution->G(args.wo, args.wi);
+    return rho * F * D * G / (4.0f * cosThetaO * cosThetaI);
+  }
+
+  Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const override {
+    args.wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    return f(args);
   }
 };
 

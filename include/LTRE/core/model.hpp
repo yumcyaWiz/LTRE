@@ -11,7 +11,6 @@
 #include "spdlog/spdlog.h"
 //
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
-#include "LTRE/bsdf/bxdf/disney.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
@@ -313,7 +312,7 @@ class Model {
     }
 
     // create BxDF
-    const auto bxdf = std::make_shared<DisneySheen>();
+    const auto bxdf = std::make_shared<Lambert>();
 
     return std::make_shared<BSDF>(bxdf, baseColor, 0.2, 1.0f, 0.5f);
   }
