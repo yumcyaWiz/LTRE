@@ -10,6 +10,7 @@
 #include "assimp/scene.h"
 #include "spdlog/spdlog.h"
 //
+#include "LTRE/bsdf/disney.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
