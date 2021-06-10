@@ -8,10 +8,10 @@ namespace LTRE {
 
 class Lambert : public BxDF {
  private:
-  Vec3 rho;
+  const Vec3 rho;
 
  public:
-  Lambert() {}
+  Lambert(const Vec3& rho) : rho(rho) {}
 
   Vec3 f([[maybe_unused]] const Vec3& wo,
          [[maybe_unused]] const Vec3& wi) const override {
@@ -27,8 +27,8 @@ class Lambert : public BxDF {
 
 class OrenNayer : public BxDF {
  private:
-  Vec3 rho;
-  float sigma;
+  const Vec3 rho;
+  const float sigma;
   float A;
   float B;
 
