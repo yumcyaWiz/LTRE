@@ -1,10 +1,36 @@
 #ifndef _LTRE_BXDF_H
 #define _LTRE_BXDF_H
+#include <algorithm>
+
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
 #include "LTRE/sampling/sampler.hpp"
 
 namespace LTRE {
+
+class Fresnel {
+ private:
+  const float ior1;
+  const float ior2;
+
+ public:
+  Fresnel(float ior1, float ior2) : ior1(ior1), ior2(ior2) {}
+
+  float evaluate(float cos) const {
+    const auto pow5 = [](float x) { return x * x * x * x * x; };
+
+    bool isEntering = cos < 0.0f;
+    float n1 = ior1;
+    float n2 = ior2;
+    if (!isEntering) {
+      std::swap(n1, n2);
+    }
+    cos = std::abs(cos);
+
+    const float f0 = (n1 - n2) / (n1 + n2) * (n1 - n2) / (n1 + n2);
+    return f0 + (1.0f - f0) * pow5(1.0f - cos);
+  }
+};
 
 struct BxDFArgs {
   Vec3 wo;
@@ -41,6 +67,13 @@ class BxDF {
   }
   static float cos2Phi(const Vec3& w) { return cosPhi(w) * cosPhi(w); }
   static float sin2Phi(const Vec3& w) { return sinPhi(w) * sinPhi(w); }
+
+  static float schlickFresnelR(float cos, float f0) {
+    return f0 + (1.0f - f0) * std::pow(1.0f - cos, 5.0f);
+  }
+  static float schlickFresnelT(float cos, float f90) {
+    return 1.0f + (f90 - 1.0f) * std::pow(1.0f - cos, 5.0f);
+  }
 
   virtual Vec3 f(const BxDFArgs& args) const = 0;
   virtual Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const = 0;
