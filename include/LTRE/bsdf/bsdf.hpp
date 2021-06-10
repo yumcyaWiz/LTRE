@@ -35,6 +35,13 @@ class BSDF {
   static float cos2Phi(const Vec3& w) { return cosPhi(w) * cosPhi(w); }
   static float sin2Phi(const Vec3& w) { return sinPhi(w) * sinPhi(w); }
 
+  static float schlickFresnelR(const Vec3& w, float f0) {
+    return f0 + (1.0f - f0) * std::pow(1.0f - cosTheta(w), 5.0f);
+  }
+  static float schlickFresnelT(const Vec3& w, float f90) {
+    return 1.0f + (f90 - 1.0f) * std::pow(1.0f - cosTheta(w), 5.0f);
+  }
+
   virtual Vec3 baseColor(const IntersectInfo& info) const = 0;
   virtual Vec3 bsdf(const Vec3& wo, const IntersectInfo& info,
                     const Vec3& wi) const = 0;

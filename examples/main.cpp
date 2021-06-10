@@ -4,6 +4,7 @@
 #include "LTRE/core/model.hpp"
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
+#include "LTRE/integrator/ao.hpp"
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/light/area-light.hpp"
@@ -45,24 +46,25 @@ int main() {
   // scene.build();
 
   // const auto model = Model("../assets/bunny/bunny.obj");
-  const auto model = Model("../assets/sponza/sponza.obj");
+  // const auto model = Model("../assets/sponza/sponza.obj");
   // const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
-  // const auto model = Model("../assets/salle_de_bain/salle_de_bain.obj");
+  const auto model = Model("../assets/salle_de_bain/salle_de_bain.obj");
   // const auto model = Model("../assets/test.obj");
   scene.addModel(model);
   scene.build();
 
   // const auto camera = std::make_shared<PinholeCamera>(
   //     Vec3(0, 1, 3), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 2.0f);
-  const auto camera = std::make_shared<ThinLensCamera>(
-      Vec3(-1000, 350, 0), Vec3(1, 0, 0), Vec2(0.025, 0.025), PI / 4.0f, 0.4f);
   // const auto camera = std::make_shared<ThinLensCamera>(
-  //     Vec3(0, 16, 60), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f, 1.4f);
+  //     Vec3(-1000, 350, 0), Vec3(1, 0, 0), Vec2(0.025, 0.025), PI / 4.0f,
+  //     0.4f);
+  const auto camera = std::make_shared<ThinLensCamera>(
+      Vec3(0, 16, 60), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f, 1.4f);
   const auto integrator = std::make_shared<PT>();
   const auto sampler = std::make_shared<UniformSampler>();
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(scene);
-  renderer.render(scene, 1);
-  renderer.writePPM("output.ppm", AOVType::NORMAL);
+  renderer.render(scene, 1000);
+  renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }

@@ -76,6 +76,35 @@ class OrenNayer : public BSDF {
   }
 };
 
+class DisneyDiffuse : public BSDF {
+ private:
+  Lambert lambert;
+  float roughness;
+
+ public:
+  DisneyDiffuse(const std::shared_ptr<Texture<Vec3>>& rho, float roughness)
+      : lambert{rho}, roughness{roughness} {}
+
+  Vec3 baseColor(const IntersectInfo& info) const override {
+    return lambert.baseColor(info);
+  }
+
+  Vec3 bsdf(const Vec3& wo, const IntersectInfo& info,
+            const Vec3& wi) const override {
+    const Vec3 h = normalize(wo + wi);
+    const float cosD = dot(h, wi);
+    const float f90 = 0.5f + 2.0f * roughness * cosD * cosD;
+    return lambert.bsdf(wo, info, wi) * schlickFresnelT(wi, f90) *
+           schlickFresnelT(wo, f90);
+  }
+
+  Vec3 sample(const Vec3& wo, const IntersectInfo& info, Sampler& sampler,
+              Vec3& wi, float& pdf) const {
+    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    return bsdf(wo, info, wi);
+  }
+};
+
 }  // namespace LTRE
 
 #endif

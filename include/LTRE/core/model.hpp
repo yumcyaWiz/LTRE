@@ -310,7 +310,7 @@ class Model {
       rho = std::make_shared<UniformTexture<Vec3>>(material.kd);
     }
 
-    return std::make_shared<OrenNayer>(rho, 0.34);
+    return std::make_shared<DisneyDiffuse>(rho, 0.2);
   }
 
   std::shared_ptr<AreaLight> createAreaLight(unsigned int idx) const {
