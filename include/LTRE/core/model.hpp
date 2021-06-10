@@ -11,6 +11,7 @@
 #include "spdlog/spdlog.h"
 //
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
+#include "LTRE/bsdf/bxdf/disney.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
