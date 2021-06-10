@@ -49,6 +49,8 @@ class BSDF {
     args.wi = wi;
     args.baseColor = baseColor(info);
     args.roughness = roughness(info);
+    args.sheen = sheen(info);
+    args.sheenTint = sheenTint(info);
 
     return bxdf->f(args);
   }
@@ -59,6 +61,8 @@ class BSDF {
     args.wo = wo;
     args.baseColor = baseColor(info);
     args.roughness = roughness(info);
+    args.sheen = sheen(info);
+    args.sheenTint = sheenTint(info);
 
     const Vec3 bsdf = bxdf->sample(sampler, args, pdf);
     wi = args.wi;

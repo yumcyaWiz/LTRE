@@ -313,9 +313,9 @@ class Model {
     }
 
     // create BxDF
-    const auto bxdf = std::make_shared<OrenNayer>();
+    const auto bxdf = std::make_shared<DisneySheen>();
 
-    return std::make_shared<BSDF>(bxdf, baseColor, 0.2);
+    return std::make_shared<BSDF>(bxdf, baseColor, 0.2, 1.0f, 0.5f);
   }
 
   std::shared_ptr<AreaLight> createAreaLight(unsigned int idx) const {
