@@ -31,6 +31,7 @@ class Beckmann : public MicrofacetDistribution {
     const float tan2Theta = BxDF::tan2Theta(wh);
     if (std::isinf(tan2Theta)) return 0;
     const float cos4Theta = BxDF::cos2Theta(wh) * BxDF::cos2Theta(wh);
+
     return std::exp(-tan2Theta * (BxDF::cos2Phi(wh) / (alphaX * alphaX) +
                                   BxDF::sin2Phi(wh) / (alphaY * alphaY))) /
            (PI * alphaX * alphaY * cos4Theta);
@@ -47,6 +48,36 @@ class Beckmann : public MicrofacetDistribution {
       return 0;
     }
     return (1.0f - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
+  }
+};
+
+class GGX : public MicrofacetDistribution {
+ private:
+  float alphaX;
+  float alphaY;
+
+ public:
+  GGX(float alphaX, float alphaY) : alphaX(alphaX), alphaY(alphaY) {}
+
+  float D(const Vec3& wh) const override {
+    const float tan2Theta = BxDF::tan2Theta(wh);
+    if (std::isinf(tan2Theta)) return 0;
+    const float cos4Theta = BxDF::cos2Theta(wh) * BxDF::cos2Theta(wh);
+
+    const float term =
+        1.0f + tan2Theta * (BxDF::cos2Phi(wh) / (alphaX * alphaX) +
+                            BxDF::sin2Phi(wh) / (alphaY * alphaY));
+    return 1.0f / ((PI * alphaX * alphaY * cos4Theta) * term * term);
+  }
+
+  float Lambda(const Vec3& w) const override {
+    const float absTanTheta = BxDF::absTanTheta(w);
+    if (std::isinf(absTanTheta)) return 0;
+
+    const float alpha = std::sqrt(BxDF::cos2Phi(w) * alphaX * alphaX +
+                                  BxDF::sin2Phi(w) * alphaY * alphaY);
+    const float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
+    return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
   }
 };
 
