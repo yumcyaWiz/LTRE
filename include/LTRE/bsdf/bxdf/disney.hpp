@@ -6,6 +6,15 @@
 
 namespace LTRE {
 
+inline float schlickFresnelR(const Vec3& w, float f0) {
+  return f0 +
+         (1.0f - f0) * std::pow(1.0f - std::max(BxDF::cosTheta(w), 0.0f), 5.0f);
+}
+
+inline float schlickFresnelT(const Vec3& w, const Vec3& h, float f90) {
+  return 1.0f + (f90 - 1.0f) * std::pow(1.0f - std::max(dot(w, h), 0.0f), 5.0f);
+}
+
 class DisneyDiffuse : public BxDF {
  private:
   Lambert lambert;
@@ -15,12 +24,12 @@ class DisneyDiffuse : public BxDF {
 
   Vec3 f(const BxDFArgs& args) const override {
     const Vec3 h = normalize(args.wo + args.wi);
+
     const float cosD = dot(h, args.wi);
     const float f90 = 0.5f + 2.0f * args.roughness * cosD * cosD;
-    const float cosHI = std::max(dot(args.wi, h), 0.0f);
-    const float cosHO = std::max(dot(args.wo, h), 0.0f);
-    return lambert.f(args) * schlickFresnelT(cosHI, f90) *
-           schlickFresnelT(cosHO, f90);
+
+    return lambert.f(args) * schlickFresnelT(args.wi, h, f90) *
+           schlickFresnelT(args.wo, h, f90);
   }
 
   Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const {
@@ -38,10 +47,9 @@ class DisneySubsurface : public BxDF {
 
   Vec3 f(const BxDFArgs& args) const override {
     const Vec3 h = normalize(args.wo + args.wi);
+
     const float cosD = dot(h, args.wi);
     const float f90 = args.roughness * cosD * cosD;
-    const float cosI = dot(args.wi, h);
-    const float cosO = dot(args.wo, h);
     const float cosThetaI = cosTheta(args.wi);
     const float cosThetaO = cosTheta(args.wo);
 
@@ -51,7 +59,8 @@ class DisneySubsurface : public BxDF {
     }
 
     return lambert.f(args) * 1.25f *
-           (schlickFresnelT(cosI, f90) * schlickFresnelT(cosO, f90) *
+           (schlickFresnelT(args.wi, h, f90) *
+                schlickFresnelT(args.wo, h, f90) *
                 (1.0f / (cosThetaI * cosThetaO) - 0.5f) +
             0.5f);
   }
@@ -68,8 +77,14 @@ class DisneySheen : public BxDF {
 
   Vec3 f(const BxDFArgs& args) const override {
     const Vec3 h = normalize(args.wi + args.wo);
-    const Vec3 rho_tint = args.baseColor / RGBToXYZ(args.baseColor);
+
+    const float luminance = RGBToXYZ(args.baseColor)[1];
+    Vec3 rho_tint;
+    if (luminance > 0) {
+      rho_tint = args.baseColor / luminance;
+    }
     const Vec3 rho_sheen = lerp(Vec3(1), rho_tint, args.sheenTint);
+
     return args.sheen * rho_sheen *
            std::pow(std::max(1.0f - dot(args.wi, h), 0.0f), 5.0f);
   }
