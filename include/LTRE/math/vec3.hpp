@@ -222,6 +222,10 @@ inline constexpr Vec3 pow(const Vec3& v, float k) {
   return Vec3(std::pow(v[0], k), std::pow(v[1], k), std::pow(v[2], k));
 }
 
+inline constexpr Vec3 lerp(const Vec3& v1, const Vec3& v2, float k) {
+  return (1.0f - k) * v1 + k * (v2 - v1);
+}
+
 }  // namespace LTRE
 
 #endif
