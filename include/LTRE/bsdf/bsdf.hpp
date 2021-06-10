@@ -14,11 +14,18 @@ class BSDF {
   std::shared_ptr<BxDF> bxdf;
   std::shared_ptr<Texture<Vec3>> _baseColor;
   float _roughness;
+  float _sheen;
+  float _sheenTint;
 
  public:
   BSDF(const std::shared_ptr<BxDF>& bxdf,
-       const std::shared_ptr<Texture<Vec3>> baseColor, float roughness)
-      : bxdf(bxdf), _baseColor(baseColor), _roughness(roughness) {}
+       const std::shared_ptr<Texture<Vec3>> baseColor, float roughness,
+       float sheen, float sheenTint)
+      : bxdf(bxdf),
+        _baseColor(baseColor),
+        _roughness(roughness),
+        _sheen(sheen),
+        _sheenTint(sheenTint) {}
 
   Vec3 baseColor(const IntersectInfo& info) const {
     return _baseColor->sample(info);
@@ -26,6 +33,14 @@ class BSDF {
 
   float roughness([[maybe_unused]] const IntersectInfo& info) const {
     return _roughness;
+  }
+
+  float sheen([[maybe_unused]] const IntersectInfo& info) const {
+    return _sheen;
+  }
+
+  float sheenTint([[maybe_unused]] const IntersectInfo& info) const {
+    return _sheenTint;
   }
 
   Vec3 bsdf(const Vec3& wo, const IntersectInfo& info, const Vec3& wi) const {
