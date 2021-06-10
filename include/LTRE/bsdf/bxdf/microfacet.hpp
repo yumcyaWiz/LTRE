@@ -58,6 +58,7 @@ class GGX : public MicrofacetDistribution {
   float alphaY;
 
  public:
+  GGX() {}
   GGX(float alphaX, float alphaY) : alphaX(alphaX), alphaY(alphaY) {}
 
   float D(const Vec3& wh) const override {
