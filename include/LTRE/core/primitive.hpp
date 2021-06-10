@@ -2,7 +2,7 @@
 #define _LTRE_PRIMITIVE_H
 #include <memory>
 
-#include "LTRE/bsdf/bsdf.hpp"
+#include "LTRE/core/material.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/shape/shape.hpp"
 
@@ -11,14 +11,14 @@ namespace LTRE {
 class Primitive {
  private:
   std::shared_ptr<Shape> shape;
-  std::shared_ptr<BSDF> bsdf;
+  std::shared_ptr<Material> material;
   std::shared_ptr<AreaLight> areaLight;
 
  public:
   Primitive(const std::shared_ptr<Shape>& shape,
-            const std::shared_ptr<BSDF>& bsdf,
+            const std::shared_ptr<Material>& material,
             const std::shared_ptr<AreaLight>& areaLight = nullptr)
-      : shape(shape), bsdf(bsdf), areaLight(areaLight) {}
+      : shape(shape), material(material), areaLight(areaLight) {}
 
   AABB aabb() const { return shape->aabb(); }
 
@@ -42,7 +42,7 @@ class Primitive {
 
     // sample direction in tangent space
     Vec3 wi_l;
-    const Vec3 bsdf = this->bsdf->sample(wo_l, info, sampler, wi_l, pdf);
+    const Vec3 bsdf = this->material->sample(sampler, wo_l, info, wi_l, pdf);
 
     // local to world transform
     wi = localToWorld(wi_l, t, info.hitNormal, b);
@@ -55,7 +55,7 @@ class Primitive {
   Vec3 Le(const IntersectInfo& info) const { return areaLight->radiance(info); }
 
   Vec3 baseColor(const IntersectInfo& info) const {
-    return bsdf->baseColor(info);
+    return material->baseColor(info);
   }
 };
 

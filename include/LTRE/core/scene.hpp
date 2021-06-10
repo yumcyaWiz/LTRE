@@ -14,6 +14,7 @@ class Scene {
   const std::shared_ptr<Sky> sky;
 
  public:
+  Scene() {}
   Scene(const std::shared_ptr<Intersector<Primitive>>& intersector,
         const std::shared_ptr<Sky>& sky)
       : intersector(intersector), sky(sky) {}
@@ -27,9 +28,9 @@ class Scene {
     for (unsigned int i = 0; i < model.meshes.size(); ++i) {
       // create Primitive
       const std::shared_ptr<Mesh> shape = model.meshes[i];
-      const auto bsdf = model.createBSDF(i);
+      const auto material = model.createMaterial(i);
       const auto areaLight = model.createAreaLight(i);
-      const Primitive prim = Primitive(shape, bsdf, areaLight);
+      const Primitive prim = Primitive(shape, material, areaLight);
 
       // add Primitive to intersector
       intersector->addPrimitive(prim);

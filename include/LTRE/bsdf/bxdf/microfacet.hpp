@@ -93,25 +93,26 @@ class TorranceSparrowBRDF : public BxDF {
                       const MicrofacetDistribution* distribution)
       : rho(rho), fresnel(fresnel), distribution(distribution) {}
 
-  Vec3 f(const BxDFArgs& args) const override {
-    const float cosThetaO = absCosTheta(args.wo);
-    const float cosThetaI = absCosTheta(args.wi);
+  Vec3 f(const Vec3& wo, const Vec3& wi) const override {
+    const float cosThetaO = absCosTheta(wo);
+    const float cosThetaI = absCosTheta(wi);
     if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
 
     // compute half-vector
-    Vec3 wh = args.wo + args.wi;
+    Vec3 wh = wo + wi;
     if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
     wh = normalize(wh);
 
-    const float F = fresnel->evaluate(dot(args.wi, wh));
+    const float F = fresnel->evaluate(dot(wi, wh));
     const float D = distribution->D(wh);
-    const float G = distribution->G(args.wo, args.wi);
+    const float G = distribution->G(wo, wi);
     return rho * F * D * G / (4.0f * cosThetaO * cosThetaI);
   }
 
-  Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const override {
-    args.wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
-    return f(args);
+  Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
+              float& pdf) const override {
+    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    return f(wo, wi);
   }
 };
 

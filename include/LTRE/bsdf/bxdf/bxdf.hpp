@@ -32,15 +32,6 @@ class Fresnel {
   }
 };
 
-struct BxDFArgs {
-  Vec3 wo;
-  Vec3 wi;
-  Vec3 baseColor;
-  float roughness;
-  float sheen;
-  float sheenTint;
-};
-
 class BxDF {
  public:
   static float cosTheta(const Vec3& w) { return w[1]; }
@@ -68,15 +59,9 @@ class BxDF {
   static float cos2Phi(const Vec3& w) { return cosPhi(w) * cosPhi(w); }
   static float sin2Phi(const Vec3& w) { return sinPhi(w) * sinPhi(w); }
 
-  static float schlickFresnelR(float cos, float f0) {
-    return f0 + (1.0f - f0) * std::pow(1.0f - cos, 5.0f);
-  }
-  static float schlickFresnelT(float cos, float f90) {
-    return 1.0f + (f90 - 1.0f) * std::pow(1.0f - cos, 5.0f);
-  }
-
-  virtual Vec3 f(const BxDFArgs& args) const = 0;
-  virtual Vec3 sample(Sampler& sampler, BxDFArgs& args, float& pdf) const = 0;
+  virtual Vec3 f(const Vec3& wo, const Vec3& wi) const = 0;
+  virtual Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
+                      float& pdf) const = 0;
 };
 
 }  // namespace LTRE

@@ -1,7 +1,7 @@
 #ifndef _LTRE_BSDF_H
 #define _LTRE_BSDF_H
-#include <cmath>
 #include <memory>
+#include <vector>
 
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
 #include "LTRE/core/intersect-info.hpp"
@@ -9,64 +9,38 @@
 
 namespace LTRE {
 
+// TODO: handle BTDF case
 class BSDF {
  private:
-  std::shared_ptr<BxDF> bxdf;
-  std::shared_ptr<Texture<Vec3>> _baseColor;
-  float _roughness;
-  float _sheen;
-  float _sheenTint;
+  int nBxDF;
+  std::shared_ptr<BxDF> bxdfs[8];
 
  public:
-  BSDF(const std::shared_ptr<BxDF>& bxdf,
-       const std::shared_ptr<Texture<Vec3>> baseColor, float roughness,
-       float sheen, float sheenTint)
-      : bxdf(bxdf),
-        _baseColor(baseColor),
-        _roughness(roughness),
-        _sheen(sheen),
-        _sheenTint(sheenTint) {}
+  BSDF() : nBxDF{0} {}
 
-  Vec3 baseColor(const IntersectInfo& info) const {
-    return _baseColor->sample(info);
+  void reset() { nBxDF = 0; }
+
+  void add(const std::shared_ptr<BxDF>& bxdf) { bxdfs[nBxDF++] = bxdf; }
+
+  Vec3 f(const Vec3& wo, const Vec3& wi) const {
+    Vec3 ret;
+    for (int i = 0; i < nBxDF; ++i) {
+      ret += bxdfs[i]->f(wo, wi);
+    }
+    return ret;
   }
 
-  float roughness([[maybe_unused]] const IntersectInfo& info) const {
-    return _roughness;
-  }
+  // TODO: use more nice sampling strategy
+  Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi, float& pdf) const {
+    // choose 1 BxDF randomly
+    int idx = sampler.getNext1D() * nBxDF;
+    if (idx == nBxDF) idx--;
 
-  float sheen([[maybe_unused]] const IntersectInfo& info) const {
-    return _sheen;
-  }
+    // sample from that BxDF
+    const Vec3 ret = bxdfs[idx]->sample(sampler, wo, wi, pdf);
+    pdf /= nBxDF;
 
-  float sheenTint([[maybe_unused]] const IntersectInfo& info) const {
-    return _sheenTint;
-  }
-
-  Vec3 bsdf(const Vec3& wo, const IntersectInfo& info, const Vec3& wi) const {
-    BxDFArgs args;
-    args.wo = wo;
-    args.wi = wi;
-    args.baseColor = baseColor(info);
-    args.roughness = roughness(info);
-    args.sheen = sheen(info);
-    args.sheenTint = sheenTint(info);
-
-    return bxdf->f(args);
-  }
-
-  Vec3 sample(const Vec3& wo, const IntersectInfo& info, Sampler& sampler,
-              Vec3& wi, float& pdf) const {
-    BxDFArgs args;
-    args.wo = wo;
-    args.baseColor = baseColor(info);
-    args.roughness = roughness(info);
-    args.sheen = sheen(info);
-    args.sheenTint = sheenTint(info);
-
-    const Vec3 bsdf = bxdf->sample(sampler, args, pdf);
-    wi = args.wi;
-    return bsdf;
+    return ret;
   }
 };
 

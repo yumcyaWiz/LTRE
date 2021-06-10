@@ -10,7 +10,7 @@
 #include "assimp/scene.h"
 #include "spdlog/spdlog.h"
 //
-#include "LTRE/bsdf/bxdf/diffuse.hpp"
+#include "LTRE/core/material.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/light/area-light.hpp"
 #include "LTRE/math/vec2.hpp"
@@ -76,7 +76,7 @@ class Model {
     std::vector<Vec3> tangents;
     std::vector<Vec3> dndus;
     std::vector<Vec3> dndvs;
-    Material material;
+    MaterialM material;
 
     spdlog::info("[Mesh] Processing " + std::string(mesh->mName.C_Str()));
 
@@ -269,7 +269,7 @@ class Model {
   }
 
  public:
-  struct Material {
+  struct MaterialM {
     Vec3 kd;  // diffuse color
     Vec3 ks;  // specular color
     Vec3 ka;  // ambient color
@@ -290,18 +290,18 @@ class Model {
         displacementMap;                   // index of displacement map texture
     std::optional<unsigned int> lightMap;  // index of light map textur
 
-    Material() : shininess(0), reflectivity(0), ior(0) {}
+    MaterialM() : shininess(0), reflectivity(0), ior(0) {}
   };
 
   std::vector<std::shared_ptr<Mesh>> meshes;
-  std::vector<Material> materials;
+  std::vector<MaterialM> materials;
   std::vector<std::shared_ptr<ImageTexture>> textures;
 
   Model() {}
   Model(const std::filesystem::path& filepath) { loadModel(filepath); }
 
-  std::shared_ptr<BSDF> createBSDF(unsigned int idx) const {
-    const Material& material = materials[idx];
+  std::shared_ptr<Material> createMaterial(unsigned int idx) const {
+    const MaterialM& material = materials[idx];
 
     // baseColor
     std::shared_ptr<Texture<Vec3>> baseColor;
@@ -311,14 +311,14 @@ class Model {
       baseColor = std::make_shared<UniformTexture<Vec3>>(material.kd);
     }
 
-    // create BxDF
-    const auto bxdf = std::make_shared<Lambert>();
+    // create Material
+    const auto mat = std::make_shared<Diffuse>(baseColor, 0.2);
 
-    return std::make_shared<BSDF>(bxdf, baseColor, 0.2, 1.0f, 0.5f);
+    return mat;
   }
 
   std::shared_ptr<AreaLight> createAreaLight(unsigned int idx) const {
-    const Material& material = materials[idx];
+    const MaterialM& material = materials[idx];
 
     bool hasLight = false;
     std::shared_ptr<Texture<Vec3>> le;
