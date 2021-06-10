@@ -4,6 +4,7 @@
 
 #include "LTRE/bsdf/bsdf.hpp"
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
+#include "LTRE/bsdf/bxdf/disney.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/math/vec3.hpp"
 #include "LTRE/sampling/sampler.hpp"
@@ -44,6 +45,35 @@ class Diffuse : public Material {
     BSDF bsdf;
     const Vec3 rho = _baseColor->sample(info);
     bsdf.add(std::make_shared<OrenNayer>(rho, roughness));
+    return bsdf;
+  }
+
+  Vec3 baseColor(const IntersectInfo& info) const override {
+    return _baseColor->sample(info);
+  }
+};
+
+class DisneyPrincipledBRDF : public Material {
+ private:
+  const std::shared_ptr<Texture<Vec3>> _baseColor;
+  const float roughness;
+  /*
+  const float subsurface;
+  const float metallic;
+  const float sheen;
+  const float sheenTint;
+  const float clearcoat;
+  */
+
+ public:
+  DisneyPrincipledBRDF(const std::shared_ptr<Texture<Vec3>>& baseColor,
+                       float roughness)
+      : _baseColor(baseColor), roughness(roughness) {}
+
+  BSDF prepareBSDF(const IntersectInfo& info) const override {
+    BSDF bsdf;
+    const Vec3 rho = _baseColor->sample(info);
+    bsdf.add(std::make_shared<DisneyDiffuse>(rho, roughness));
     return bsdf;
   }
 
