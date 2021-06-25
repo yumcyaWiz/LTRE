@@ -36,6 +36,12 @@ class Sphere : public Shape {
     constexpr float EPS = 1e-8f;
     return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
   }
+
+  Vec3 samplePoint(Sampler& sampler, float& pdf) const override {
+    const Vec3 p = sampleSphere(sampler.getNext2D(), pdf);
+    pdf /= (radius * radius);
+    return center + p;
+  }
 };
 
 }  // namespace LTRE
