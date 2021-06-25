@@ -221,7 +221,7 @@ class Mesh : public Shape {
 
     // compute surface area
     surfaceArea = 0;
-    for (unsigned int f = 0; f < indices.size(); f += 3) {
+    for (unsigned int f = 0; f < nFaces(); f += 3) {
       const int idx1 = indices[3 * f];
       const int idx2 = indices[3 * f + 1];
       const int idx3 = indices[3 * f + 2];
