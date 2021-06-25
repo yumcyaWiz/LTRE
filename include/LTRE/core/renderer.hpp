@@ -192,6 +192,7 @@ class Renderer {
         break;
       }
       case AOVType::BASECOLOR: {
+        gammaCorrection(aov.baseColor);
         aov.baseColor.writePPM(filename);
         break;
       }
