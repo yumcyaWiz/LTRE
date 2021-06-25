@@ -26,7 +26,7 @@ inline Vec3 sampleCosineHemisphere(const Vec2& uv, float& pdf) {
 inline Vec3 sampleSphere(const Vec2& uv, float& pdf) {
   const float theta = std::acos(std::clamp(1.0f - 2.0f * uv[0], -1.0f, 1.0f));
   const float phi = PI_MUL_2 * uv[1];
-  pdf = PI_MUL_2_INV;
+  pdf = PI_MUL_4_INV;
   return sphericalToCartesian(theta, phi);
 }
 
