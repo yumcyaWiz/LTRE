@@ -37,10 +37,11 @@ class Sphere : public Shape {
     return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
   }
 
-  Vec3 samplePoint(Sampler& sampler, float& pdf) const override {
+  Vec3 samplePoint(Sampler& sampler, Vec3& normal, float& pdf) const override {
     const Vec3 p = sampleSphere(sampler.getNext2D(), pdf);
+    normal = p;
     pdf /= (radius * radius);
-    return center + p;
+    return center + radius * p;
   }
 };
 
