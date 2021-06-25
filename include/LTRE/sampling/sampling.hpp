@@ -30,6 +30,15 @@ inline Vec3 sampleSphere(const Vec2& uv, float& pdf) {
   return sphericalToCartesian(theta, phi);
 }
 
+inline Vec3 sampleTriangle(const Vec2& uv, const Vec3& p1, const Vec3& p2,
+                           const Vec3& p3, float& pdf) {
+  const float su0 = std::sqrt(uv[0]);
+  const float u = 1.0f - su0;
+  const float v = uv[1] * su0;
+  pdf = 0.5f * length(cross(p2 - p1, p3 - p1));
+  return (1.0f - u - v) * p1 + u * p2 + v * p3;
+}
+
 inline Vec2 sampleDisk(const Vec2& uv, float R, float& pdf) {
   const float r = R * std::sqrt(std::max(uv[0], 0.0f));
   const float theta = PI_MUL_2 * uv[1];
