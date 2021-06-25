@@ -156,6 +156,7 @@ class Mesh : public Shape {
   const std::vector<Vec3> tangents;   // tangent vector(dp/du)
   const std::vector<Vec3> dndus;      // differential of normal by texcoords
   const std::vector<Vec3> dndvs;      // differential of normal by texcoords
+  float surfaceArea;
 
   std::shared_ptr<Intersector<MeshTriangle>> intersector;
 
@@ -218,17 +219,50 @@ class Mesh : public Shape {
       std::exit(EXIT_FAILURE);
     }
 
+    // compute surface area
+    surfaceArea = 0;
+    for (unsigned int f = 0; f < indices.size(); f += 3) {
+      const int idx1 = indices[3 * f];
+      const int idx2 = indices[3 * f + 1];
+      const int idx3 = indices[3 * f + 2];
+      const Vec3 p1 = positions[idx1];
+      const Vec3 p2 = positions[idx2];
+      const Vec3 p3 = positions[idx3];
+      surfaceArea += 0.5f * length(cross(p2 - p1, p3 - p1));
+    }
+
     setupIntersector();
   }
 
   unsigned int nVertices() const { return indices.size(); }
   unsigned int nFaces() const { return indices.size() / 3; }
+  float getSurfaceArea() const { return surfaceArea; }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     return intersector->intersect(ray, info);
   }
 
   AABB aabb() const override { return intersector->aabb(); }
+
+  Vec3 samplePoint(Sampler& sampler, float& pdf) const override {
+    // sample triangle
+    unsigned int faceID = nFaces() * sampler.getNext1D();
+    if (faceID == nFaces()) faceID--;
+
+    // sample point on triangle
+    const unsigned int idx1 = indices[3 * faceID];
+    const unsigned int idx2 = indices[3 * faceID + 1];
+    const unsigned int idx3 = indices[3 * faceID + 2];
+    const Vec3 p1 = positions[idx1];
+    const Vec3 p2 = positions[idx2];
+    const Vec3 p3 = positions[idx3];
+
+    // sample point on triangle
+    float _pdf;
+    const Vec3 p = sampleTriangle(sampler.getNext2D(), p1, p2, p3, _pdf);
+    pdf = 1.0f / getSurfaceArea();
+    return p;
+  }
 };
 
 }  // namespace LTRE
