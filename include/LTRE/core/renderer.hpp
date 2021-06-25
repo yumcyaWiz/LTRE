@@ -98,9 +98,12 @@ class Renderer {
 
         // set aov
         {
+          // compute (u, v)
+          // NOTE: adding "-"" to flip uv
           Vec2 uv;
-          uv[0] = (2.0f * i - width) / height;
-          uv[1] = (2.0f * j - height) / height;
+          uv[0] = -(2.0f * i - width) / height;
+          uv[1] = -(height - 2.0f * j) / height;
+
           Ray ray;
           Vec3 wi;
           float pdf;
@@ -121,9 +124,10 @@ class Renderer {
         Vec3 radiance(0);
         for (int k = 0; k < samples; ++k) {
           // compute (u, v) with SSAA
+          // NOTE: adding "-"" to flip uv
           Vec2 uv;
-          uv[0] = (2.0f * (i + sampler->getNext1D()) - width) / height;
-          uv[1] = (2.0f * (j + sampler->getNext1D()) - height) / height;
+          uv[0] = -(2.0f * (i + sampler->getNext1D()) - width) / height;
+          uv[1] = -(height - 2.0f * (j + sampler->getNext1D())) / height;
 
           // generate camera ray
           Ray ray;

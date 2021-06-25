@@ -20,8 +20,8 @@ int main() {
   const int height = 512;
 
   const auto intersector =
-      std::make_shared<BVH<Primitive, BVHSplitStrategy::EQUAL>>();
-  const auto sky = std::make_shared<UniformSky>(Vec3(1));
+      std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
+  const auto sky = std::make_shared<UniformSky>(Vec3(0));
   Scene scene(intersector, sky);
 
   // const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
@@ -47,19 +47,19 @@ int main() {
 
   // const auto model = Model("../assets/bunny/bunny.obj");
   // const auto model = Model("../assets/sponza/sponza.obj");
-  // const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
-  const auto model = Model("../assets/salle_de_bain/salle_de_bain.obj");
+  const auto model = Model("../assets/CornellBox/CornellBox-Original.obj");
+  // const auto model = Model("../assets/salle_de_bain/salle_de_bain.obj");
   // const auto model = Model("../assets/test.obj");
   scene.addModel(model);
   scene.build();
 
-  // const auto camera = std::make_shared<PinholeCamera>(
-  //     Vec3(0, 1, 3), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 2.0f);
+  const auto camera = std::make_shared<PinholeCamera>(
+      Vec3(0, 1, 5), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f);
   // const auto camera = std::make_shared<ThinLensCamera>(
   //     Vec3(-1000, 350, 0), Vec3(1, 0, 0), Vec2(0.025, 0.025), PI / 4.0f,
   //     0.4f);
-  const auto camera = std::make_shared<ThinLensCamera>(
-      Vec3(0, 16, 60), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f, 1.4f);
+  // const auto camera = std::make_shared<ThinLensCamera>(
+  //     Vec3(0, 16, 60), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f, 1.4f);
   const auto integrator = std::make_shared<PT>();
   const auto sampler = std::make_shared<UniformSampler>();
 
