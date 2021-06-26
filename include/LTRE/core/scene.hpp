@@ -44,7 +44,7 @@ class Scene {
     intersector->build();
 
     // initialize lights
-    for (const auto& prim : intersector->primitives) {
+    for (const auto& prim : intersector->getPrimitivesRef()) {
       if (prim.hasArealight()) {
         lights.push_back(prim.getAreaLightPtr());
       }

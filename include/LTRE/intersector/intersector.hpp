@@ -14,11 +14,14 @@ concept Intersectable = requires(T& x, const Ray& ray, IntersectInfo& info) {
 
 template <Intersectable T>
 class Intersector {
- public:
+ protected:
   std::vector<T> primitives;
 
+ public:
   Intersector() {}
   Intersector(const std::vector<T>& primitives) : primitives(primitives) {}
+
+  const std::vector<T>& getPrimitivesRef() const { return primitives; }
 
   void addPrimitive(const T& primitive) { primitives.push_back(primitive); }
 
