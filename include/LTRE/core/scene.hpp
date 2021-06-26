@@ -57,6 +57,13 @@ class Scene {
   }
 
   Vec3 getSkyRadiance(const Ray& ray) const { return sky->radiance(ray); }
+
+  std::shared_ptr<Light> sampleLight(Sampler& sampler, float& pdf) const {
+    unsigned int lightIdx = lights.size() * sampler.getNext1D();
+    if (lightIdx == lights.size()) lightIdx--;
+    pdf = 1.0f / lights.size();
+    return lights[lightIdx];
+  }
 };
 
 }  // namespace LTRE
