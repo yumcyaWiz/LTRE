@@ -5,6 +5,7 @@
 #include "LTRE/core/renderer.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/ao.hpp"
+#include "LTRE/integrator/nee.hpp"
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/light/area-light.hpp"
