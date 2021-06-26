@@ -20,6 +20,8 @@ class Primitive {
             const std::shared_ptr<AreaLight>& areaLight = nullptr)
       : shape(shape), material(material), areaLight(areaLight) {}
 
+  std::shared_ptr<AreaLight> getAreaLightPtr() const { return areaLight; }
+
   AABB aabb() const { return shape->aabb(); }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const {
