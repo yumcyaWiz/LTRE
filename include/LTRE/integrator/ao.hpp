@@ -14,29 +14,29 @@ class AO : public Integrator {
   Vec3 integrate(const Ray& ray_in, const Scene& scene,
                  Sampler& sampler) const override {
     IntersectInfo info;
-    if (scene.intersect(ray_in, info)) {
-      const Primitive& prim = *info.hitPrimitive;
-
-      // BRDF Sampling
-      Vec3 wi;
-      float pdf;
-      const Vec3 bsdf = prim.sampleBSDF(-ray_in.direction, info.surfaceInfo,
-                                        sampler, wi, pdf);
-
-      // test occulusion
-      Ray shadowRay = Ray(info.surfaceInfo.position, wi);
-      shadowRay.tmax = occulusionDistance;
-      IntersectInfo shadowInfo;
-      if (scene.intersect(shadowRay, shadowInfo)) {
-        return Vec3(0);
-      }
-
-      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
-      return bsdf * cos / pdf;
-
-    } else {
-      return Vec3(1);
+    if (!scene.intersect(ray_in, info)) {
+      // sky
+      return scene.getSkyRadiance(ray_in);
     }
+
+    const Primitive& hitPrimitive = *info.hitPrimitive;
+
+    // BRDF Sampling
+    Vec3 wi;
+    float pdf;
+    const Vec3 bsdf = hitPrimitive.sampleBSDF(
+        -ray_in.direction, info.surfaceInfo, sampler, wi, pdf);
+
+    // test occulusion
+    const Ray shadowRay = Ray(info.surfaceInfo.position, wi);
+    shadowRay.tmax = occulusionDistance;
+    IntersectInfo shadowInfo;
+    if (scene.intersect(shadowRay, shadowInfo)) {
+      return Vec3(0);
+    }
+
+    const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
+    return bsdf * cos / pdf;
   }
 };
 
