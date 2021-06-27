@@ -21,11 +21,12 @@ class AreaLight : public Light {
   }
 
   Vec3 sampleDirection(const IntersectInfo& info, Sampler& sampler,
-                       float& pdf) const override {
+                       float& distToLight, float& pdf) const override {
     // sample point on shape
     float pdf_a;
     Vec3 normal;
     const Vec3 p = shape->samplePoint(sampler, normal, pdf_a);
+    distToLight = length(p - info.hitPos);
 
     // sample direction
     const Vec3 dir = normalize(p - info.hitPos);

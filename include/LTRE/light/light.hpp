@@ -11,7 +11,7 @@ class Light {
  public:
   virtual Vec3 radiance(const IntersectInfo& info) const = 0;
   virtual Vec3 sampleDirection(const IntersectInfo& info, Sampler& sampler,
-                               float& pdf) const = 0;
+                               float& distToLight, float& pdf) const = 0;
 };
 
 }  // namespace LTRE
