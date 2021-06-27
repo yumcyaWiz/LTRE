@@ -12,6 +12,7 @@ class Sphere : public Shape {
  public:
   Sphere(const Vec3& center, float radius) : center(center), radius(radius) {}
 
+  // TODO: set uv
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     const float b = dot(ray.origin - center, ray.direction);
     const float c = length2(ray.origin - center) - radius * radius;
@@ -39,11 +40,14 @@ class Sphere : public Shape {
     return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
   }
 
-  Vec3 samplePoint(Sampler& sampler, Vec3& normal, float& pdf) const override {
+  // TODO: set uv
+  SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const override {
+    SurfaceInfo ret;
     const Vec3 p = sampleSphere(sampler.getNext2D(), pdf);
-    normal = p;
+    ret.position = center + radius * p;
+    ret.normal = p;
     pdf /= (radius * radius);
-    return center + radius * p;
+    return ret;
   }
 };
 

@@ -10,8 +10,7 @@ class Shape {
  public:
   virtual bool intersect(const Ray& ray, IntersectInfo& info) const = 0;
   virtual AABB aabb() const = 0;
-  virtual Vec3 samplePoint(Sampler& sampler, Vec3& normal,
-                           float& pdf) const = 0;
+  virtual SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const = 0;
 };
 
 }  // namespace LTRE

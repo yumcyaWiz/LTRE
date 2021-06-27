@@ -247,7 +247,9 @@ class Mesh : public Shape {
 
   AABB aabb() const override { return intersector->aabb(); }
 
-  Vec3 samplePoint(Sampler& sampler, Vec3& normal, float& pdf) const override {
+  SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const override {
+    SurfaceInfo ret;
+
     // sample triangle
     unsigned int faceID = nFaces() * sampler.getNext1D();
     if (faceID == nFaces()) faceID--;
@@ -265,23 +267,35 @@ class Mesh : public Shape {
     const float su0 = std::sqrt(uv[0]);
     const float u = 1.0f - su0;
     const float v = uv[1] * su0;
-    const Vec3 p = (1.0f - u - v) * p1 + u * p2 + v * p3;
-    const float triSurfaceArea = 0.5f * length(cross(p2 - p1, p3 - p1));
-    // NOTE: we can't use 1.0f / meshSurfaceArea, since sampling triangle is not
-    // uniform across all triangles.
-    pdf = 1.0f / (nFaces() * triSurfaceArea);
+    ret.position = (1.0f - u - v) * p1 + u * p2 + v * p3;
 
     // compute normal
     if (normals.size() > 0) {
       const Vec3 n1 = normals[idx1];
       const Vec3 n2 = normals[idx2];
       const Vec3 n3 = normals[idx3];
-      normal = (1.0f - u - v) * n1 + u * n2 + v * n3;
+      ret.normal = (1.0f - u - v) * n1 + u * n2 + v * n3;
     } else {
-      normal = normalize(cross(p2 - p1, p3 - p1));
+      ret.normal = normalize(cross(p2 - p1, p3 - p1));
     }
 
-    return p;
+    // compute uv
+    if (texcoords.size() > 0) {
+      const Vec2 uv1 = texcoords[idx1];
+      const Vec2 uv2 = texcoords[idx2];
+      const Vec2 uv3 = texcoords[idx3];
+      ret.uv = (1.0f - u - v) * uv1 + u * uv2 + v * uv3;
+    } else {
+      ret.uv = Vec2(u, v);
+    }
+
+    // compute pdf
+    const float triSurfaceArea = 0.5f * length(cross(p2 - p1, p3 - p1));
+    // NOTE: we can't use 1.0f / meshSurfaceArea, since sampling triangle is not
+    // uniform across all triangles.
+    pdf = 1.0f / (nFaces() * triSurfaceArea);
+
+    return ret;
   }
 };
 
