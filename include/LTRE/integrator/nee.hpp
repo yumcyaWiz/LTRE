@@ -60,7 +60,8 @@ class NEE : public Integrator {
           const Vec3 bsdf =
               hitPrimitive.evaluateBSDF(-ray.direction, dir, info.surfaceInfo);
           const float cos = std::abs(dot(dir, info.surfaceInfo.normal));
-          radiance += throughput * bsdf * cos * le;
+          radiance +=
+              throughput * bsdf * cos * le / (lightChoosePdf * lightPdf);
         }
       }
 
