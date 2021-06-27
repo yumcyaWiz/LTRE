@@ -6,14 +6,14 @@
 #include "stb_image.h"
 //
 #include "LTRE/core/image.hpp"
-#include "LTRE/core/intersect-info.hpp"
+#include "LTRE/core/types.hpp"
 
 namespace LTRE {
 
 template <typename T>
 class Texture {
  protected:
-  Vec2 calcTexCoords(const IntersectInfo& info) const {
+  Vec2 calcTexCoords(const SurfaceInfo& info) const {
     // GL_REPEAT
     float u = info.uv[0];
     if (u > 1) {
@@ -33,7 +33,7 @@ class Texture {
   }
 
  public:
-  virtual T sample(const IntersectInfo& info) const = 0;
+  virtual T sample(const SurfaceInfo& info) const = 0;
 };
 
 template <typename T>
@@ -44,7 +44,7 @@ class UniformTexture : public Texture<T> {
  public:
   UniformTexture(const T& value) : value(value) {}
 
-  T sample([[maybe_unused]] const IntersectInfo& info) const override {
+  T sample([[maybe_unused]] const SurfaceInfo& info) const override {
     return value;
   };
 };
@@ -88,7 +88,7 @@ class ImageTexture : public Texture<Vec3> {
 
   std::filesystem::path getFilepath() const { return filepath; }
 
-  Vec3 sample(const IntersectInfo& info) const override {
+  Vec3 sample(const SurfaceInfo& info) const override {
     const Vec2 uv = calcTexCoords(info);
     const int width = image.getWidth();
     const int height = image.getHeight();

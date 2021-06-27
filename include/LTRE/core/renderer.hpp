@@ -72,7 +72,7 @@ class Renderer {
   void focus(const Ray& ray, const Scene& scene) {
     IntersectInfo info;
     if (scene.intersect(ray, info)) {
-      focus(info.hitPos);
+      focus(info.surfaceInfo.position);
     }
   }
   // focus at camera direction
@@ -80,7 +80,7 @@ class Renderer {
     Ray ray(camera->getCameraPosition(), camera->getCameraForward());
     IntersectInfo info;
     if (scene.intersect(ray, info)) {
-      focus(info.hitPos);
+      focus(info.surfaceInfo.position);
     }
   }
 
@@ -111,11 +111,13 @@ class Renderer {
             IntersectInfo info;
             if (scene.intersect(ray, info)) {
               aov.depth.setPixel(i, j, info.t);
-              aov.position.setPixel(i, j, info.hitPos);
-              aov.normal.setPixel(i, j, 0.5f * (info.hitNormal + 1.0f));
+              aov.position.setPixel(i, j, info.surfaceInfo.position);
+              aov.normal.setPixel(i, j,
+                                  0.5f * (info.surfaceInfo.normal + 1.0f));
               aov.barycentric.setPixel(i, j, info.barycentric);
-              aov.texcoords.setPixel(i, j, info.uv);
-              aov.baseColor.setPixel(i, j, info.hitPrimitive->baseColor(info));
+              aov.texcoords.setPixel(i, j, info.surfaceInfo.uv);
+              aov.baseColor.setPixel(
+                  i, j, info.hitPrimitive->baseColor(info.surfaceInfo));
             }
           }
         }

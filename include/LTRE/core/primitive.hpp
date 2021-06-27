@@ -33,30 +33,30 @@ class Primitive {
     }
   }
 
-  Vec3 sampleBSDF(const Vec3& wo, const IntersectInfo& info, Sampler& sampler,
+  Vec3 sampleBSDF(const Vec3& wo, const SurfaceInfo& info, Sampler& sampler,
                   Vec3& wi, float& pdf) const {
     // compute tangent space basis
     Vec3 t, b;
-    orthonormalBasis(info.hitNormal, t, b);
+    orthonormalBasis(info.normal, t, b);
 
     // world to local transform
-    const Vec3 wo_l = worldToLocal(wo, t, info.hitNormal, b);
+    const Vec3 wo_l = worldToLocal(wo, t, info.normal, b);
 
     // sample direction in tangent space
     Vec3 wi_l;
     const Vec3 bsdf = this->material->sample(sampler, wo_l, info, wi_l, pdf);
 
     // local to world transform
-    wi = localToWorld(wi_l, t, info.hitNormal, b);
+    wi = localToWorld(wi_l, t, info.normal, b);
 
     return bsdf;
   }
 
   bool hasArealight() const { return areaLight != nullptr; }
 
-  Vec3 Le(const IntersectInfo& info) const { return areaLight->radiance(info); }
+  Vec3 Le(const SurfaceInfo& info) const { return areaLight->radiance(info); }
 
-  Vec3 baseColor(const IntersectInfo& info) const {
+  Vec3 baseColor(const SurfaceInfo& info) const {
     return material->baseColor(info);
   }
 };

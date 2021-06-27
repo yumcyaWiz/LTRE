@@ -119,31 +119,34 @@ class Mesh : public Shape {
       if (t < ray.tmin || t > ray.tmax) return false;
 
       info.t = t;
-      info.hitPos = ray(t);
       info.barycentric[0] = u;
       info.barycentric[1] = v;
+
+      SurfaceInfo surfaceInfo;
+      surfaceInfo.position = ray(t);
 
       // calc normal
       const float w = 1.0f - u - v;
       if (hasNormals()) {
         // interpolated normal
         const auto [n1, n2, n3] = getNormals();
-        info.hitNormal = w * n1 + u * n2 + v * n3;
+        surfaceInfo.normal = w * n1 + u * n2 + v * n3;
       } else {
         // face normal
-        info.hitNormal = normalize(cross(e1, e2));
+        surfaceInfo.normal = normalize(cross(e1, e2));
       }
 
       // calc texcoords
       if (hasTexcoords()) {
         // interpolated texcoords
         const auto [texcoord1, texcoord2, texcoord3] = getTexcoords();
-        info.uv = w * texcoord1 + u * texcoord2 + v * texcoord3;
+        surfaceInfo.uv = w * texcoord1 + u * texcoord2 + v * texcoord3;
       } else {
         // barycentric
-        info.uv[0] = u;
-        info.uv[1] = v;
+        surfaceInfo.uv[0] = u;
+        surfaceInfo.uv[1] = v;
       }
+      info.surfaceInfo = surfaceInfo;
 
       return true;
     }

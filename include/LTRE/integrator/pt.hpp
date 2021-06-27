@@ -34,21 +34,22 @@ class PT : public Integrator {
 
       // Le
       if (prim.hasArealight()) {
-        radiance += throughput * prim.Le(info);
+        radiance += throughput * prim.Le(info.surfaceInfo);
         break;
       }
 
       // BRDF Sampling
       Vec3 wi;
       float pdf;
-      const Vec3 bsdf = prim.sampleBSDF(-ray.direction, info, sampler, wi, pdf);
+      const Vec3 bsdf =
+          prim.sampleBSDF(-ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
-      const float cos = std::abs(dot(wi, info.hitNormal));
+      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
       throughput *= bsdf * cos / pdf;
 
       // update ray
-      ray = Ray(info.hitPos, wi);
+      ray = Ray(info.surfaceInfo.position, wi);
     }
     return radiance;
   }

@@ -27,8 +27,10 @@ class Sphere : public Shape {
     }
 
     info.t = t;
-    info.hitPos = ray(t);
-    info.hitNormal = normalize(info.hitPos - center);
+    SurfaceInfo surfaceInfo;
+    surfaceInfo.position = ray(t);
+    surfaceInfo.normal = normalize(surfaceInfo.position - center);
+    info.surfaceInfo = surfaceInfo;
     return true;
   }
 

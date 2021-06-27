@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
-#include "LTRE/core/intersect-info.hpp"
 #include "LTRE/core/texture.hpp"
+#include "LTRE/core/types.hpp"
 
 namespace LTRE {
 

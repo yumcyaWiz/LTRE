@@ -16,27 +16,25 @@ class AreaLight : public Light {
             const std::shared_ptr<Shape>& shape)
       : le(le), shape(shape) {}
 
-  Vec3 radiance(const IntersectInfo& info) const override {
+  Vec3 radiance(const SurfaceInfo& info) const override {
     return le->sample(info);
   }
 
-  Vec3 sampleDirection(const IntersectInfo& info, Sampler& sampler,
+  Vec3 sampleDirection(const Vec3& pos, Sampler& sampler, Vec3& dir,
                        float& distToLight, float& pdf) const override {
     // sample point on shape
     float pdf_a;
     Vec3 normal;
     const Vec3 p = shape->samplePoint(sampler, normal, pdf_a);
-    distToLight = length(p - info.hitPos);
-
-    // sample direction
-    const Vec3 dir = normalize(p - info.hitPos);
+    dir = normalize(p - pos);
+    distToLight = length(p - pos);
 
     // convert area pdf to solid angle pdf
-    const float dist2 = length2(p - info.hitPos);
+    const float dist2 = length2(p - pos);
     const float cos = abs(dot(-dir, normal));
     pdf = pdf_a * dist2 / cos;
 
-    return dir;
+    return le;
   }
 };
 

@@ -20,18 +20,18 @@ class AO : public Integrator {
       // BRDF Sampling
       Vec3 wi;
       float pdf;
-      const Vec3 bsdf =
-          prim.sampleBSDF(-ray_in.direction, info, sampler, wi, pdf);
+      const Vec3 bsdf = prim.sampleBSDF(-ray_in.direction, info.surfaceInfo,
+                                        sampler, wi, pdf);
 
       // test occulusion
-      Ray shadowRay = Ray(info.hitPos, wi);
+      Ray shadowRay = Ray(info.surfaceInfo.position, wi);
       shadowRay.tmax = occulusionDistance;
       IntersectInfo shadowInfo;
       if (scene.intersect(shadowRay, shadowInfo)) {
         return Vec3(0);
       }
 
-      const float cos = std::abs(dot(wi, info.hitNormal));
+      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
       return bsdf * cos / pdf;
 
     } else {

@@ -15,17 +15,17 @@ class Material {
  public:
   Material() {}
 
-  virtual BSDF prepareBSDF(const IntersectInfo& info) const = 0;
-  virtual Vec3 baseColor(const IntersectInfo& info) const = 0;
+  virtual BSDF prepareBSDF(const SurfaceInfo& info) const = 0;
+  virtual Vec3 baseColor(const SurfaceInfo& info) const = 0;
 
   // NOTE: having bsdf as private member does not work on multithread case
-  Vec3 f(const Vec3& wo, const IntersectInfo& info, const Vec3& wi) const {
+  Vec3 f(const Vec3& wo, const SurfaceInfo& info, const Vec3& wi) const {
     const BSDF bsdf = prepareBSDF(info);
     return bsdf.f(wo, wi);
   }
 
   // NOTE: having bsdf as private member does not work on multithread case
-  Vec3 sample(Sampler& sampler, const Vec3& wo, const IntersectInfo& info,
+  Vec3 sample(Sampler& sampler, const Vec3& wo, const SurfaceInfo& info,
               Vec3& wi, float& pdf) const {
     const BSDF bsdf = prepareBSDF(info);
     return bsdf.sample(sampler, wo, wi, pdf);
@@ -41,14 +41,14 @@ class Diffuse : public Material {
   Diffuse(const std::shared_ptr<Texture<Vec3>>& baseColor, float roughness)
       : _baseColor(baseColor), roughness(roughness) {}
 
-  BSDF prepareBSDF(const IntersectInfo& info) const override {
+  BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = _baseColor->sample(info);
     bsdf.add(std::make_shared<OrenNayer>(rho, roughness));
     return bsdf;
   }
 
-  Vec3 baseColor(const IntersectInfo& info) const override {
+  Vec3 baseColor(const SurfaceInfo& info) const override {
     return _baseColor->sample(info);
   }
 };
@@ -70,14 +70,14 @@ class DisneyPrincipledBRDF : public Material {
                        float roughness)
       : _baseColor(baseColor), roughness(roughness) {}
 
-  BSDF prepareBSDF(const IntersectInfo& info) const override {
+  BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = _baseColor->sample(info);
     bsdf.add(std::make_shared<DisneyDiffuse>(rho, roughness));
     return bsdf;
   }
 
-  Vec3 baseColor(const IntersectInfo& info) const override {
+  Vec3 baseColor(const SurfaceInfo& info) const override {
     return _baseColor->sample(info);
   }
 };

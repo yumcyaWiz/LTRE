@@ -34,7 +34,7 @@ class NEE : public Integrator {
 
       // first hit light case
       if (depth == 0 && prim.hasArealight()) {
-        radiance += throughput * prim.Le(info);
+        radiance += throughput * prim.Le(info.surfaceInfo);
         break;
       }
 
@@ -46,25 +46,34 @@ class NEE : public Integrator {
             scene.sampleLight(sampler, lightChoosePdf);
 
         // sample direction by light
+        Vec3 dir;
+        float distToLight;
         float lightPdf;
-        const Vec3 dir = light->sampleDirection(info, sampler, lightPdf);
+        light->sampleDirection(info.surfaceInfo.position, sampler, dir,
+                               distToLight, lightPdf);
 
         // test visibility
-        Ray shadowRay(info.hitPos, dir);
+        Ray shadowRay(info.surfaceInfo.position, dir);
+        shadowRay.tmax = distToLight;
         IntersectInfo shadowInfo;
+        if (!scene.intersect(shadowRay, shadowInfo)) {
+          // add Le
+          radiance += throughput * le;
+        }
       }
 
       // BRDF Sampling
       Vec3 wi;
       float pdf;
-      const Vec3 bsdf = prim.sampleBSDF(-ray.direction, info, sampler, wi, pdf);
+      const Vec3 bsdf =
+          prim.sampleBSDF(-ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
-      const float cos = std::abs(dot(wi, info.hitNormal));
+      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
       throughput *= bsdf * cos / pdf;
 
       // update ray
-      ray = Ray(info.hitPos, wi);
+      ray = Ray(info.surfaceInfo.position, wi);
     }
     return radiance;
   }
