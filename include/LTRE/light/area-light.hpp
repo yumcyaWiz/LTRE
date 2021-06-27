@@ -24,16 +24,17 @@ class AreaLight : public Light {
                        float& distToLight, float& pdf) const override {
     // sample point on shape
     float pdf_a;
-    const SurfaceInfo info = shape->samplePoint(sampler, pdf_a);
-    dir = normalize(info.position - pos);
-    distToLight = length(info.position - pos);
+    const SurfaceInfo sampledInfo = shape->samplePoint(sampler, pdf_a);
+    dir = normalize(sampledInfo.position - pos);
+    distToLight = length(sampledInfo.position - pos);
 
     // convert area pdf to solid angle pdf
     const float dist2 = distToLight * distToLight;
-    const float cos = abs(dot(-dir, info.normal));
+    const float cos = abs(dot(-dir, sampledInfo.normal));
     pdf = pdf_a * dist2 / cos;
 
-    return le->sample(info);
+    // return black when the sampled surface is back faced
+    return (dot(-dir, sampledInfo.normal) > 0) * le->sample(sampledInfo);
   }
 };
 
