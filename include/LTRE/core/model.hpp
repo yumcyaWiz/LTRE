@@ -161,8 +161,7 @@ class Model {
       // kd
       aiColor3D color;
       mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-      // convert sRGB to linear
-      material.kd = pow(Vec3(color.r, color.g, color.b), 2.2f);
+      material.kd = Vec3(color.r, color.g, color.b);
 
       // ks
       mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
