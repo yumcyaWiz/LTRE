@@ -33,6 +33,19 @@ class Primitive {
     }
   }
 
+  Vec3 evaluateBSDF(const Vec3& wo, const Vec3& wi,
+                    const SurfaceInfo& info) const {
+    // compute tangent space basis
+    Vec3 t, b;
+    orthonormalBasis(info.normal, t, b);
+
+    // world to local transform
+    const Vec3 wo_l = worldToLocal(wo, t, info.normal, b);
+    const Vec3 wi_l = worldToLocal(wi, t, info.normal, b);
+
+    return this->material->f(wo_l, wi_l, info);
+  }
+
   Vec3 sampleBSDF(const Vec3& wo, const SurfaceInfo& info, Sampler& sampler,
                   Vec3& wi, float& pdf) const {
     // compute tangent space basis

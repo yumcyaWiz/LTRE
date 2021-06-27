@@ -19,7 +19,7 @@ class Material {
   virtual Vec3 baseColor(const SurfaceInfo& info) const = 0;
 
   // NOTE: having bsdf as private member does not work on multithread case
-  Vec3 f(const Vec3& wo, const SurfaceInfo& info, const Vec3& wi) const {
+  Vec3 f(const Vec3& wo, const Vec3& wi, const SurfaceInfo& info) const {
     const BSDF bsdf = prepareBSDF(info);
     return bsdf.f(wo, wi);
   }
