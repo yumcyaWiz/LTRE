@@ -30,11 +30,11 @@ class NEE : public Integrator {
         break;
       }
 
-      const Primitive& prim = *info.hitPrimitive;
+      const Primitive& hitPrimitive = *info.hitPrimitive;
 
       // first hit light case
-      if (depth == 0 && prim.hasArealight()) {
-        radiance += throughput * prim.Le(info.surfaceInfo);
+      if (depth == 0 && hitPrimitive.hasArealight()) {
+        radiance += throughput * hitPrimitive.Le(info.surfaceInfo);
         break;
       }
 
@@ -45,28 +45,30 @@ class NEE : public Integrator {
         const std::shared_ptr<Light> light =
             scene.sampleLight(sampler, lightChoosePdf);
 
-        // sample direction by light
+        // sample direction and get Le
         Vec3 dir;
         float distToLight;
         float lightPdf;
-        light->sampleDirection(info.surfaceInfo.position, sampler, dir,
-                               distToLight, lightPdf);
+        const Vec3 le = light->sampleDirection(
+            info.surfaceInfo.position, sampler, dir, distToLight, lightPdf);
 
         // test visibility
         Ray shadowRay(info.surfaceInfo.position, dir);
         shadowRay.tmax = distToLight;
         IntersectInfo shadowInfo;
         if (!scene.intersect(shadowRay, shadowInfo)) {
-          // add Le
-          radiance += throughput * le;
+          const Vec3 bsdf =
+              hitPrimitive.evaluateBSDF(-ray.direction, dir, info.surfaceInfo);
+          const float cos = std::abs(dot(dir, info.surfaceInfo.normal));
+          radiance += throughput * bsdf * cos * le;
         }
       }
 
       // BRDF Sampling
       Vec3 wi;
       float pdf;
-      const Vec3 bsdf =
-          prim.sampleBSDF(-ray.direction, info.surfaceInfo, sampler, wi, pdf);
+      const Vec3 bsdf = hitPrimitive.sampleBSDF(
+          -ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
       const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
