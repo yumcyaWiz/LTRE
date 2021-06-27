@@ -30,19 +30,19 @@ class PT : public Integrator {
         break;
       }
 
-      const Primitive& prim = *info.hitPrimitive;
+      const Primitive& hitPrimitive = *info.hitPrimitive;
 
       // Le
-      if (prim.hasArealight()) {
-        radiance += throughput * prim.Le(info.surfaceInfo);
+      if (hitPrimitive.hasArealight()) {
+        radiance += throughput * hitPrimitive.Le(info.surfaceInfo);
         break;
       }
 
       // BRDF Sampling
       Vec3 wi;
       float pdf;
-      const Vec3 bsdf =
-          prim.sampleBSDF(-ray.direction, info.surfaceInfo, sampler, wi, pdf);
+      const Vec3 bsdf = hitPrimitive.sampleBSDF(
+          -ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
       const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
