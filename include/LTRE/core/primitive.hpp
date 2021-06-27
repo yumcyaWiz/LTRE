@@ -67,7 +67,9 @@ class Primitive {
 
   bool hasArealight() const { return areaLight != nullptr; }
 
-  Vec3 Le(const SurfaceInfo& info) const { return areaLight->Le(info); }
+  Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const {
+    return areaLight->Le(wi, info);
+  }
 
   Vec3 baseColor(const SurfaceInfo& info) const {
     return material->baseColor(info);

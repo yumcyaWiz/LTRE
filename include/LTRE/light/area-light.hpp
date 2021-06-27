@@ -16,7 +16,10 @@ class AreaLight : public Light {
             const std::shared_ptr<Shape>& shape)
       : le(le), shape(shape) {}
 
-  Vec3 Le(const SurfaceInfo& info) const override { return le->sample(info); }
+  Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const override {
+    // return black when the surface is back faced
+    return (dot(-wi, info.normal) > 0) * le->sample(info);
+  }
 
   Vec3 sampleDirection(const Vec3& pos, Sampler& sampler, Vec3& dir,
                        float& distToLight, float& pdf) const override {

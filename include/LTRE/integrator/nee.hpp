@@ -34,7 +34,7 @@ class NEE : public Integrator {
 
       // first hit light case
       if (depth == 0 && hitPrimitive.hasArealight()) {
-        radiance += throughput * hitPrimitive.Le(info.surfaceInfo);
+        radiance += throughput * hitPrimitive.Le(ray.direction, info.surfaceInfo);
         break;
       }
 
