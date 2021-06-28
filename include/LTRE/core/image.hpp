@@ -83,6 +83,17 @@ class Image {
     }
     file.close();
   }
+
+  // compute average pixel value of image
+  T average() const {
+    T sum = 0;
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        sum += getPixel(i, j);
+      }
+    }
+    return sum / (width * height);
+  }
 };
 
 void gammaCorrection(Image<Vec3>& image) {
