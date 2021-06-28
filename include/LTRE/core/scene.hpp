@@ -4,7 +4,7 @@
 
 #include "LTRE/core/model.hpp"
 #include "LTRE/intersector/intersector.hpp"
-#include "LTRE/sky/sky.hpp"
+#include "LTRE/light/sky/sky.hpp"
 
 namespace LTRE {
 

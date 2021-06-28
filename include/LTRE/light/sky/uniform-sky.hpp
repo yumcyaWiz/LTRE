@@ -1,6 +1,6 @@
 #ifndef _LTRE_UNIFORM_SKY_H
 #define _LTRE_UNIFORM_SKY_H
-#include "LTRE/sky/sky.hpp"
+#include "LTRE/light/sky/sky.hpp"
 
 namespace LTRE {
 class UniformSky : public Sky {
