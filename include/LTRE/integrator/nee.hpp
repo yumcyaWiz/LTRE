@@ -61,7 +61,7 @@ class NEE : public Integrator {
         if (!scene.intersectP(shadowRay)) {
           const Vec3 bsdf =
               hitPrimitive.evaluateBSDF(-ray.direction, dir, info.surfaceInfo);
-          const float cos = std::abs(dot(dir, info.surfaceInfo.normal));
+          const float cos = std::max(dot(dir, info.surfaceInfo.normal), 0.0f);
           radiance +=
               throughput * bsdf * cos * le / (lightChoosePdf * lightPdf);
         }
@@ -74,7 +74,7 @@ class NEE : public Integrator {
           -ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
-      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
+      const float cos = std::max(dot(wi, info.surfaceInfo.normal), 0.0f);
       throughput *= bsdf * cos / pdf;
 
       // update ray
