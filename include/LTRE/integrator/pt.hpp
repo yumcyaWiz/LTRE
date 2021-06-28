@@ -45,7 +45,7 @@ class PT : public Integrator {
           -ray.direction, info.surfaceInfo, sampler, wi, pdf);
 
       // update throughput
-      const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
+      const float cos = std::max(dot(wi, info.surfaceInfo.normal), 0.0f);
       throughput *= bsdf * cos / pdf;
 
       // update ray

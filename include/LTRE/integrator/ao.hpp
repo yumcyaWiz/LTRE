@@ -34,7 +34,7 @@ class AO : public Integrator {
       return Vec3(0);
     }
 
-    const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
+    const float cos = std::max(dot(wi, info.surfaceInfo.normal), 0.0f);
     return bsdf * cos / pdf;
   }
 };
