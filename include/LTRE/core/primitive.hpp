@@ -33,6 +33,8 @@ class Primitive {
     }
   }
 
+  bool intersectP(const Ray& ray) const { return shape->intersectP(ray); }
+
   Vec3 evaluateBSDF(const Vec3& wo, const Vec3& wi,
                     const SurfaceInfo& info) const {
     // compute tangent space basis
