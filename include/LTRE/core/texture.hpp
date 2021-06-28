@@ -34,6 +34,7 @@ class Texture {
 
  public:
   virtual T sample(const SurfaceInfo& info) const = 0;
+  virtual T average() const = 0;
 };
 
 template <typename T>
@@ -47,6 +48,8 @@ class UniformTexture : public Texture<T> {
   T sample([[maybe_unused]] const SurfaceInfo& info) const override {
     return value;
   };
+
+  T average() const override { return value; }
 };
 
 class ImageTexture : public Texture<Vec3> {
@@ -96,6 +99,8 @@ class ImageTexture : public Texture<Vec3> {
     const int j = std::clamp(static_cast<int>(height * uv[1]), 0, height - 1);
     return image.getPixel(i, j);
   }
+
+  Vec3 average() const override { return image.average(); }
 };
 
 }  // namespace LTRE
