@@ -57,7 +57,10 @@ class Scene {
   }
   bool intersectP(const Ray& ray) const { return intersector->intersectP(ray); }
 
-  Vec3 getSkyRadiance(const Ray& ray) const { return sky->radiance(ray); }
+  Vec3 getSkyRadiance(const Ray& ray) const {
+    SurfaceInfo dummy;
+    return sky->Le(ray.direction, dummy);
+  }
 
   std::shared_ptr<Light> sampleLight(Sampler& sampler, float& pdf) const {
     unsigned int lightIdx = lights.size() * sampler.getNext1D();
