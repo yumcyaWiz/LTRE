@@ -30,8 +30,7 @@ class AO : public Integrator {
     // test occulusion
     const Ray shadowRay = Ray(info.surfaceInfo.position, wi);
     shadowRay.tmax = occulusionDistance;
-    IntersectInfo shadowInfo;
-    if (scene.intersect(shadowRay, shadowInfo)) {
+    if (scene.intersectP(shadowRay)) {
       return Vec3(0);
     }
 
