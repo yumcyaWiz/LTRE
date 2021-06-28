@@ -49,13 +49,19 @@ class Scene {
                  sceneAABB.bounds[1][1], sceneAABB.bounds[1][2]);
 
     // initialize lights
+    // NOTE: only add lights which has power greater than 0
     for (const auto& prim : intersector->getPrimitivesRef()) {
       if (prim.hasArealight()) {
-        lights.push_back(prim.getAreaLightPtr());
+        const auto light = prim.getAreaLightPtr();
+        if (light->power() > Vec3(0)) {
+          lights.push_back(light);
+        }
       }
     }
     // add sky to lights
-    lights.push_back(sky);
+    if (sky->power() > Vec3(0)) {
+      lights.push_back(sky);
+    }
     spdlog::info("[Scene] number of lights: {}", lights.size());
   }
 
