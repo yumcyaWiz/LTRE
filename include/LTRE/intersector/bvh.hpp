@@ -269,6 +269,43 @@ class BVH : public Intersector<T> {
     return hit;
   }
 
+  // traverse bvh recursively
+  bool intersectNodeP(int nodeIdx, const Ray& ray, const Vec3& dirInv,
+                      const int dirInvSign[3]) const {
+    bool hit = false;
+    const BVHNode& node = nodes[nodeIdx];
+
+    if (node.bbox.intersect(ray, dirInv, dirInvSign)) {
+      // leaf node
+      if (node.nPrimitives > 0) {
+        // test intersection with all primitives in this node
+        const int primEnd = node.primIndicesOffset + node.nPrimitives;
+        for (int i = node.primIndicesOffset; i < primEnd; ++i) {
+          if (this->primitives[i].intersectP(ray)) {
+            hit = true;
+            break;
+          }
+        }
+      }
+      // internal node
+      else {
+        // test intersection with child node
+        // use splitting axis heuristics for early termination
+        if (dirInvSign[node.axis] == 0) {
+          hit |= intersectNodeP(nodeIdx + 1, ray, dirInv, dirInvSign);
+          hit |=
+              intersectNodeP(node.secondChildOffset, ray, dirInv, dirInvSign);
+        } else {
+          hit |=
+              intersectNodeP(node.secondChildOffset, ray, dirInv, dirInvSign);
+          hit |= intersectNodeP(nodeIdx + 1, ray, dirInv, dirInvSign);
+        }
+      }
+    }
+
+    return hit;
+  }
+
  public:
   BVH() {}
   BVH(const std::vector<T>& primitives) : Intersector<T>(primitives) {}
@@ -312,6 +349,18 @@ class BVH : public Intersector<T> {
     }
     // traverse from root node
     return intersectNode(0, ray, dirInv, dirInvSign, info);
+  }
+
+  bool intersectP(const Ray& ray) const override {
+    // precompute ray's inversed direction, sign of direction
+    const Vec3 dirInv = 1.0f / ray.direction;
+    int dirInvSign[3];
+    for (int i = 0; i < 3; ++i) {
+      dirInvSign[i] = dirInv[i] > 0 ? 0 : 1;
+    }
+
+    // traverse from root node
+    return intersectNodeP(0, ray, dirInv, dirInvSign);
   }
 };
 
