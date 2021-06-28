@@ -10,7 +10,7 @@ namespace LTRE {
 
 class Scene {
  private:
-  std::shared_ptr<Intersector<Primitive>> intersector;
+  const std::shared_ptr<Intersector<Primitive>> intersector;
   const std::shared_ptr<Sky> sky;
 
   std::vector<std::shared_ptr<Light>> lights;
@@ -42,6 +42,11 @@ class Scene {
   void build() {
     // build intersector
     intersector->build();
+    const AABB sceneAABB = intersector->aabb();
+    spdlog::info("[Scene] scene bounds: ({0}, {1}, {2}), ({3}, {4}, {5})",
+                 sceneAABB.bounds[0][0], sceneAABB.bounds[0][1],
+                 sceneAABB.bounds[0][2], sceneAABB.bounds[1][0],
+                 sceneAABB.bounds[1][1], sceneAABB.bounds[1][2]);
 
     // initialize lights
     for (const auto& prim : intersector->getPrimitivesRef()) {
@@ -49,6 +54,8 @@ class Scene {
         lights.push_back(prim.getAreaLightPtr());
       }
     }
+    // add sky to lights
+    lights.push_back(sky);
     spdlog::info("[Scene] number of lights: {}", lights.size());
   }
 
