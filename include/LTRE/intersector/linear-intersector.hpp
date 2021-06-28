@@ -38,6 +38,16 @@ class LinearIntersector : public Intersector<T> {
 
     return hit;
   }
+
+  bool intersectP(const Ray& ray) const override {
+    for (const auto& prim : this->primitives) {
+      if (prim.intersectP(ray)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 };
 
 }  // namespace LTRE
