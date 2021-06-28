@@ -25,14 +25,16 @@ class NEE : public Integrator {
 
       IntersectInfo info;
       if (!scene.intersect(ray, info)) {
-        // sky
-        radiance += throughput * scene.getSkyRadiance(ray);
+        // first hit sky case
+        if (depth == 0) {
+          radiance += throughput * scene.getSkyRadiance(ray);
+        }
         break;
       }
 
       const Primitive& hitPrimitive = *info.hitPrimitive;
 
-      // first hit light case
+      // first hit area light case
       if (depth == 0 && hitPrimitive.hasArealight()) {
         radiance +=
             throughput * hitPrimitive.Le(ray.direction, info.surfaceInfo);
