@@ -4,21 +4,20 @@
 
 #include "LTRE/core/model.hpp"
 #include "LTRE/intersector/intersector.hpp"
-#include "LTRE/light/sky/sky.hpp"
 
 namespace LTRE {
 
 class Scene {
  private:
   const std::shared_ptr<Intersector<Primitive>> intersector;
-  const std::shared_ptr<Sky> sky;
+  const std::shared_ptr<Light> sky;
 
   std::vector<std::shared_ptr<Light>> lights;
 
  public:
   Scene() {}
   Scene(const std::shared_ptr<Intersector<Primitive>>& intersector,
-        const std::shared_ptr<Sky>& sky)
+        const std::shared_ptr<Light>& sky)
       : intersector(intersector), sky(sky) {}
 
   void addPrimitive(const Primitive& primitive) {

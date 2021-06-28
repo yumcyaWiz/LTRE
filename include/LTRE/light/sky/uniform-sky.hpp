@@ -2,11 +2,11 @@
 #define _LTRE_UNIFORM_SKY_H
 #include <limits>
 
-#include "LTRE/light/sky/sky.hpp"
+#include "LTRE/light/light.hpp"
 #include "LTRE/sampling/sampling.hpp"
 
 namespace LTRE {
-class UniformSky : public Sky {
+class UniformSky : public Light {
  private:
   const Vec3 ke;
 
