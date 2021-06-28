@@ -17,7 +17,9 @@ class AreaLight : public Light {
       : le(le), shape(shape) {}
 
   // return average power
-  virtual Vec3 power() const override { return le->average(); }
+  virtual Vec3 power() const override {
+    return shape->surfaceArea() * le->average();
+  }
 
   Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const override {
     // return black when the surface is back faced
