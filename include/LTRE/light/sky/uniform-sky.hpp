@@ -1,5 +1,7 @@
 #ifndef _LTRE_UNIFORM_SKY_H
 #define _LTRE_UNIFORM_SKY_H
+#include <limits>
+
 #include "LTRE/light/sky/sky.hpp"
 #include "LTRE/sampling/sampling.hpp"
 
@@ -17,9 +19,10 @@ class UniformSky : public Sky {
   }
 
   Vec3 sampleDirection([[maybe_unused]] const Vec3& pos, Sampler& sampler,
-                       Vec3& dir, [[maybe_unused]] float& distToLight,
+                       Vec3& dir, float& distToLight,
                        float& pdf) const override {
     dir = sampleSphere(sampler.getNext2D(), pdf);
+    distToLight = std::numeric_limits<float>::max();
     return ke;
   }
 };
