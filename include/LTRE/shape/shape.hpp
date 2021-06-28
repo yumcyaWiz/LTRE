@@ -9,6 +9,7 @@ namespace LTRE {
 class Shape {
  public:
   virtual bool intersect(const Ray& ray, IntersectInfo& info) const = 0;
+  virtual bool intersectP(const Ray& ray) const = 0;
   virtual AABB aabb() const = 0;
   virtual SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const = 0;
 };
