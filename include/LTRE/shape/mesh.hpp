@@ -187,7 +187,7 @@ class Mesh : public Shape {
   const std::vector<Vec3> tangents;   // tangent vector(dp/du)
   const std::vector<Vec3> dndus;      // differential of normal by texcoords
   const std::vector<Vec3> dndvs;      // differential of normal by texcoords
-  float surfaceArea;
+  float surfaceArea_;
 
   std::shared_ptr<Intersector<MeshTriangle>> intersector;
 
@@ -251,7 +251,7 @@ class Mesh : public Shape {
     }
 
     // compute surface area
-    surfaceArea = 0;
+    surfaceArea_ = 0;
     for (unsigned int f = 0; f < nFaces(); f += 3) {
       const int idx1 = indices[3 * f];
       const int idx2 = indices[3 * f + 1];
@@ -259,7 +259,7 @@ class Mesh : public Shape {
       const Vec3 p1 = positions[idx1];
       const Vec3 p2 = positions[idx2];
       const Vec3 p3 = positions[idx3];
-      surfaceArea += 0.5f * length(cross(p2 - p1, p3 - p1));
+      surfaceArea_ += 0.5f * length(cross(p2 - p1, p3 - p1));
     }
 
     setupIntersector();
@@ -267,7 +267,7 @@ class Mesh : public Shape {
 
   unsigned int nVertices() const { return indices.size(); }
   unsigned int nFaces() const { return indices.size() / 3; }
-  float getSurfaceArea() const { return surfaceArea; }
+  float getSurfaceArea() const { return surfaceArea_; }
 
   bool intersect(const Ray& ray, IntersectInfo& info) const override {
     return intersector->intersect(ray, info);
@@ -277,6 +277,8 @@ class Mesh : public Shape {
   }
 
   AABB aabb() const override { return intersector->aabb(); }
+
+  float surfaceArea() const override { return surfaceArea_; }
 
   SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const override {
     SurfaceInfo ret;

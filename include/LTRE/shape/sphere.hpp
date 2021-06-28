@@ -57,6 +57,8 @@ class Sphere : public Shape {
     return AABB(center - Vec3(radius + EPS), center + Vec3(radius + EPS));
   }
 
+  float surfaceArea() const override { return PI_MUL_4 * radius * radius; }
+
   // TODO: set uv
   SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const override {
     SurfaceInfo ret;
