@@ -26,13 +26,13 @@ class AreaLight : public Light {
     return (dot(-wi, info.normal) > 0) * le->sample(info);
   }
 
-  Vec3 sampleDirection(const Vec3& pos, Sampler& sampler, Vec3& dir,
+  Vec3 sampleDirection(const SurfaceInfo& surfInfo, Sampler& sampler, Vec3& dir,
                        float& distToLight, float& pdf) const override {
     // sample point on shape
     float pdf_a;
     const SurfaceInfo sampledInfo = shape->samplePoint(sampler, pdf_a);
-    dir = normalize(sampledInfo.position - pos);
-    distToLight = length(sampledInfo.position - pos);
+    dir = normalize(sampledInfo.position - surfInfo.position);
+    distToLight = length(sampledInfo.position - surfInfo.position);
 
     // convert area pdf to solid angle pdf
     const float dist2 = distToLight * distToLight;

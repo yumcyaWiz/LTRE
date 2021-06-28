@@ -52,8 +52,8 @@ class NEE : public Integrator {
         Vec3 dir;
         float distToLight;
         float lightPdf;
-        const Vec3 le = light->sampleDirection(
-            info.surfaceInfo.position, sampler, dir, distToLight, lightPdf);
+        const Vec3 le = light->sampleDirection(info.surfaceInfo, sampler, dir,
+                                               distToLight, lightPdf);
 
         // test visibility
         const Ray shadowRay(info.surfaceInfo.position, dir);

@@ -20,11 +20,21 @@ class UniformSky : public Sky {
     return ke;
   }
 
-  Vec3 sampleDirection([[maybe_unused]] const Vec3& pos, Sampler& sampler,
-                       Vec3& dir, float& distToLight,
-                       float& pdf) const override {
-    dir = sampleSphere(sampler.getNext2D(), pdf);
+  Vec3 sampleDirection(const SurfaceInfo& surfInfo, Sampler& sampler, Vec3& dir,
+                       float& distToLight, float& pdf) const override {
+    // compute tangent space basis
+    Vec3 t, b;
+    orthonormalBasis(surfInfo.normal, t, b);
+
+    // sample in tangent space
+    Vec3 dir_l = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+
+    // local to world transform
+    dir = localToWorld(dir_l, t, surfInfo.normal, b);
+
+    // set very large value to distToLight
     distToLight = std::numeric_limits<float>::max();
+
     return ke;
   }
 };
