@@ -9,10 +9,10 @@
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/light/area-light.hpp"
+#include "LTRE/light/sky/uniform-sky.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/mesh.hpp"
 #include "LTRE/shape/sphere.hpp"
-#include "LTRE/sky/uniform-sky.hpp"
 
 using namespace LTRE;
 
@@ -22,7 +22,7 @@ int main() {
 
   const auto intersector =
       std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
-  const auto sky = std::make_shared<UniformSky>(Vec3(0));
+  const auto sky = std::make_shared<UniformSky>(Vec3(1));
   Scene scene(intersector, sky);
 
   // const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
@@ -61,7 +61,7 @@ int main() {
   //     0.4f);
   // const auto camera = std::make_shared<ThinLensCamera>(
   //     Vec3(0, 16, 60), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f, 1.4f);
-  const auto integrator = std::make_shared<PT>();
+  const auto integrator = std::make_shared<NEE>();
   const auto sampler = std::make_shared<UniformSampler>();
 
   Renderer renderer(width, height, camera, integrator, sampler);
