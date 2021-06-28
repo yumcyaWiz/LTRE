@@ -16,6 +16,9 @@ class AreaLight : public Light {
             const std::shared_ptr<Shape>& shape)
       : le(le), shape(shape) {}
 
+  // return average power
+  virtual Vec3 power() const override { return le->average(); }
+
   Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const override {
     // return black when the surface is back faced
     return (dot(-wi, info.normal) > 0) * le->sample(info);

@@ -33,7 +33,10 @@ class Texture {
   }
 
  public:
+  // sample color from texture
   virtual T sample(const SurfaceInfo& info) const = 0;
+
+  // average color of texture
   virtual T average() const = 0;
 };
 

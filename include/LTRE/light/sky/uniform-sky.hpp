@@ -13,6 +13,8 @@ class UniformSky : public Sky {
  public:
   UniformSky(const Vec3& ke) : ke(ke) {}
 
+  Vec3 power() const override { return PI_MUL_4 * 10000.0f * ke; }
+
   Vec3 Le([[maybe_unused]] const Vec3& wi,
           [[maybe_unused]] const SurfaceInfo& info) const override {
     return ke;

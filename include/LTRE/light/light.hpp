@@ -9,6 +9,8 @@ namespace LTRE {
 
 class Light {
  public:
+  virtual Vec3 power() const = 0;
+
   virtual Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const = 0;
 
   // return Le
