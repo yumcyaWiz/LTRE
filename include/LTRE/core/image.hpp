@@ -33,22 +33,27 @@ class Image {
   }
 
   T getPixel(unsigned int i, unsigned int j) const {
-    using namespace std::string_literals;
     if (i >= width || j >= height) {
-      spdlog::error("[Image] pixel index out of bounds "s + "(" +
-                    std::to_string(i) + ", " + std::to_string(j) + ")");
+      spdlog::error("[Image] pixel index out of bounds ({0}, {1})", i, j);
       std::exit(EXIT_FAILURE);
     }
     return image[i + width * j];
   }
+
   void setPixel(unsigned int i, unsigned int j, const T& value) {
-    using namespace std::string_literals;
     if (i >= width || j >= height) {
-      spdlog::error("[Image] pixel index out of bounds "s + "(" +
-                    std::to_string(i) + ", " + std::to_string(j) + ")");
+      spdlog::error("[Image] pixel index out of bounds ({0}, {1})", i, j);
       std::exit(EXIT_FAILURE);
     }
     image[i + width * j] = value;
+  }
+
+  void addPixel(unsigned int i, unsigned int j, const T& value) {
+    if (i >= width || j >= height) {
+      spdlog::error("[Image] pixel index out of bounds ({0}, {1})", i, j);
+      std::exit(EXIT_FAILURE);
+    }
+    image[i + width * j] += value;
   }
 
   void writePPM(const std::string& filename) {
