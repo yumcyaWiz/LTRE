@@ -23,6 +23,39 @@ class Image {
     image.resize(width * height, T{0});
   }
 
+  Image<T> operator+=(const T& v) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        image[i + width * j] += v;
+      }
+    }
+    return *this;
+  }
+  Image<T> operator-=(const T& v) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        image[i + width * j] -= v;
+      }
+    }
+    return *this;
+  }
+  Image<T> operator*=(const T& v) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        image[i + width * j] *= v;
+      }
+    }
+    return *this;
+  }
+  Image<T> operator/=(const T& v) {
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        image[i + width * j] /= v;
+      }
+    }
+    return *this;
+  }
+
   unsigned int getWidth() const { return width; }
   unsigned int getHeight() const { return height; }
 
