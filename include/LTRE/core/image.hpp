@@ -59,7 +59,8 @@ class Image {
   void writePPM(const std::string& filename) {
     std::ofstream file(filename);
     if (!file) {
-      spdlog::error("[Image] failed to open " + filename);
+      spdlog::error("[Image] failed to open {0}", filename);
+      return;
     }
 
     file << "P3" << std::endl;
