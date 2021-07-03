@@ -20,7 +20,7 @@ class Image {
   Image() {}
   Image(unsigned int width, unsigned int height)
       : width(width), height(height) {
-    image.resize(width * height);
+    image.resize(width * height, T{0});
   }
 
   unsigned int getWidth() const { return width; }
@@ -29,7 +29,7 @@ class Image {
   void resize(unsigned int width, unsigned int height) {
     this->width = width;
     this->height = height;
-    image.resize(width * height);
+    image.resize(width * height, T{0});
   }
 
   T getPixel(unsigned int i, unsigned int j) const {
