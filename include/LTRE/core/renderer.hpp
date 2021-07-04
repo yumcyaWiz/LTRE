@@ -84,7 +84,7 @@ class Renderer {
     }
   }
 
-  void render(const Scene& scene, int samples) {
+  void render(const Scene& scene, unsigned int samples) {
     spdlog::info("[Renderer] samples: " + std::to_string(samples));
 
     spdlog::info("[Renderer] rendering started...");
@@ -124,7 +124,7 @@ class Renderer {
 
         // compute radiance
         Vec3 radiance(0);
-        for (int k = 0; k < samples; ++k) {
+        for (unsigned int sample = 0; sample < samples; ++sample) {
           // compute (u, v) with SSAA
           // NOTE: adding "-"" to flip uv
           Vec2 uv;
@@ -140,7 +140,8 @@ class Renderer {
             const Vec3 We = camera->We(uv, wi);
 
             // evaluate cos
-            const float cos = std::abs(dot(wi, camera->getCameraForward()));
+            const float cos =
+                std::max(dot(wi, camera->getCameraForward()), 0.0f);
 
             // integrate light transport equation
             radiance +=
@@ -164,6 +165,80 @@ class Renderer {
                         .count();
     spdlog::info("[Renderer] rendering finished in " + std::to_string(ms) +
                  " ms");
+  }
+
+  // limitTime [ms]
+  void renderWithInLimitTime(const Scene& scene, unsigned int limitTime) {
+    spdlog::info("[Renderer] rendering started...");
+    const auto startTime = std::chrono::steady_clock::now();
+
+    // setup sampler
+    std::vector<std::unique_ptr<Sampler>> samplers(width * height);
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        samplers[i + width * j] = this->sampler->clone();
+        samplers[i + width * j]->setSeed(i + width * j);
+      }
+    }
+
+    // render beauty
+    unsigned int nSamples = 0;
+    for (unsigned int samples = 0; true; samples++) {
+      // exit rendering if elapsed time is bigger than limit time
+      const auto elapsedTime =
+          std::chrono::duration_cast<std::chrono::milliseconds>(
+              std::chrono::steady_clock::now() - startTime)
+              .count();
+      if (elapsedTime >= limitTime) {
+        break;
+      }
+
+      nSamples++;
+#pragma omp parallel for schedule(dynamic, 1) collapse(2)
+      for (unsigned int j = 0; j < height; ++j) {
+        for (unsigned int i = 0; i < width; ++i) {
+          const std::unique_ptr<Sampler>& sampler = samplers[i + width * j];
+
+          // compute (u, v) with SSAA
+          // NOTE: adding "-"" to flip uv
+          Vec2 uv;
+          uv[0] = -(2.0f * (i + sampler->getNext1D()) - width) / height;
+          uv[1] = -(height - 2.0f * (j + sampler->getNext1D())) / height;
+
+          // generate camera ray
+          Ray ray;
+          Vec3 wi;
+          float pdf;
+          if (camera->sampleRay(uv, *sampler, ray, wi, pdf)) {
+            // evaluate We
+            const Vec3 We = camera->We(uv, wi);
+
+            // evaluate cos
+            const float cos =
+                std::max(dot(wi, camera->getCameraForward()), 0.0f);
+
+            // integrate light transport equation
+            const Vec3 radiance =
+                We * integrator->integrate(ray, scene, *sampler) * cos / pdf;
+            if (radiance.isNan()) {
+              spdlog::error("[Renderer] radiance has NaN");
+              std::exit(EXIT_FAILURE);
+            }
+
+            // accumulate radiance
+            aov.beauty.addPixel(i, j, radiance);
+          }
+        }
+      }
+    }
+    aov.beauty /= Vec3(nSamples);
+
+    const auto elapsedTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - startTime)
+            .count();
+    spdlog::info("[Renderer] rendering finished in {0} ms", elapsedTime);
+    spdlog::info("[Renderer] samples: {0}", nSamples);
   }
 
   void writePPM(const std::string& filename, const AOVType& aovType) {
