@@ -84,11 +84,7 @@ class Renderer {
     }
   }
 
-  void render(const Scene& scene, unsigned int samples) {
-    spdlog::info("[Renderer] samples: " + std::to_string(samples));
-
-    spdlog::info("[Renderer] rendering started...");
-    const auto startTime = std::chrono::steady_clock::now();
+  void renderFirstHitAOV(const Scene& scene) {
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < height; ++j) {
       for (unsigned int i = 0; i < width; ++i) {
@@ -96,31 +92,44 @@ class Renderer {
         std::unique_ptr<Sampler> sampler = this->sampler->clone();
         sampler->setSeed(i + width * j);
 
-        // set aov
-        {
-          // compute (u, v)
-          // NOTE: adding "-"" to flip uv
-          Vec2 uv;
-          uv[0] = -(2.0f * i - width) / height;
-          uv[1] = -(height - 2.0f * j) / height;
+        // compute (u, v)
+        // NOTE: adding "-"" to flip uv
+        Vec2 uv;
+        uv[0] = -(2.0f * i - width) / height;
+        uv[1] = -(height - 2.0f * j) / height;
 
-          Ray ray;
-          Vec3 wi;
-          float pdf;
-          if (camera->sampleRay(uv, *sampler, ray, wi, pdf)) {
-            IntersectInfo info;
-            if (scene.intersect(ray, info)) {
-              aov.depth.setPixel(i, j, info.t);
-              aov.position.setPixel(i, j, info.surfaceInfo.position);
-              aov.normal.setPixel(i, j,
-                                  0.5f * (info.surfaceInfo.normal + 1.0f));
-              aov.barycentric.setPixel(i, j, info.barycentric);
-              aov.texcoords.setPixel(i, j, info.surfaceInfo.uv);
-              aov.baseColor.setPixel(
-                  i, j, info.hitPrimitive->baseColor(info.surfaceInfo));
-            }
+        Ray ray;
+        Vec3 wi;
+        float pdf;
+        if (camera->sampleRay(uv, *sampler, ray, wi, pdf)) {
+          IntersectInfo info;
+          if (scene.intersect(ray, info)) {
+            aov.depth.setPixel(i, j, info.t);
+            aov.position.setPixel(i, j, info.surfaceInfo.position);
+            aov.normal.setPixel(i, j, 0.5f * (info.surfaceInfo.normal + 1.0f));
+            aov.barycentric.setPixel(i, j, info.barycentric);
+            aov.texcoords.setPixel(i, j, info.surfaceInfo.uv);
+            aov.baseColor.setPixel(
+                i, j, info.hitPrimitive->baseColor(info.surfaceInfo));
           }
         }
+      }
+    }
+  }
+
+  void render(const Scene& scene, unsigned int samples) {
+    renderFirstHitAOV(scene);
+
+    spdlog::info("[Renderer] samples: " + std::to_string(samples));
+    spdlog::info("[Renderer] rendering started...");
+
+    const auto startTime = std::chrono::steady_clock::now();
+#pragma omp parallel for schedule(dynamic, 1) collapse(2)
+    for (unsigned int j = 0; j < height; ++j) {
+      for (unsigned int i = 0; i < width; ++i) {
+        // setup sampler
+        std::unique_ptr<Sampler> sampler = this->sampler->clone();
+        sampler->setSeed(i + width * j);
 
         // compute radiance
         Vec3 radiance(0);
