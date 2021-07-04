@@ -54,36 +54,6 @@ class Renderer {
 
   AOV aov;
 
- public:
-  Renderer(unsigned int width, unsigned int height,
-           const std::shared_ptr<Camera>& camera,
-           const std::shared_ptr<Integrator>& integrator,
-           const std::shared_ptr<Sampler>& sampler)
-      : width(width),
-        height(height),
-        camera{camera},
-        integrator{integrator},
-        sampler{sampler},
-        aov{width, height} {}
-
-  // focus at specified point
-  void focus(const Vec3& p) { camera->focus(p); }
-  // focus at specified direction
-  void focus(const Ray& ray, const Scene& scene) {
-    IntersectInfo info;
-    if (scene.intersect(ray, info)) {
-      focus(info.surfaceInfo.position);
-    }
-  }
-  // focus at camera direction
-  void focus(const Scene& scene) {
-    Ray ray(camera->getCameraPosition(), camera->getCameraForward());
-    IntersectInfo info;
-    if (scene.intersect(ray, info)) {
-      focus(info.surfaceInfo.position);
-    }
-  }
-
   void renderFirstHitAOV(const Scene& scene) {
 #pragma omp parallel for schedule(dynamic, 1) collapse(2)
     for (unsigned int j = 0; j < height; ++j) {
@@ -114,6 +84,36 @@ class Renderer {
           }
         }
       }
+    }
+  }
+
+ public:
+  Renderer(unsigned int width, unsigned int height,
+           const std::shared_ptr<Camera>& camera,
+           const std::shared_ptr<Integrator>& integrator,
+           const std::shared_ptr<Sampler>& sampler)
+      : width(width),
+        height(height),
+        camera{camera},
+        integrator{integrator},
+        sampler{sampler},
+        aov{width, height} {}
+
+  // focus at specified point
+  void focus(const Vec3& p) { camera->focus(p); }
+  // focus at specified direction
+  void focus(const Ray& ray, const Scene& scene) {
+    IntersectInfo info;
+    if (scene.intersect(ray, info)) {
+      focus(info.surfaceInfo.position);
+    }
+  }
+  // focus at camera direction
+  void focus(const Scene& scene) {
+    Ray ray(camera->getCameraPosition(), camera->getCameraForward());
+    IntersectInfo info;
+    if (scene.intersect(ray, info)) {
+      focus(info.surfaceInfo.position);
     }
   }
 
@@ -178,6 +178,8 @@ class Renderer {
 
   // limitTime [ms]
   void renderWithInLimitTime(const Scene& scene, unsigned int limitTime) {
+    renderFirstHitAOV(scene);
+
     spdlog::info("[Renderer] rendering started...");
     const auto startTime = std::chrono::steady_clock::now();
 
