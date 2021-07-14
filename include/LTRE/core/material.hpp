@@ -5,6 +5,7 @@
 #include "LTRE/bsdf/bsdf.hpp"
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
 #include "LTRE/bsdf/bxdf/disney.hpp"
+#include "LTRE/bsdf/bxdf/microfacet.hpp"
 #include "LTRE/core/texture.hpp"
 #include "LTRE/math/vec3.hpp"
 #include "LTRE/sampling/sampler.hpp"
@@ -50,6 +51,27 @@ class Diffuse : public Material {
 
   Vec3 baseColor(const SurfaceInfo& info) const override {
     return _baseColor->sample(info);
+  }
+};
+
+class Glossy : public Material {
+ private:
+  const std::shared_ptr<Texture<Vec3>> baseColor_;
+  const float roughness_;
+
+ public:
+  Glossy(const std::shared_ptr<Texture<Vec3>>& baseColor, float roughness)
+      : baseColor_(baseColor), roughness_(roughness) {}
+
+  BSDF prepareBSDF(const SurfaceInfo& info) const override {
+    BSDF bsdf;
+    const Vec3 rho = baseColor_->sample(info);
+    const auto F = std::make_shared<Fresnel>(1.0f, 1.5f);
+    const auto D = std::make_shared<GGX>(roughness_ * roughness_);
+    const auto bxdf =
+        std::make_shared<TorranceSparrowBRDF>(rho, F.get(), D.get());
+    bsdf.add(bxdf);
+    return bsdf;
   }
 };
 
