@@ -141,10 +141,12 @@ class DisneySpecular : public BxDF {
     const Vec3 rho_specular = lerp(Vec3(1), rho_tint, specularTint);
     f0 = lerp(0.08 * specular * rho_specular, baseColor, metallic);
 
-    const float aspect = std::sqrt(std::max(1.0f - 0.9f * anisotropic, 0.0f));
-    const float alphaX = std::max(0.001f, roughness * roughness / aspect);
-    const float alphaY = std::max(0.001f, roughness * roughness * aspect);
-    distribution = GGX(alphaX, alphaY);
+    // TODO: handle anisotropic parameter
+    // const float aspect = std::sqrt(std::max(1.0f - 0.9f * anisotropic,
+    // 0.0f)); const float alphaX = std::max(0.001f, roughness * roughness /
+    // aspect); const float alphaY = std::max(0.001f, roughness * roughness *
+    // aspect);
+    distribution = GGX(roughness * roughness);
   }
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {

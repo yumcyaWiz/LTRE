@@ -14,7 +14,7 @@ class MicrofacetDistribution {
 
   float G1(const Vec3& w) const { return 1.0f / (1.0f + Lambda(w)); }
 
-  // height-correlated masking and shadowing
+  // height-correlated masking-shadowing
   float G(const Vec3& wo, const Vec3& wi) const {
     return 1.0f / (1.0f + Lambda(wo) + Lambda(wi));
   }
@@ -22,28 +22,24 @@ class MicrofacetDistribution {
 
 class Beckmann : public MicrofacetDistribution {
  private:
-  float alphaX;
-  float alphaY;
+  float alpha;
 
  public:
-  Beckmann(float alphaX, float alphaY) : alphaX(alphaX), alphaY(alphaY) {}
+  Beckmann(float alpha) : alpha(alpha) {}
 
   float D(const Vec3& wh) const override {
     const float tan2Theta = BxDF::tan2Theta(wh);
     if (std::isinf(tan2Theta)) return 0;
     const float cos4Theta = BxDF::cos2Theta(wh) * BxDF::cos2Theta(wh);
 
-    return std::exp(-tan2Theta * (BxDF::cos2Phi(wh) / (alphaX * alphaX) +
-                                  BxDF::sin2Phi(wh) / (alphaY * alphaY))) /
-           (PI * alphaX * alphaY * cos4Theta);
+    return std::exp(-tan2Theta / (alpha * alpha)) *
+           (PI * alpha * alpha * cos4Theta);
   }
 
   float Lambda(const Vec3& w) const override {
     const float absTanTheta = BxDF::absTanTheta(w);
     if (std::isinf(absTanTheta)) return 0;
 
-    const float alpha = std::sqrt(BxDF::cos2Phi(w) * alphaX * alphaX +
-                                  BxDF::sin2Phi(w) * alphaY * alphaY);
     const float a = 1.0f / (alpha * absTanTheta);
     if (a >= 1.6f) {
       return 0;
@@ -54,30 +50,25 @@ class Beckmann : public MicrofacetDistribution {
 
 class GGX : public MicrofacetDistribution {
  private:
-  float alphaX;
-  float alphaY;
+  float alpha;
 
  public:
   GGX() {}
-  GGX(float alphaX, float alphaY) : alphaX(alphaX), alphaY(alphaY) {}
+  GGX(float alpha) : alpha(alpha) {}
 
   float D(const Vec3& wh) const override {
     const float tan2Theta = BxDF::tan2Theta(wh);
     if (std::isinf(tan2Theta)) return 0;
     const float cos4Theta = BxDF::cos2Theta(wh) * BxDF::cos2Theta(wh);
 
-    const float term =
-        1.0f + tan2Theta * (BxDF::cos2Phi(wh) / (alphaX * alphaX) +
-                            BxDF::sin2Phi(wh) / (alphaY * alphaY));
-    return 1.0f / ((PI * alphaX * alphaY * cos4Theta) * term * term);
+    const float term = 1.0f + tan2Theta / (alpha * alpha);
+    return 1.0f / ((PI * alpha * alpha * cos4Theta) * term * term);
   }
 
   float Lambda(const Vec3& w) const override {
     const float absTanTheta = BxDF::absTanTheta(w);
     if (std::isinf(absTanTheta)) return 0;
 
-    const float alpha = std::sqrt(BxDF::cos2Phi(w) * alphaX * alphaX +
-                                  BxDF::sin2Phi(w) * alphaY * alphaY);
     const float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
     return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
   }
