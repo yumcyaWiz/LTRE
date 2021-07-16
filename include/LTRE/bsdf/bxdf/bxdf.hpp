@@ -100,6 +100,19 @@ class FresnelConductor : public Fresnel {
   }
 };
 
+class FresnelSchlick : public Fresnel {
+ private:
+  float f0_;
+
+ public:
+  FresnelSchlick(float f0) : f0_(f0) {}
+
+  float evaluate(float cosThetaI) const override {
+    const auto pow5 = [](float x) { return x * x * x * x * x; };
+    return f0_ + (1.0f - f0_) * pow5(1.0f - std::abs(cosThetaI));
+  }
+};
+
 class BxDF {
  public:
   static float cosTheta(const Vec3& w) { return w[1]; }
