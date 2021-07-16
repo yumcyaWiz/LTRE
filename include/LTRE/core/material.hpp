@@ -66,12 +66,17 @@ class Glossy : public Material {
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = baseColor_->sample(info);
-    const auto F = std::make_shared<Fresnel>(1.0f, 1.5f);
-    const auto D = std::make_shared<GGX>(roughness_ * roughness_);
+    const auto F = std::make_shared<Fresnel>(1.0f, 100.f);
+    const auto D =
+        std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
     const auto bxdf =
         std::make_shared<TorranceSparrowBRDF>(rho, F.get(), D.get());
     bsdf.add(bxdf);
     return bsdf;
+  }
+
+  Vec3 baseColor(const SurfaceInfo& info) const override {
+    return baseColor_->sample(info);
   }
 };
 

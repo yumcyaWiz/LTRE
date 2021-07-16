@@ -95,7 +95,7 @@ class TorranceSparrowBRDF : public BxDF {
     if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
     wh = normalize(wh);
 
-    const float F = fresnel->evaluate(dot(wi, wh));
+    const float F = fresnel->evaluate(dot(wo, wh));
     const float D = distribution->D(wh);
     const float G = distribution->G(wo, wi);
     return rho * F * D * G / (4.0f * cosThetaO * cosThetaI);
