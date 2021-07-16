@@ -54,19 +54,19 @@ class Diffuse : public Material {
   }
 };
 
-class Glossy : public Material {
+class Metal : public Material {
  private:
   const std::shared_ptr<Texture<Vec3>> baseColor_;
   const float roughness_;
 
  public:
-  Glossy(const std::shared_ptr<Texture<Vec3>>& baseColor, float roughness)
+  Metal(const std::shared_ptr<Texture<Vec3>>& baseColor, float roughness)
       : baseColor_(baseColor), roughness_(roughness) {}
 
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = baseColor_->sample(info);
-    const auto F = std::make_shared<Fresnel>(1.0f, 100.f);
+    const auto F = std::make_shared<FresnelConductor>(1.0f, 1.0152f, 6.6273f);
     const auto D =
         std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
     const auto bxdf =
