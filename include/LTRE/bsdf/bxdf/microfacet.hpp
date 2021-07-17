@@ -11,6 +11,7 @@ class MicrofacetDistribution {
  public:
   virtual float D(const Vec3& wh) const = 0;
   virtual float Lambda(const Vec3& w) const = 0;
+  virtual Vec3 sample(const Vec2& uv, float& pdf) const = 0;
 
   float G1(const Vec3& w) const { return 1.0f / (1.0f + Lambda(w)); }
 
@@ -46,6 +47,15 @@ class Beckmann : public MicrofacetDistribution {
     }
     return (1.0f - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
   }
+
+  Vec3 sample(const Vec2& uv, float& pdf) const override {
+    const float theta = std::atan(
+        std::sqrt(-alpha * alpha * std::log(std::max(1.0f - uv[0], 0.0f))));
+    const float phi = 2.0f * PI * uv[1];
+    const Vec3 wh = sphericalToCartesian(theta, phi);
+    pdf = D(wh) * BxDF::absCosTheta(wh);
+    return wh;
+  }
 };
 
 class GGX : public MicrofacetDistribution {
@@ -72,17 +82,26 @@ class GGX : public MicrofacetDistribution {
     const float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
     return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
   }
+
+  Vec3 sample(const Vec2& uv, float& pdf) const override {
+    const float theta = std::atan((alpha * std::sqrt(std::max(uv[0], 0.0f))) /
+                                  std::sqrt(std::max(1.0f - uv[0], 0.0f)));
+    const float phi = 2.0f * PI * uv[1];
+    const Vec3 wh = sphericalToCartesian(theta, phi);
+    pdf = D(wh) * BxDF::absCosTheta(wh);
+    return wh;
+  }
 };
 
-class TorranceSparrowBRDF : public BxDF {
+class MicrofacetBRDF : public BxDF {
  private:
   const Vec3 rho;
   const Fresnel* fresnel;
   const MicrofacetDistribution* distribution;
 
  public:
-  TorranceSparrowBRDF(const Vec3& rho, const Fresnel* fresnel,
-                      const MicrofacetDistribution* distribution)
+  MicrofacetBRDF(const Vec3& rho, const Fresnel* fresnel,
+                 const MicrofacetDistribution* distribution)
       : rho(rho), fresnel(fresnel), distribution(distribution) {}
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
@@ -103,7 +122,18 @@ class TorranceSparrowBRDF : public BxDF {
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
-    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+    // wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
+
+    // sample half-vector
+    float pdf_wh;
+    const Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
+
+    // compute indident direction
+    wi = BxDF::reflect(wo, wh);
+
+    // convert hald-vector pdf to incident direction pdf
+    pdf = pdf_wh / (4.0f * dot(wi, wh));
+
     return f(wo, wi);
   }
 };

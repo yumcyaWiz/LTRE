@@ -140,6 +140,10 @@ class BxDF {
   static float cos2Phi(const Vec3& w) { return cosPhi(w) * cosPhi(w); }
   static float sin2Phi(const Vec3& w) { return sinPhi(w) * sinPhi(w); }
 
+  static Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return -v + 2.0f * dot(v, n) * n;
+  }
+
   virtual Vec3 f(const Vec3& wo, const Vec3& wi) const = 0;
   virtual Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
                       float& pdf) const = 0;

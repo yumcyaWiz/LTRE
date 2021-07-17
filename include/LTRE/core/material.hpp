@@ -69,8 +69,7 @@ class Metal : public Material {
     const auto F = std::make_shared<FresnelConductor>(1.0f, 1.0152f, 6.6273f);
     const auto D =
         std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
-    const auto bxdf =
-        std::make_shared<TorranceSparrowBRDF>(rho, F.get(), D.get());
+    const auto bxdf = std::make_shared<MicrofacetBRDF>(rho, F.get(), D.get());
     bsdf.add(bxdf);
     return bsdf;
   }
