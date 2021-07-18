@@ -33,7 +33,7 @@ class Beckmann : public MicrofacetDistribution {
     if (std::isinf(tan2Theta)) return 0;
     const float cos4Theta = BxDF::cos2Theta(wh) * BxDF::cos2Theta(wh);
 
-    return std::exp(-tan2Theta / (alpha * alpha)) *
+    return std::exp(-tan2Theta / (alpha * alpha)) /
            (PI * alpha * alpha * cos4Theta);
   }
 
@@ -50,7 +50,7 @@ class Beckmann : public MicrofacetDistribution {
 
   Vec3 sample(const Vec2& uv, float& pdf) const override {
     const float theta = std::atan(
-        std::sqrt(-alpha * alpha * std::log(std::max(1.0f - uv[0], 0.0f))));
+        std::sqrt(-alpha * alpha * std::log(std::max(1.0f - uv[0], 1e-9f))));
     const float phi = 2.0f * PI * uv[1];
     const Vec3 wh = sphericalToCartesian(theta, phi);
     pdf = D(wh) * BxDF::absCosTheta(wh);
