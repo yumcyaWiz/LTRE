@@ -132,7 +132,6 @@ class DisneySpecular : public BxDF {
   MicrofacetBRDF microfacetBRDF;
   FresnelSchlick F;
   GGX G;
-  Vec3 f0;
 
  public:
   DisneySpecular(const Vec3& baseColor, float roughness, float specular,
@@ -145,7 +144,7 @@ class DisneySpecular : public BxDF {
     }
 
     const Vec3 rho_specular = lerp(Vec3(1), rho_tint, specularTint);
-    f0 = lerp(0.08 * specular * rho_specular, baseColor, metallic);
+    const Vec3 f0 = lerp(0.08 * specular * rho_specular, baseColor, metallic);
 
     // TODO: handle anisotropic parameter
     // const float aspect = std::sqrt(std::max(1.0f - 0.9f * anisotropic,
@@ -164,6 +163,30 @@ class DisneySpecular : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
     return microfacetBRDF.sample(sampler, wo, wi, pdf);
+  }
+};
+
+class DisneyClearcoat : public BxDF {
+ private:
+  MicrofacetBRDF microfacetBRDF;
+  FresnelSchlick F;
+  GGX G;
+  float clearcoat;
+
+ public:
+  DisneyClearcoat(float clearcoat) : clearcoat(clearcoat) {
+    F = FresnelSchlick(Vec3(0.04));
+    G = GGX(0.25);
+    microfacetBRDF = MicrofacetBRDF(&F, &G);
+  }
+
+  Vec3 f(const Vec3& wo, const Vec3& wi) const override {
+    return 0.25 * clearcoat * microfacetBRDF.f(wo, wi);
+  }
+
+  Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
+              float& pdf) const override {
+    return 0.25 * clearcoat * microfacetBRDF.sample(sampler, wo, wi, pdf);
   }
 };
 
