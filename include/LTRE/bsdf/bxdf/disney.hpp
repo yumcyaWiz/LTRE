@@ -19,12 +19,12 @@ inline Vec3 schlickFresnelR(float cos, const Vec3& f0) {
 
 class DisneyDiffuse : public BxDF {
  private:
-  const Lambert lambert;
+  const Vec3 baseColor;
   const float roughness;
 
  public:
   DisneyDiffuse(const Vec3& baseColor, float roughness)
-      : lambert{baseColor}, roughness{roughness} {}
+      : baseColor{baseColor}, roughness{roughness} {}
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
     // compute half-vector
@@ -39,7 +39,7 @@ class DisneyDiffuse : public BxDF {
       constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
       return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
     };
-    return lambert.f(wo, wi) * schlickFresnelT(absCosTheta(wi), f90) *
+    return baseColor * PI_INV * schlickFresnelT(absCosTheta(wi), f90) *
            schlickFresnelT(absCosTheta(wo), f90);
   }
 
@@ -51,12 +51,12 @@ class DisneyDiffuse : public BxDF {
 
 class DisneySubsurface : public BxDF {
  private:
-  const Lambert lambert;
+  const Vec3 baseColor;
   const float roughness;
 
  public:
   DisneySubsurface(const Vec3& baseColor, float roughness)
-      : lambert{baseColor}, roughness(roughness) {}
+      : baseColor{baseColor}, roughness{roughness} {}
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
     const float cosThetaI = absCosTheta(wi);
@@ -79,7 +79,7 @@ class DisneySubsurface : public BxDF {
       constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
       return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
     };
-    return lambert.f(wo, wi) * 1.25f *
+    return baseColor * PI_INV * 1.25f *
            (schlickFresnelT(absCosTheta(wi), f90) *
                 schlickFresnelT(absCosTheta(wo), f90) *
                 (1.0f / (cosThetaI + cosThetaO) - 0.5f) +
