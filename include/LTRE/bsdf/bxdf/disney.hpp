@@ -7,16 +7,6 @@
 
 namespace LTRE {
 
-inline float schlickFresnelR(float cos, float f0) {
-  constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
-  return f0 + (1.0f - f0) * pow5(std::max(1.0f - cos, 0.0f));
-}
-
-inline Vec3 schlickFresnelR(float cos, const Vec3& f0) {
-  constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
-  return f0 + (1.0f - f0) * pow5(std::max(1.0f - cos, 0.0f));
-}
-
 class DisneyDiffuse : public BxDF {
  private:
   const Vec3 baseColor;
