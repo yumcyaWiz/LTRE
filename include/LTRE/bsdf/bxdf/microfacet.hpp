@@ -95,14 +95,13 @@ class GGX : public MicrofacetDistribution {
 
 class MicrofacetBRDF : public BxDF {
  private:
-  const Vec3 rho;
   const Fresnel* fresnel;
   const MicrofacetDistribution* distribution;
 
  public:
-  MicrofacetBRDF(const Vec3& rho, const Fresnel* fresnel,
+  MicrofacetBRDF(const Fresnel* fresnel,
                  const MicrofacetDistribution* distribution)
-      : rho(rho), fresnel(fresnel), distribution(distribution) {}
+      : fresnel(fresnel), distribution(distribution) {}
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
     const float cosThetaO = absCosTheta(wo);
@@ -114,10 +113,10 @@ class MicrofacetBRDF : public BxDF {
     if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
     wh = normalize(wh);
 
-    const float F = fresnel->evaluate(dot(wo, wh));
+    const Vec3 F = fresnel->evaluate(dot(wo, wh));
     const float D = distribution->D(wh);
     const float G = distribution->G(wo, wi);
-    return rho * F * D * G / (4.0f * cosThetaO * cosThetaI);
+    return F * D * G / (4.0f * cosThetaO * cosThetaI);
   }
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,

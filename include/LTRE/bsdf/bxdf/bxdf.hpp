@@ -10,7 +10,7 @@ namespace LTRE {
 
 class Fresnel {
  public:
-  virtual float evaluate(float cosThetaI) const = 0;
+  virtual Vec3 evaluate(float cosThetaI) const = 0;
 };
 
 class FresnelDielectric : public Fresnel {
@@ -21,7 +21,7 @@ class FresnelDielectric : public Fresnel {
  public:
   FresnelDielectric(float iorI, float iorT) : iorI_(iorI), iorT_(iorT) {}
 
-  float evaluate(float cosThetaI) const override {
+  Vec3 evaluate(float cosThetaI) const override {
     // handle from internal case
     float iorI = iorI_;
     float iorT = iorT_;
@@ -37,7 +37,7 @@ class FresnelDielectric : public Fresnel {
 
     // total reflection
     if (std::abs(sinThetaT) > 1.0f) {
-      return 1.0f;
+      return Vec3(1);
     }
 
     const float cosThetaT =
@@ -51,10 +51,11 @@ class FresnelDielectric : public Fresnel {
     term2 = iorI * cosThetaT;
     const float r_p = (term1 - term2) / (term1 + term2);
 
-    return 0.5f * (r_s * r_s + r_p * r_p);
+    return 0.5f * (r_s * r_s + r_p * r_p) * Vec3(1);
   }
 };
 
+// TODO: specify IOR with Vec3, then we can get colored reflectance
 class FresnelConductor : public Fresnel {
  private:
   float iorI_;
@@ -65,7 +66,7 @@ class FresnelConductor : public Fresnel {
   FresnelConductor(float iorI, float iorT, float extinctionT)
       : iorI_(iorI), iorT_(iorT), extinctionT_(extinctionT) {}
 
-  float evaluate(float cosThetaI) const override {
+  Vec3 evaluate(float cosThetaI) const override {
     // handle from internal case
     float iorI = iorI_;
     float iorT = iorT_;
@@ -96,18 +97,18 @@ class FresnelConductor : public Fresnel {
     term1 = cosThetaI2 * a2plusb2 + sinThetaI4;
     term2 = 2 * a * cosThetaI * sinThetaI2;
     const float Rp = Rs * (term1 - term2) / (term1 + term2);
-    return 0.5 * (Rs + Rp);
+    return 0.5 * (Rs + Rp) * Vec3(1);
   }
 };
 
 class FresnelSchlick : public Fresnel {
  private:
-  float f0_;
+  Vec3 f0_;
 
  public:
-  FresnelSchlick(float f0) : f0_(f0) {}
+  FresnelSchlick(const Vec3& f0) : f0_(f0) {}
 
-  float evaluate(float cosThetaI) const override {
+  Vec3 evaluate(float cosThetaI) const override {
     const auto pow5 = [](float x) { return x * x * x * x * x; };
     return f0_ + (1.0f - f0_) * pow5(1.0f - std::abs(cosThetaI));
   }
