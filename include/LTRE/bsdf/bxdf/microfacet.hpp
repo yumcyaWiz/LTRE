@@ -58,6 +58,49 @@ class Beckmann : public MicrofacetDistribution {
   }
 };
 
+class Berry : public MicrofacetDistribution {
+ private:
+  float alpha;
+
+ public:
+  Berry() {}
+  Berry(float alpha) : alpha(alpha) {}
+
+  float D(const Vec3& wh) const override {
+    const float alpha2 = alpha * alpha;
+    const float cosThetaH = BxDF::absCosTheta(wh);
+    const float cosThetaH2 = cosThetaH * cosThetaH;
+    return (alpha2 - 1.0f) / (PI * std::log(alpha2)) * 1.0f /
+           (1.0f + (alpha2 - 1.0f) * cosThetaH2);
+  }
+
+  // NOTE: use GGX Lambda since Berry has no analytic G, this is inacurate
+  // though
+  float Lambda(const Vec3& w) const override {
+    const float absTanTheta = BxDF::absTanTheta(w);
+    if (std::isinf(absTanTheta)) return 0;
+
+    const float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
+    return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
+  }
+
+  Vec3 sample(const Vec2& uv, float& pdf) const override {
+    const float alpha2 = alpha * alpha;
+    // NOTE: to prevent NaN, max with 1e-9f
+    float cosTheta = std::max(
+        std::sqrt(std::max(
+            (1.0f - std::pow(alpha2, 1.0f - uv[0])) / (1.0f - alpha2), 0.0f)),
+        1e-9f);
+    const float sinTheta =
+        std::sqrt(std::max(1.0f - cosTheta * cosTheta, 0.0f));
+    const float phi = 2.0f * PI * uv[1];
+    const Vec3 wh =
+        Vec3(std::cos(phi) * sinTheta, cosTheta, std::sin(phi) * sinTheta);
+    pdf = D(wh) * cosTheta;
+    return wh;
+  }
+};
+
 class GGX : public MicrofacetDistribution {
  private:
   float alpha;
