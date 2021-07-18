@@ -103,7 +103,8 @@ class DisneySheen : public BxDF {
  public:
   DisneySheen(const Vec3& baseColor, float sheen, float sheenTint)
       : baseColor{baseColor}, sheen(sheen), sheenTint(sheenTint) {
-    const float luminance = RGBToXYZ(baseColor)[1];
+    const float luminance =
+        0.3 * baseColor[0] + 0.6 * baseColor[1] + 0.1 * baseColor[2];
     if (luminance > 0) {
       rho_tint = baseColor / luminance;
     }
@@ -135,7 +136,8 @@ class DisneySpecular : public BxDF {
   DisneySpecular(const Vec3& baseColor, float roughness, float specular,
                  float specularTint, float metallic, float anisotropic) {
     Vec3 rho_tint;
-    const float luminance = RGBToXYZ(baseColor)[1];
+    const float luminance =
+        0.3 * baseColor[0] + 0.6 * baseColor[1] + 0.1 * baseColor[2];
     if (luminance > 0) {
       rho_tint = baseColor / luminance;
     }
