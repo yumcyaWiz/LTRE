@@ -17,11 +17,6 @@ inline Vec3 schlickFresnelR(float cos, const Vec3& f0) {
   return f0 + (1.0f - f0) * pow5(std::max(1.0f - cos, 0.0f));
 }
 
-inline float schlickFresnelT(float cos, float f90) {
-  constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
-  return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
-}
-
 class DisneyDiffuse : public BxDF {
  private:
   const Lambert lambert;
@@ -40,6 +35,10 @@ class DisneyDiffuse : public BxDF {
     const float cosD = std::abs(dot(wh, wi));
     const float f90 = 0.5f + 2.0f * roughness * cosD * cosD;
 
+    constexpr auto schlickFresnelT = [](float cos, float f90) {
+      constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
+      return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
+    };
     return lambert.f(wo, wi) * schlickFresnelT(absCosTheta(wi), f90) *
            schlickFresnelT(absCosTheta(wo), f90);
   }
@@ -50,7 +49,6 @@ class DisneyDiffuse : public BxDF {
   }
 };
 
-// TODO: fix NaN
 class DisneySubsurface : public BxDF {
  private:
   const Lambert lambert;
@@ -77,6 +75,10 @@ class DisneySubsurface : public BxDF {
     const float cosD = std::abs(dot(wh, wi));
     const float f90 = roughness * cosD * cosD;
 
+    constexpr auto schlickFresnelT = [](float cos, float f90) {
+      constexpr auto pow5 = [](float x) { return x * x * x * x * x; };
+      return 1.0f + (f90 - 1.0f) * pow5(std::max(1.0f - cos, 0.0f));
+    };
     return lambert.f(wo, wi) * 1.25f *
            (schlickFresnelT(absCosTheta(wi), f90) *
                 schlickFresnelT(absCosTheta(wo), f90) *
