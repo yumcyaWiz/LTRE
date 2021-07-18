@@ -80,7 +80,7 @@ class DisneySubsurface : public BxDF {
     return lambert.f(wo, wi) * 1.25f *
            (schlickFresnelT(absCosTheta(wi), f90) *
                 schlickFresnelT(absCosTheta(wo), f90) *
-                (1.0f / (cosThetaI * cosThetaO) - 0.5f) +
+                (1.0f / (cosThetaI + cosThetaO) - 0.5f) +
             0.5f);
   }
 

@@ -122,8 +122,6 @@ class MicrofacetBRDF : public BxDF {
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
-    // wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
-
     // sample half-vector
     float pdf_wh;
     const Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
