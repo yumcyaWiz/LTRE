@@ -129,7 +129,9 @@ class DisneySheen : public BxDF {
 
 class DisneySpecular : public BxDF {
  private:
-  GGX distribution;
+  MicrofacetBRDF microfacetBRDF;
+  FresnelSchlick F;
+  GGX G;
   Vec3 f0;
 
  public:
@@ -150,29 +152,18 @@ class DisneySpecular : public BxDF {
     // 0.0f)); const float alphaX = std::max(0.001f, roughness * roughness /
     // aspect); const float alphaY = std::max(0.001f, roughness * roughness *
     // aspect);
-    distribution = GGX(roughness * roughness);
+    F = FresnelSchlick(f0);
+    G = GGX(roughness * roughness);
+    microfacetBRDF = MicrofacetBRDF(&F, &G);
   }
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
-    const float cosThetaO = absCosTheta(wo);
-    const float cosThetaI = absCosTheta(wi);
-    if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
-
-    // compute half-vector
-    Vec3 wh = wo + wi;
-    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
-    wh = normalize(wh);
-
-    const Vec3 F = schlickFresnelR(std::abs(dot(wi, wh)), f0);
-    const float D = distribution.D(wh);
-    const float G = distribution.G(wo, wi);
-    return F * D * G / (4.0f * cosThetaO * cosThetaI);
+    return microfacetBRDF.f(wo, wi);
   }
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
-    wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
-    return f(wo, wi);
+    return microfacetBRDF.sample(sampler, wo, wi, pdf);
   }
 };
 

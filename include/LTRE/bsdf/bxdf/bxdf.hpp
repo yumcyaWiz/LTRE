@@ -106,6 +106,7 @@ class FresnelSchlick : public Fresnel {
   Vec3 f0_;
 
  public:
+  FresnelSchlick() {}
   FresnelSchlick(const Vec3& f0) : f0_(f0) {}
 
   Vec3 evaluate(float cosThetaI) const override {

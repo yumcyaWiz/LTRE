@@ -99,6 +99,7 @@ class MicrofacetBRDF : public BxDF {
   const MicrofacetDistribution* distribution;
 
  public:
+  MicrofacetBRDF() : fresnel(nullptr), distribution(nullptr) {}
   MicrofacetBRDF(const Fresnel* fresnel,
                  const MicrofacetDistribution* distribution)
       : fresnel(fresnel), distribution(distribution) {}

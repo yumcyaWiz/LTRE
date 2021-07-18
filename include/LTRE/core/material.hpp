@@ -99,7 +99,7 @@ class DisneyPrincipledBRDF : public Material {
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = _baseColor->sample(info);
-    bsdf.add(std::make_shared<DisneySubsurface>(rho, roughness));
+    bsdf.add(std::make_shared<DisneySpecular>(rho, roughness, 0, 0, 1, 0));
     return bsdf;
   }
 
