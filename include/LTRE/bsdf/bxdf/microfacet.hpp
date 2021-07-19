@@ -16,7 +16,7 @@ class MicrofacetDistribution {
   float G1(const Vec3& w) const { return 1.0f / (1.0f + Lambda(w)); }
 
   // height-correlated masking-shadowing
-  float G(const Vec3& wo, const Vec3& wi) const {
+  float G2(const Vec3& wo, const Vec3& wi) const {
     return 1.0f / (1.0f + Lambda(wo) + Lambda(wi));
   }
 };
@@ -160,7 +160,7 @@ class MicrofacetBRDF : public BxDF {
 
     const Vec3 F = fresnel->evaluate(dot(wo, wh));
     const float D = distribution->D(wh);
-    const float G = distribution->G(wo, wi);
+    const float G = distribution->G2(wo, wi);
     return F * D * G / (4.0f * cosThetaO * cosThetaI);
   }
 
