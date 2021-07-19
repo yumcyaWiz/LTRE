@@ -158,25 +158,84 @@ class DisneySpecular : public BxDF {
 
 class DisneyClearcoat : public BxDF {
  private:
-  MicrofacetBRDF microfacetBRDF;
-  FresnelSchlick F;
-  GGX G;
   float clearcoat;
+  float alpha_D;
+  float alpha_G;
+  FresnelSchlick F;
+
+  // berry
+  float D(const Vec3& wh) const {
+    const float alpha2 = alpha_D * alpha_D;
+    const float cosThetaH = BxDF::absCosTheta(wh);
+    const float cosThetaH2 = cosThetaH * cosThetaH;
+    return (alpha2 - 1.0f) / (PI * std::log(alpha2)) * 1.0f /
+           (1.0f + (alpha2 - 1.0f) * cosThetaH2);
+  }
+
+  // GGX Lambda
+  float Lambda(const Vec3& w) const {
+    const float absTanTheta = BxDF::absTanTheta(w);
+    if (std::isinf(absTanTheta)) return 0;
+
+    const float alpha2Tan2Theta =
+        (alpha_G * absTanTheta) * (alpha_G * absTanTheta);
+    return 0.5f * (-1.0f + std::sqrt(1.0f + alpha2Tan2Theta));
+  }
+
+  float G1(const Vec3& w) const { return 1.0f / (1.0f + Lambda(w)); }
+
+  // separable masking-shadowing
+  float G2(const Vec3& wo, const Vec3& wi) const { return G1(wo) * G1(wi); }
 
  public:
-  DisneyClearcoat(float clearcoat) : clearcoat(clearcoat) {
+  DisneyClearcoat(float clearcoat, float clearcoatGloss)
+      : clearcoat(clearcoat) {
     F = FresnelSchlick(Vec3(0.04f));
-    G = GGX(0.25f);
-    microfacetBRDF = MicrofacetBRDF(&F, &G);
+    alpha_D = std::lerp(0.1f, 0.001f, clearcoatGloss);
+    alpha_G = 0.25f;
   }
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
-    return 0.25f * clearcoat * microfacetBRDF.f(wo, wi);
+    const float cosThetaO = absCosTheta(wo);
+    const float cosThetaI = absCosTheta(wi);
+    if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
+
+    // compute half-vector
+    Vec3 wh = wo + wi;
+    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
+    wh = normalize(wh);
+
+    const Vec3 f = F.evaluate(dot(wo, wh));
+    const float d = D(wh);
+    const float g = G2(wo, wi);
+    return 0.25f * clearcoat * f * d * g / (4.0f * cosThetaO * cosThetaI);
   }
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
-    return 0.25f * clearcoat * microfacetBRDF.sample(sampler, wo, wi, pdf);
+    const float alpha2 = alpha_D * alpha_D;
+
+    // sample half-vector
+    const Vec2 uv = sampler.getNext2D();
+    // NOTE: to prevent NaN, max with EPS
+    float cosTheta = std::max(
+        std::sqrt(std::max(
+            (1.0f - std::pow(alpha2, 1.0f - uv[0])) / (1.0f - alpha2), 0.0f)),
+        EPS);
+    const float sinTheta =
+        std::sqrt(std::max(1.0f - cosTheta * cosTheta, 0.0f));
+    const float phi = 2.0f * PI * uv[1];
+    const Vec3 wh =
+        Vec3(std::cos(phi) * sinTheta, cosTheta, std::sin(phi) * sinTheta);
+    const float pdf_wh = D(wh) * cosTheta;
+
+    // compute indident direction
+    wi = BxDF::reflect(wo, wh);
+
+    // convert hald-vector pdf to incident direction pdf
+    pdf = pdf_wh / (4.0f * dot(wi, wh));
+
+    return f(wo, wi);
   }
 };
 

@@ -87,15 +87,17 @@ class DisneyPrincipledBRDF : public Material {
   const float metallic_;
   const float sheen_;
   const float sheenTint_;
-  float specular_;
-  float specularTint_;
+  const float specular_;
+  const float specularTint_;
   const float clearcoat_;
+  const float clearcoatGloss_;
 
  public:
   DisneyPrincipledBRDF(const std::shared_ptr<Texture<Vec3>>& baseColor,
                        float roughness, float subsurface, float metallic,
                        float sheen, float sheenTint, float specular,
-                       float specularTint, float clearcoat)
+                       float specularTint, float clearcoat,
+                       float clearcoatGloss)
       : baseColor_(baseColor),
         roughness_(roughness),
         subsurface_(subsurface),
@@ -104,7 +106,8 @@ class DisneyPrincipledBRDF : public Material {
         sheenTint_(sheenTint),
         specular_(specular),
         specularTint_(specularTint),
-        clearcoat_(clearcoat) {}
+        clearcoat_(clearcoat),
+        clearcoatGloss_(clearcoatGloss) {}
 
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
@@ -123,7 +126,8 @@ class DisneyPrincipledBRDF : public Material {
     bsdf.add(std::make_shared<DisneySpecular>(baseColor, roughness_, specular_,
                                               specularTint_, metallic_, 0),
              kSpecular);
-    bsdf.add(std::make_shared<DisneyClearcoat>(clearcoat_), kClearcoat);
+    bsdf.add(std::make_shared<DisneyClearcoat>(clearcoat_, clearcoatGloss_),
+             kClearcoat);
     return bsdf;
   }
 
