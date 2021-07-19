@@ -45,7 +45,7 @@ class Diffuse : public Material {
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
     const Vec3 rho = _baseColor->sample(info);
-    bsdf.add(std::make_shared<OrenNayer>(rho, roughness));
+    bsdf.add(std::make_shared<OrenNayer>(rho, roughness), 1.0f);
     return bsdf;
   }
 
@@ -70,7 +70,7 @@ class Metal : public Material {
     const auto D =
         std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
     const auto bxdf = std::make_shared<MicrofacetBRDF>(F.get(), D.get());
-    bsdf.add(bxdf);
+    bsdf.add(bxdf, 1.0f);
     return bsdf;
   }
 
@@ -81,30 +81,54 @@ class Metal : public Material {
 
 class DisneyPrincipledBRDF : public Material {
  private:
-  const std::shared_ptr<Texture<Vec3>> _baseColor;
-  const float roughness;
-  /*
-  const float subsurface;
-  const float metallic;
-  const float sheen;
-  const float sheenTint;
-  const float clearcoat;
-  */
+  const std::shared_ptr<Texture<Vec3>> baseColor_;
+  const float roughness_;
+  const float subsurface_;
+  const float metallic_;
+  const float sheen_;
+  const float sheenTint_;
+  float specular_;
+  float specularTint_;
+  const float clearcoat_;
 
  public:
   DisneyPrincipledBRDF(const std::shared_ptr<Texture<Vec3>>& baseColor,
-                       float roughness)
-      : _baseColor(baseColor), roughness(roughness) {}
+                       float roughness, float subsurface, float metallic,
+                       float sheen, float sheenTint, float specular,
+                       float specularTint, float clearcoat)
+      : baseColor_(baseColor),
+        roughness_(roughness),
+        subsurface_(subsurface),
+        metallic_(metallic),
+        sheen_(sheen),
+        sheenTint_(sheenTint),
+        specular_(specular),
+        specularTint_(specularTint),
+        clearcoat_(clearcoat) {}
 
   BSDF prepareBSDF(const SurfaceInfo& info) const override {
     BSDF bsdf;
-    const Vec3 rho = _baseColor->sample(info);
-    bsdf.add(std::make_shared<DisneyClearcoat>(1));
+    const Vec3 baseColor = baseColor_->sample(info);
+    const float kDiffuse = (1.0f - metallic_) * (1.0f - subsurface_);
+    const float kSubsurface = (1.0f - metallic_) * subsurface_;
+    const float kSheen = (1.0f - metallic_);
+    const float kSpecular = 1.0f;
+    const float kClearcoat = 1.0f;
+
+    bsdf.add(std::make_shared<DisneyDiffuse>(baseColor, roughness_), kDiffuse);
+    bsdf.add(std::make_shared<DisneySubsurface>(baseColor, subsurface_),
+             kSubsurface);
+    bsdf.add(std::make_shared<DisneySheen>(baseColor, sheen_, sheenTint_),
+             kSheen);
+    bsdf.add(std::make_shared<DisneySpecular>(baseColor, roughness_, specular_,
+                                              specularTint_, metallic_, 0),
+             kSpecular);
+    bsdf.add(std::make_shared<DisneyClearcoat>(clearcoat_), kClearcoat);
     return bsdf;
   }
 
   Vec3 baseColor(const SurfaceInfo& info) const override {
-    return _baseColor->sample(info);
+    return baseColor_->sample(info);
   }
 };
 

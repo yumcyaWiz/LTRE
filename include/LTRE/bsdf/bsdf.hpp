@@ -12,20 +12,32 @@ namespace LTRE {
 // TODO: handle BTDF case
 class BSDF {
  private:
+  static constexpr int MAX_NUM_BXDFS = 8;
+
   int nBxDF;
-  std::shared_ptr<BxDF> bxdfs[8];
+  std::shared_ptr<BxDF> bxdfs[MAX_NUM_BXDFS];
+  float coefficients[MAX_NUM_BXDFS];
 
  public:
   BSDF() : nBxDF{0} {}
 
   void reset() { nBxDF = 0; }
 
-  void add(const std::shared_ptr<BxDF>& bxdf) { bxdfs[nBxDF++] = bxdf; }
+  void add(const std::shared_ptr<BxDF>& bxdf, float coefficient) {
+    if (nBxDF >= MAX_NUM_BXDFS) {
+      spdlog::error("maximum number of BxDFs exceeded.");
+      std::exit(EXIT_FAILURE);
+    }
+
+    bxdfs[nBxDF] = bxdf;
+    coefficients[nBxDF] = coefficient;
+    nBxDF++;
+  }
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const {
     Vec3 ret;
     for (int i = 0; i < nBxDF; ++i) {
-      ret += bxdfs[i]->f(wo, wi);
+      ret += coefficients[i] * bxdfs[i]->f(wo, wi);
     }
     return ret;
   }
@@ -37,7 +49,8 @@ class BSDF {
     if (idx == nBxDF) idx--;
 
     // sample from that BxDF
-    const Vec3 ret = bxdfs[idx]->sample(sampler, wo, wi, pdf);
+    const Vec3 ret =
+        coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
     pdf /= nBxDF;
 
     return ret;

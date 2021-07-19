@@ -49,8 +49,9 @@ class Beckmann : public MicrofacetDistribution {
   }
 
   Vec3 sample(const Vec2& uv, float& pdf) const override {
+    // NOTE: to prevent NaN, max with EPS
     const float theta = std::atan(
-        std::sqrt(-alpha * alpha * std::log(std::max(1.0f - uv[0], 1e-9f))));
+        std::sqrt(-alpha * alpha * std::log(std::max(1.0f - uv[0], EPS))));
     const float phi = 2.0f * PI * uv[1];
     const Vec3 wh = sphericalToCartesian(theta, phi);
     pdf = D(wh) * BxDF::absCosTheta(wh);
@@ -86,11 +87,11 @@ class Berry : public MicrofacetDistribution {
 
   Vec3 sample(const Vec2& uv, float& pdf) const override {
     const float alpha2 = alpha * alpha;
-    // NOTE: to prevent NaN, max with 1e-9f
+    // NOTE: to prevent NaN, max with EPS
     float cosTheta = std::max(
         std::sqrt(std::max(
             (1.0f - std::pow(alpha2, 1.0f - uv[0])) / (1.0f - alpha2), 0.0f)),
-        1e-9f);
+        EPS);
     const float sinTheta =
         std::sqrt(std::max(1.0f - cosTheta * cosTheta, 0.0f));
     const float phi = 2.0f * PI * uv[1];

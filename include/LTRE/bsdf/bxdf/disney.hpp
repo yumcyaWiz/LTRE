@@ -142,7 +142,7 @@ class DisneySpecular : public BxDF {
     // aspect); const float alphaY = std::max(0.001f, roughness * roughness *
     // aspect);
     F = FresnelSchlick(f0);
-    G = GGX(roughness * roughness);
+    G = GGX(std::max(roughness * roughness, 0.001f));
     microfacetBRDF = MicrofacetBRDF(&F, &G);
   }
 
@@ -165,18 +165,18 @@ class DisneyClearcoat : public BxDF {
 
  public:
   DisneyClearcoat(float clearcoat) : clearcoat(clearcoat) {
-    F = FresnelSchlick(Vec3(0.04));
-    G = GGX(0.25);
+    F = FresnelSchlick(Vec3(0.04f));
+    G = GGX(0.25f);
     microfacetBRDF = MicrofacetBRDF(&F, &G);
   }
 
   Vec3 f(const Vec3& wo, const Vec3& wi) const override {
-    return 0.25 * clearcoat * microfacetBRDF.f(wo, wi);
+    return 0.25f * clearcoat * microfacetBRDF.f(wo, wi);
   }
 
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
-    return 0.25 * clearcoat * microfacetBRDF.sample(sampler, wo, wi, pdf);
+    return 0.25f * clearcoat * microfacetBRDF.sample(sampler, wo, wi, pdf);
   }
 };
 
