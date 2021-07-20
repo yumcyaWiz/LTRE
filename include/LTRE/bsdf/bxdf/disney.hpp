@@ -37,6 +37,10 @@ class DisneyDiffuse : public BxDF {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return f(wo, wi);
   }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return sampleCosineHemispherePdf(wi);
+  }
 };
 
 class DisneySubsurface : public BxDF {
@@ -80,6 +84,10 @@ class DisneySubsurface : public BxDF {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return f(wo, wi);
   }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return sampleCosineHemispherePdf(wi);
+  }
 };
 
 class DisneySheen : public BxDF {
@@ -111,9 +119,14 @@ class DisneySheen : public BxDF {
     return sheen * rho_sheen * pow5(std::max(1.0f - dot(wi, wh), 0.0f));
   }
 
+  // TODO: more nice sampling
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi, float& pdf) const {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return f(wo, wi);
+  }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return sampleCosineHemispherePdf(wi);
   }
 };
 
@@ -153,6 +166,10 @@ class DisneySpecular : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override {
     return microfacetBRDF.sample(sampler, wo, wi, pdf);
+  }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return microfacetBRDF.pdf(wo, wi);
   }
 };
 
@@ -236,6 +253,19 @@ class DisneyClearcoat : public BxDF {
     pdf = pdf_wh / (4.0f * dot(wi, wh));
 
     return f(wo, wi);
+  }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    // compute half-vector
+    Vec3 wh = wo + wi;
+    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return 0;
+    wh = normalize(wh);
+
+    // compute half-vector pdf
+    const float pdf_wh = D(wh) * absCosTheta(wh);
+
+    // convert hald-vector pdf to incident direction pdf
+    return pdf_wh / (4.0f * dot(wi, wh));
   }
 };
 

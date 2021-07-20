@@ -23,6 +23,10 @@ class Lambert : public BxDF {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return f(wo, wi);
   }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return sampleCosineHemispherePdf(wi);
+  }
 };
 
 class OrenNayer : public BxDF {
@@ -67,6 +71,10 @@ class OrenNayer : public BxDF {
               float& pdf) const override {
     wi = sampleCosineHemisphere(sampler.getNext2D(), pdf);
     return f(wo, wi);
+  }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    return sampleCosineHemispherePdf(wi);
   }
 };
 

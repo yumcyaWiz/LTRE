@@ -11,7 +11,9 @@ class MicrofacetDistribution {
  public:
   virtual float D(const Vec3& wh) const = 0;
   virtual float Lambda(const Vec3& w) const = 0;
+
   virtual Vec3 sample(const Vec2& uv, float& pdf) const = 0;
+  float pdf(const Vec3& wh) const { return D(wh) * BxDF::absCosTheta(wh); }
 
   float G1(const Vec3& w) const { return 1.0f / (1.0f + Lambda(w)); }
 
@@ -177,6 +179,19 @@ class MicrofacetBRDF : public BxDF {
     pdf = pdf_wh / (4.0f * dot(wi, wh));
 
     return f(wo, wi);
+  }
+
+  float pdf(const Vec3& wo, const Vec3& wi) const override {
+    // compute half-vector
+    Vec3 wh = wo + wi;
+    if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return 0;
+    wh = normalize(wh);
+
+    // compute half-vector pdf
+    const float pdf_wh = distribution->pdf(wh);
+
+    // convert hald-vector pdf to incident direction pdf
+    return pdf_wh / (4.0f * dot(wi, wh));
   }
 };
 
