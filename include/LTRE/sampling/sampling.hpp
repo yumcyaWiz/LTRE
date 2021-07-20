@@ -13,6 +13,7 @@ inline Vec3 sampleHemisphere(const Vec2& uv, float& pdf) {
   pdf = PI_MUL_2_INV;
   return sphericalToCartesian(theta, phi);
 }
+inline float sampleHemispherePdf() { return PI_MUL_2_INV; }
 
 inline Vec3 sampleCosineHemisphere(const Vec2& uv, float& pdf) {
   const float theta =
@@ -22,6 +23,7 @@ inline Vec3 sampleCosineHemisphere(const Vec2& uv, float& pdf) {
   pdf = PI_INV * cosTheta;
   return sphericalToCartesian(theta, phi);
 }
+inline float sampleCosineHemispherePdf(const Vec3& w) { return PI_INV * w[1]; }
 
 inline Vec3 sampleSphere(const Vec2& uv, float& pdf) {
   const float theta = std::acos(std::clamp(1.0f - 2.0f * uv[0], -1.0f, 1.0f));
@@ -29,6 +31,7 @@ inline Vec3 sampleSphere(const Vec2& uv, float& pdf) {
   pdf = PI_MUL_4_INV;
   return sphericalToCartesian(theta, phi);
 }
+inline float sampleSpherePdf() { return PI_MUL_4_INV; }
 
 inline Vec2 sampleDisk(const Vec2& uv, float R, float& pdf) {
   const float r = R * std::sqrt(std::max(uv[0], 0.0f));
@@ -36,11 +39,13 @@ inline Vec2 sampleDisk(const Vec2& uv, float R, float& pdf) {
   pdf = 1.0f / (R * R) * PI_INV;
   return Vec2(r * std::cos(theta), r * std::sin(theta));
 }
+inline float sampleDiskPdf(float R) { return 1.0f / (R * R) * PI_INV; }
 
 inline Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf) {
   pdf = 1.0f / (lx * ly);
   return Vec2(uv[0] * lx, uv[1] * ly);
 }
+inline float samplePlanePdf(float lx, float ly) { return 1.0f / (lx * ly); }
 
 }  // namespace LTRE
 
