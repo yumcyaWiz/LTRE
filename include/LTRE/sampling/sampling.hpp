@@ -37,6 +37,11 @@ inline Vec2 sampleDisk(const Vec2& uv, float R, float& pdf) {
   return Vec2(r * std::cos(theta), r * std::sin(theta));
 }
 
+inline Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf) {
+  pdf = 1.0f / (lx * ly);
+  return Vec2(uv[0] * lx, uv[1] * ly);
+}
+
 }  // namespace LTRE
 
 #endif
