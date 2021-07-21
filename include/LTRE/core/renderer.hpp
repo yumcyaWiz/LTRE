@@ -153,14 +153,16 @@ class Renderer {
                 std::max(dot(wi, camera->getCameraForward()), 0.0f);
 
             // integrate light transport equation
-            radiance +=
+            const Vec3 dPhi =
                 We * integrator->integrate(ray, scene, *sampler) * cos / pdf;
-          }
-        }
+            if (dPhi.isNan()) {
+              spdlog::error("[Renderer] radiance has NaN");
+              continue;
+              // std::exit(EXIT_FAILURE);
+            }
 
-        if (radiance.isNan()) {
-          spdlog::error("[Renderer] radiance has NaN");
-          std::exit(EXIT_FAILURE);
+            radiance += dPhi;
+          }
         }
 
         // take average
@@ -233,7 +235,8 @@ class Renderer {
                 We * integrator->integrate(ray, scene, *sampler) * cos / pdf;
             if (radiance.isNan()) {
               spdlog::error("[Renderer] radiance has NaN");
-              std::exit(EXIT_FAILURE);
+              continue;
+              // std::exit(EXIT_FAILURE);
             }
 
             // accumulate radiance
