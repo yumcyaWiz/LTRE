@@ -12,6 +12,7 @@
 #include "LTRE/light/sky/uniform-sky.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/mesh.hpp"
+#include "LTRE/shape/plane.hpp"
 #include "LTRE/shape/sphere.hpp"
 
 using namespace LTRE;
@@ -25,20 +26,21 @@ int main() {
   const auto sky = std::make_shared<UniformSky>(Vec3(1));
   Scene scene(intersector, sky);
 
-  const auto sphere1 = std::make_shared<Sphere>(Vec3(0, -1001, 0), 1000);
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
   const auto sphere3 = std::make_shared<Sphere>(Vec3(-3, 0, 0), 1);
   const auto sphere4 = std::make_shared<Sphere>(Vec3(3, 0, 0), 1);
-  const auto tex1 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.8, 0.1, 0.1));
+  const auto plane =
+      std::make_shared<Plane>(Vec3(-5, -1, -5), Vec3(0, 0, 10), Vec3(10, 0, 0));
+  const auto tex1 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.8));
   const auto tex2 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.8, 0.2, 0.2));
   const auto tex3 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.8, 0.2));
   const auto tex4 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.2, 0.8));
-  const auto mat1 =
-      std::make_shared<DisneyPrincipledBRDF>(tex1, 0.2, 0, 0, 0, 0, 1, 0, 1, 1);
-  const auto mat2 = std::make_shared<Metal>(tex2, 0);
+  const auto mat1 = std::make_shared<Diffuse>(tex1, 0.2);
+  const auto mat2 =
+      std::make_shared<DisneyPrincipledBRDF>(tex2, 0, 0, 1, 0, 0, 0, 0, 0, 0);
   const auto mat3 = std::make_shared<Diffuse>(tex3, 0.2);
   const auto mat4 = std::make_shared<Diffuse>(tex4, 0.2);
-  const auto prim1 = Primitive(sphere1, mat1);
+  const auto prim1 = Primitive(plane, mat1);
   const auto prim2 = Primitive(sphere2, mat2);
   const auto prim3 = Primitive(sphere3, mat3);
   const auto prim4 = Primitive(sphere4, mat4);
