@@ -101,6 +101,7 @@ class Renderer {
 
   // focus at specified point
   void focus(const Vec3& p) { camera->focus(p); }
+
   // focus at specified direction
   void focus(const Ray& ray, const Scene& scene) {
     IntersectInfo info;

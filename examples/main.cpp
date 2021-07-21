@@ -9,6 +9,7 @@
 #include "LTRE/integrator/pt.hpp"
 #include "LTRE/intersector/bvh.hpp"
 #include "LTRE/light/area-light.hpp"
+#include "LTRE/light/sky/ibl.hpp"
 #include "LTRE/light/sky/uniform-sky.hpp"
 #include "LTRE/sampling/uniform.hpp"
 #include "LTRE/shape/mesh.hpp"
@@ -23,7 +24,7 @@ int main() {
 
   const auto intersector =
       std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
-  const auto sky = std::make_shared<UniformSky>(Vec3(1));
+  const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr", 0.5f);
   Scene scene(intersector, sky);
 
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
