@@ -76,9 +76,12 @@ class ImageTexture : public Texture<Vec3> {
     for (int j = 0; j < height; ++j) {
       for (int i = 0; i < width; ++i) {
         constexpr float divider = 1.0f / 255.0f;
-        const float R = img[3 * i + 3 * width * j] * divider;
-        const float G = img[3 * i + 3 * width * j + 1] * divider;
-        const float B = img[3 * i + 3 * width * j + 2] * divider;
+        // sRGB to linear RGB transform
+        const float R = std::pow(img[3 * i + 3 * width * j] * divider, 2.2f);
+        const float G =
+            std::pow(img[3 * i + 3 * width * j + 1] * divider, 2.2f);
+        const float B =
+            std::pow(img[3 * i + 3 * width * j + 2] * divider, 2.2f);
         this->image.setPixel(i, j, Vec3(R, G, B));
       }
     }
