@@ -12,9 +12,11 @@ namespace LTRE {
 class IBL : public Light {
  private:
   const ImageTexture imageTexture;
+  const float scale;
 
  public:
-  IBL(const std::filesystem::path& filepath) : imageTexture{filepath} {}
+  IBL(const std::filesystem::path& filepath, float scale = 1.0f)
+      : imageTexture{filepath}, scale(scale) {}
 
   Vec3 power() const override {
     return PI_MUL_4 * 10000.0f * imageTexture.average();
@@ -33,7 +35,7 @@ class IBL : public Light {
     const float v = theta * PI_INV;
     temp.uv = Vec2(u, v);
 
-    return imageTexture.sample(temp);
+    return scale * imageTexture.sample(temp);
   }
 
   Vec3 sampleDirection(const SurfaceInfo& surfInfo, Sampler& sampler, Vec3& dir,
