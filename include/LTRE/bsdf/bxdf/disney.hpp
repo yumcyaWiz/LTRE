@@ -38,7 +38,7 @@ class DisneyDiffuse : public BxDF {
     return f(wo, wi);
   }
 
-  float pdf(const Vec3& wo, const Vec3& wi) const override {
+  float pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const override {
     return sampleCosineHemispherePdf(wi);
   }
 };
@@ -85,7 +85,7 @@ class DisneySubsurface : public BxDF {
     return f(wo, wi);
   }
 
-  float pdf(const Vec3& wo, const Vec3& wi) const override {
+  float pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const override {
     return sampleCosineHemispherePdf(wi);
   }
 };
@@ -125,7 +125,7 @@ class DisneySheen : public BxDF {
     return f(wo, wi);
   }
 
-  float pdf(const Vec3& wo, const Vec3& wi) const override {
+  float pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const override {
     return sampleCosineHemispherePdf(wi);
   }
 };

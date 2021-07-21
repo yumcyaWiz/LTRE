@@ -54,6 +54,29 @@ class Diffuse : public Material {
   }
 };
 
+// class TestDiffuse : public Material {
+//  private:
+//   const std::shared_ptr<Texture<Vec3>> baseColor_;
+//   const float roughness_;
+
+//  public:
+//   TestDiffuse(const std::shared_ptr<Texture<Vec3>>& baseColor, float
+//   roughness)
+//       : baseColor_(baseColor), roughness_(roughness) {}
+
+//   BSDF prepareBSDF(const SurfaceInfo& info) const override {
+//     BSDF bsdf;
+//     const Vec3 rho = baseColor_->sample(info);
+//     bsdf.add(std::make_shared<OrenNayer>(rho, roughness_), 0.5f);
+//     bsdf.add(std::make_shared<OrenNayer>(rho, roughness_), 0.5f);
+//     return bsdf;
+//   }
+
+//   Vec3 baseColor(const SurfaceInfo& info) const override {
+//     return baseColor_->sample(info);
+//   }
+// };
+
 class Metal : public Material {
  private:
   const std::shared_ptr<Texture<Vec3>> baseColor_;

@@ -53,6 +53,15 @@ class BSDF {
         coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
     pdf /= nBxDF;
 
+    // pbrt method
+    // NOTE: maybe wrong
+    // for (int i = 0; i < nBxDF; ++i) {
+    //   if (i != idx) {
+    //     pdf += bxdfs[i]->pdf(wo, wi);
+    //   }
+    // }
+    // pdf /= nBxDF;
+
     return ret;
   }
 };
