@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "LTRE/core/constant.hpp"
+
 namespace LTRE {
 
 struct Vec3 {
@@ -220,6 +222,13 @@ inline constexpr Vec3 sphericalToCartesian(float theta, float phi) {
   const float cosTheta = std::cos(theta);
   const float sinTheta = std::sin(theta);
   return Vec3(std::cos(phi) * sinTheta, cosTheta, std::sin(phi) * sinTheta);
+}
+
+inline constexpr void cartesianToSpherical(const Vec3& v, float& theta,
+                                           float& phi) {
+  phi = std::atan2(v[2], v[0]);
+  if (phi < 0) phi += PI_MUL_2;
+  theta = std::acos(std::clamp(v[1], -1.0f, 1.0f));
 }
 
 inline void orthonormalBasis(const Vec3& n, Vec3& t, Vec3& b) {
