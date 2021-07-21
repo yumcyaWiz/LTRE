@@ -3,9 +3,9 @@
 #include <filesystem>
 
 #include "spdlog/spdlog.h"
-#include "stb_image.h"
 //
 #include "LTRE/core/image.hpp"
+#include "LTRE/core/io.hpp"
 #include "LTRE/core/types.hpp"
 
 namespace LTRE {
@@ -60,39 +60,9 @@ class ImageTexture : public Texture<Vec3> {
   Image<Vec3> image;
   std::filesystem::path filepath;
 
-  void loadImage(const std::filesystem::path& filepath) {
-    spdlog::info("[ImageTexture] loading " + filepath.string());
-    // load image with stb_image
-    int width, height, channels;
-    unsigned char* img = stbi_load(filepath.generic_string().c_str(), &width,
-                                   &height, &channels, 3);
-    if (!img) {
-      spdlog::error("[ImageTexture] failed to load " + filepath.string());
-      std::exit(EXIT_FAILURE);
-    }
-
-    // make float image
-    this->image.resize(width, height);
-    for (int j = 0; j < height; ++j) {
-      for (int i = 0; i < width; ++i) {
-        constexpr float divider = 1.0f / 255.0f;
-        // sRGB to linear RGB transform
-        const float R = std::pow(img[3 * i + 3 * width * j] * divider, 2.2f);
-        const float G =
-            std::pow(img[3 * i + 3 * width * j + 1] * divider, 2.2f);
-        const float B =
-            std::pow(img[3 * i + 3 * width * j + 2] * divider, 2.2f);
-        this->image.setPixel(i, j, Vec3(R, G, B));
-      }
-    }
-
-    // free stb image
-    stbi_image_free(img);
-  }
-
  public:
   ImageTexture(const std::filesystem::path& filepath) : filepath(filepath) {
-    loadImage(filepath);
+    image = ImageLoader::loadImage(filepath);
   }
 
   std::filesystem::path getFilepath() const { return filepath; }

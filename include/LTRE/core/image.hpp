@@ -135,7 +135,7 @@ class Image {
   }
 };
 
-void gammaCorrection(Image<Vec3>& image) {
+inline void gammaCorrection(Image<Vec3>& image) {
   for (unsigned int j = 0; j < image.getHeight(); ++j) {
     for (unsigned int i = 0; i < image.getWidth(); ++i) {
       const Vec3 c = image.getPixel(i, j);
