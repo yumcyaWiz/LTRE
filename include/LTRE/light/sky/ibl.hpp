@@ -12,11 +12,17 @@ namespace LTRE {
 class IBL : public Light {
  private:
   const ImageTexture imageTexture;
+  const float thetaOffset;
+  const float phiOffset;
   const float scale;
 
  public:
-  IBL(const std::filesystem::path& filepath, float scale = 1.0f)
-      : imageTexture{filepath}, scale(scale) {}
+  IBL(const std::filesystem::path& filepath, float thetaOffset = 0.0f,
+      float phiOffset = 0.0f, float scale = 1.0f)
+      : imageTexture{filepath},
+        thetaOffset(thetaOffset),
+        phiOffset(phiOffset),
+        scale(scale) {}
 
   Vec3 power() const override {
     return PI_MUL_4 * 10000.0f * imageTexture.average();
@@ -27,6 +33,8 @@ class IBL : public Light {
     // compute spherical coordinate
     float theta, phi;
     cartesianToSpherical(wi, theta, phi);
+    theta = std::fmod(theta + thetaOffset, PI);
+    phi = std::fmod(phi + phiOffset, PI_MUL_2);
 
     // compute texture coordinate
     // TODO: more nice way?
