@@ -73,7 +73,7 @@ class Plane : public Shape {
   SurfaceInfo samplePoint(Sampler& sampler, float& pdf) const override {
     SurfaceInfo ret;
     const Vec2 p = samplePlane(sampler.getNext2D(), rightLength, upLength, pdf);
-    ret.position = leftCornerPoint + p[0] * right + p[1] * up;
+    ret.position = leftCornerPoint + p[0] * rightDir + p[1] * upDir;
     ret.normal = normal;
     ret.uv = Vec2(p[0] / rightLength, p[1] / upLength);
     return ret;
