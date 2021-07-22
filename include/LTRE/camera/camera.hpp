@@ -1,7 +1,6 @@
 #ifndef _LTRE_CAMERA_H
 #define _LTRE_CAMERA_H
-#include "spdlog/spdlog.h"
-//
+
 #include "LTRE/core/ray.hpp"
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
@@ -18,29 +17,16 @@ class Camera {
 
   const Vec2 filmSize;
 
-  Vec3 sensorPos(const Vec2& uv) const {
-    return camPos + uv[0] * 0.5f * filmSize[0] * camRight +
-           uv[1] * 0.5f * filmSize[1] * camUp;
-  }
+  Vec3 sensorPos(const Vec2& uv) const;
 
  public:
   Camera(const Vec3& camPos, const Vec3& camForward,
-         const Vec2& filmSize = Vec2(0.025, 0.025))
-      : camPos(camPos), camForward(camForward), filmSize(filmSize) {
-    camRight = normalize(cross(camForward, Vec3(0, 1, 0)));
-    camUp = normalize(cross(camRight, camForward));
+         const Vec2& filmSize = Vec2(0.025, 0.025));
 
-    spdlog::info("[Camera] camPos: " + camPos.toString());
-    spdlog::info("[Camera] camForward: " + camForward.toString());
-    spdlog::info("[Camera] camRight: " + camRight.toString());
-    spdlog::info("[Camera] camUp: " + camUp.toString());
-  }
-
-  Vec3 getCameraPosition() const { return camPos; }
-  Vec3 getCameraForward() const { return camForward; }
+  Vec3 getCameraPosition() const;
+  Vec3 getCameraForward() const;
 
   virtual Vec3 We(const Vec2& uv, const Vec3& wi) const = 0;
-
   virtual bool sampleRay(const Vec2& uv, Sampler& sampler, Ray& ray, Vec3& wi,
                          float& pdf) const = 0;
 
