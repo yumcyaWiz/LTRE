@@ -18,6 +18,11 @@ target_compile_features(LTRE PUBLIC cxx_std_20)
 set_target_properties(LTRE PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(LTRE PUBLIC "include")
 target_sources(LTRE PUBLIC
+  "src/bsdf/bsdf.cpp"
+  "src/bsdf/bxdf/bxdf.cpp"
+  "src/bsdf/bxdf/diffuse.cpp"
+  "src/bsdf/bxdf/microfacet.cpp"
+  "src/bsdf/bxdf/disney.cpp"
   "src/core/aabb.cpp"
   "src/core/material.cpp"
   "src/core/model.cpp"

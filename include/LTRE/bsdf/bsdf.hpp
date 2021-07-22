@@ -1,11 +1,8 @@
 #ifndef _LTRE_BSDF_H
 #define _LTRE_BSDF_H
 #include <memory>
-#include <vector>
 
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
-#include "LTRE/core/texture.hpp"
-#include "LTRE/core/types.hpp"
 
 namespace LTRE {
 
@@ -19,51 +16,14 @@ class BSDF {
   float coefficients[MAX_NUM_BXDFS];
 
  public:
-  BSDF() : nBxDF{0} {}
+  BSDF();
 
-  void reset() { nBxDF = 0; }
+  void reset();
 
-  void add(const std::shared_ptr<BxDF>& bxdf, float coefficient) {
-    if (nBxDF >= MAX_NUM_BXDFS) {
-      spdlog::error("maximum number of BxDFs exceeded.");
-      std::exit(EXIT_FAILURE);
-    }
+  void add(const std::shared_ptr<BxDF>& bxdf, float coefficient);
 
-    bxdfs[nBxDF] = bxdf;
-    coefficients[nBxDF] = coefficient;
-    nBxDF++;
-  }
-
-  Vec3 f(const Vec3& wo, const Vec3& wi) const {
-    Vec3 ret;
-    for (int i = 0; i < nBxDF; ++i) {
-      ret += coefficients[i] * bxdfs[i]->f(wo, wi);
-    }
-    return ret;
-  }
-
-  // TODO: use more nice sampling strategy
-  Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi, float& pdf) const {
-    // choose 1 BxDF randomly
-    int idx = sampler.getNext1D() * nBxDF;
-    if (idx == nBxDF) idx--;
-
-    // sample from that BxDF
-    const Vec3 ret =
-        coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
-    pdf /= nBxDF;
-
-    // pbrt method
-    // NOTE: maybe wrong
-    // for (int i = 0; i < nBxDF; ++i) {
-    //   if (i != idx) {
-    //     pdf += bxdfs[i]->pdf(wo, wi);
-    //   }
-    // }
-    // pdf /= nBxDF;
-
-    return ret;
-  }
+  Vec3 f(const Vec3& wo, const Vec3& wi) const;
+  Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi, float& pdf) const;
 };
 
 }  // namespace LTRE
