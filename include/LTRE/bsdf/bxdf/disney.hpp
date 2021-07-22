@@ -3,7 +3,6 @@
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
 #include "LTRE/bsdf/bxdf/microfacet.hpp"
-#include "LTRE/core/color.hpp"
 
 namespace LTRE {
 
