@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(LTRE LANGUAGES C CXX)
 
-option(BUILD_TESTS "build tests" ON)
+option(BUILD_TESTS "build tests" OFF)
 
 # OpenMP
 find_package(OpenMP)
@@ -34,6 +34,9 @@ target_sources(LTRE PUBLIC
   "src/core/ray.cpp"
   "src/core/renderer.cpp"
   "src/core/scene.cpp"
+  "src/integrator/ao.cpp"
+  "src/integrator/pt.cpp"
+  "src/integrator/nee.cpp"
 )
 target_link_libraries(LTRE PUBLIC OpenMP::OpenMP_CXX)
 target_link_libraries(LTRE PUBLIC assimp::assimp)
