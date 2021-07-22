@@ -27,22 +27,6 @@ int main() {
       std::make_shared<IBL>("entrance_hall_4k.hdr", 0, PI_DIV_2, 0.5f);
   Scene scene(intersector, sky);
 
-  //   const auto floor_shape = std::make_shared<Plane>(
-  //       Vec3(-15, -radius, -15), Vec3(0, 0, 30), Vec3(30, 0, 0));
-  //   const auto floor_tex =
-  //   std::make_shared<UniformTexture<Vec3>>(Vec3(0.9f)); const auto
-  //   floor_material = std::make_shared<Diffuse>(floor_tex, 0.2f);
-  //   scene.addPrimitive(Primitive(floor_shape, floor_material));
-
-  //   const auto light_shape =
-  //       std::make_shared<Plane>(Vec3(-5, 20, -5), Vec3(10, 0, 0), Vec3(0, 0,
-  //       10));
-  //   const auto light_ke = std::make_shared<UniformTexture<Vec3>>(Vec3(0.9f));
-  //   const auto light_le =
-  //   std::make_shared<UniformTexture<Vec3>>(Vec3(15.0f)); const auto light =
-  //   std::make_shared<AreaLight>(light_le, light_shape);
-  //   scene.addPrimitive(Primitive(light_shape, floor_material, light));
-
   // prepare shapes
   std::vector<std::shared_ptr<Shape>> shapes;
   for (int j = 0; j < 9; ++j) {

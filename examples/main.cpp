@@ -24,7 +24,7 @@ int main() {
 
   const auto intersector =
       std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
-  const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr", 0.5f);
+  const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr");
   Scene scene(intersector, sky);
 
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
