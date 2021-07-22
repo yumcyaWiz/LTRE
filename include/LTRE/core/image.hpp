@@ -89,40 +89,6 @@ class Image {
     image[i + width * j] += value;
   }
 
-  void writePPM(const std::string& filename) {
-    std::ofstream file(filename);
-    if (!file) {
-      spdlog::error("[Image] failed to open {0}", filename);
-      return;
-    }
-
-    file << "P3" << std::endl;
-    file << width << " " << height << std::endl;
-    file << "255" << std::endl;
-    for (unsigned int j = 0; j < height; ++j) {
-      for (unsigned int i = 0; i < width; ++i) {
-        const T c = getPixel(i, j);
-
-        // TODO: use concept to restrict template parameter?
-        if constexpr (std::is_floating_point_v<T>) {
-          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c), 0, 255) << std::endl;
-        } else if constexpr (T::nComponents == 2) {
-          file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c[1]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * 0), 0, 255) << std::endl;
-        } else if constexpr (T::nComponents == 3) {
-          file << std::clamp(static_cast<int>(255.0f * c[0]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c[1]), 0, 255) << " ";
-          file << std::clamp(static_cast<int>(255.0f * c[2]), 0, 255)
-               << std::endl;
-        }
-      }
-    }
-    file.close();
-  }
-
   // compute average pixel value of image
   T average() const {
     T sum{0};

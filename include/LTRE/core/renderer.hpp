@@ -9,6 +9,7 @@
 //
 #include "LTRE/camera/camera.hpp"
 #include "LTRE/core/image.hpp"
+#include "LTRE/core/io.hpp"
 #include "LTRE/core/scene.hpp"
 #include "LTRE/integrator/integrator.hpp"
 #include "LTRE/sampling/sampler.hpp"
@@ -256,36 +257,36 @@ class Renderer {
     spdlog::info("[Renderer] samples: {0}", nSamples);
   }
 
-  void writePPM(const std::string& filename, const AOVType& aovType) {
+  void writePPM(const std::filesystem::path& filepath, const AOVType& aovType) {
     switch (aovType) {
       case AOVType::BEAUTY: {
         gammaCorrection(aov.beauty);
-        aov.beauty.writePPM(filename);
+        ImageWriter::writeImage(aov.beauty, filepath);
         break;
       }
       case AOVType::POSITION: {
-        aov.position.writePPM(filename);
+        ImageWriter::writeImage(aov.position, filepath);
         break;
       }
       case AOVType::DEPTH: {
-        aov.depth.writePPM(filename);
+        ImageWriter::writeImage(aov.depth, filepath);
         break;
       }
       case AOVType::NORMAL: {
-        aov.normal.writePPM(filename);
+        ImageWriter::writeImage(aov.normal, filepath);
         break;
       }
       case AOVType::BARYCENTRIC: {
-        aov.barycentric.writePPM(filename);
+        ImageWriter::writeImage(aov.barycentric, filepath);
         break;
       }
       case AOVType::TEXCOORDS: {
-        aov.texcoords.writePPM(filename);
+        ImageWriter::writeImage(aov.texcoords, filepath);
         break;
       }
       case AOVType::BASECOLOR: {
         gammaCorrection(aov.baseColor);
-        aov.baseColor.writePPM(filename);
+        ImageWriter::writeImage(aov.baseColor, filepath);
         break;
       }
     }
