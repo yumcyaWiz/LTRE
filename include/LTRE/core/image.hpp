@@ -6,6 +6,8 @@
 #include <type_traits>
 
 #include "spdlog/spdlog.h"
+//
+#include "LTRE/math/vec3.hpp"
 
 namespace LTRE {
 

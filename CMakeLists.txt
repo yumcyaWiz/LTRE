@@ -13,15 +13,25 @@ endif()
 add_subdirectory("externals")
 
 # LTRE
-add_library(LTRE INTERFACE)
-target_include_directories(LTRE INTERFACE "include")
-target_compile_features(LTRE INTERFACE cxx_std_20)
+add_library(LTRE STATIC)
+target_compile_features(LTRE PUBLIC cxx_std_20)
 set_target_properties(LTRE PROPERTIES CXX_EXTENSIONS OFF)
-target_link_libraries(LTRE INTERFACE OpenMP::OpenMP_CXX)
-target_link_libraries(LTRE INTERFACE assimp::assimp)
-target_link_libraries(LTRE INTERFACE spdlog::spdlog)
-target_link_libraries(LTRE INTERFACE stb)
-target_compile_options(LTRE INTERFACE
+target_include_directories(LTRE PUBLIC "include")
+target_sources(LTRE PUBLIC
+  "src/core/aabb.cpp"
+  "src/core/material.cpp"
+  "src/core/model.cpp"
+  "src/core/io.cpp"
+  "src/core/primitive.cpp"
+  "src/core/ray.cpp"
+  "src/core/renderer.cpp"
+  "src/core/scene.cpp"
+)
+target_link_libraries(LTRE PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(LTRE PUBLIC assimp::assimp)
+target_link_libraries(LTRE PUBLIC spdlog::spdlog)
+target_link_libraries(LTRE PUBLIC stb)
+target_compile_options(LTRE PUBLIC
   $<$<CXX_COMPILER_ID:MSVC>:/W4>
   $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic -march=native
     $<$<CONFIG:DEBUG>: -O0 -g>

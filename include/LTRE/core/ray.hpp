@@ -1,6 +1,5 @@
 #ifndef _LTRE_RAY_H
 #define _LTRE_RAY_H
-#include <limits>
 
 #include "LTRE/math/vec3.hpp"
 
@@ -13,15 +12,10 @@ struct Ray {
   mutable float tmax;
   static constexpr float RAY_EPS = 1e-3f;
 
-  Ray() : tmin(RAY_EPS), tmax(std::numeric_limits<float>::max()) {}
+  Ray();
+  Ray(const Vec3& origin, const Vec3& direction);
 
-  Ray(const Vec3& origin, const Vec3& direction)
-      : origin(origin),
-        direction(direction),
-        tmin(RAY_EPS),
-        tmax(std::numeric_limits<float>::max()) {}
-
-  Vec3 operator()(float t) const { return origin + t * direction; }
+  Vec3 operator()(float t) const;
 };
 
 }  // namespace LTRE

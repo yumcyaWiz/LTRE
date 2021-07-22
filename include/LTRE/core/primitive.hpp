@@ -17,65 +17,25 @@ class Primitive {
  public:
   Primitive(const std::shared_ptr<Shape>& shape,
             const std::shared_ptr<Material>& material,
-            const std::shared_ptr<AreaLight>& areaLight = nullptr)
-      : shape(shape), material(material), areaLight(areaLight) {}
+            const std::shared_ptr<AreaLight>& areaLight = nullptr);
 
-  std::shared_ptr<AreaLight> getAreaLightPtr() const { return areaLight; }
+  std::shared_ptr<AreaLight> getAreaLightPtr() const;
+  AABB aabb() const;
 
-  AABB aabb() const { return shape->aabb(); }
-
-  bool intersect(const Ray& ray, IntersectInfo& info) const {
-    if (shape->intersect(ray, info)) {
-      info.hitPrimitive = this;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool intersectP(const Ray& ray) const { return shape->intersectP(ray); }
+  bool intersect(const Ray& ray, IntersectInfo& info) const;
+  bool intersectP(const Ray& ray) const;
 
   Vec3 evaluateBSDF(const Vec3& wo, const Vec3& wi,
-                    const SurfaceInfo& info) const {
-    // compute tangent space basis
-    Vec3 t, b;
-    orthonormalBasis(info.normal, t, b);
-
-    // world to local transform
-    const Vec3 wo_l = worldToLocal(wo, t, info.normal, b);
-    const Vec3 wi_l = worldToLocal(wi, t, info.normal, b);
-
-    return this->material->f(wo_l, wi_l, info);
-  }
+                    const SurfaceInfo& info) const;
 
   Vec3 sampleBSDF(const Vec3& wo, const SurfaceInfo& info, Sampler& sampler,
-                  Vec3& wi, float& pdf) const {
-    // compute tangent space basis
-    Vec3 t, b;
-    orthonormalBasis(info.normal, t, b);
+                  Vec3& wi, float& pdf) const;
 
-    // world to local transform
-    const Vec3 wo_l = worldToLocal(wo, t, info.normal, b);
+  bool hasArealight() const;
 
-    // sample direction in tangent space
-    Vec3 wi_l;
-    const Vec3 bsdf = this->material->sample(sampler, wo_l, info, wi_l, pdf);
+  Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const;
 
-    // local to world transform
-    wi = localToWorld(wi_l, t, info.normal, b);
-
-    return bsdf;
-  }
-
-  bool hasArealight() const { return areaLight != nullptr; }
-
-  Vec3 Le(const Vec3& wi, const SurfaceInfo& info) const {
-    return areaLight->Le(wi, info);
-  }
-
-  Vec3 baseColor(const SurfaceInfo& info) const {
-    return material->baseColor(info);
-  }
+  Vec3 baseColor(const SurfaceInfo& info) const;
 };
 
 }  // namespace LTRE
