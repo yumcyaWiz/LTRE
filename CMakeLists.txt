@@ -43,6 +43,9 @@ target_sources(LTRE PUBLIC
   "src/sampling/rng.cpp"
   "src/sampling/sampling.cpp"
   "src/sampling/uniform.cpp"
+  "src/shape/mesh.cpp"
+  "src/shape/plane.cpp"
+  "src/shape/sphere.cpp"
 )
 target_link_libraries(LTRE PUBLIC OpenMP::OpenMP_CXX)
 target_link_libraries(LTRE PUBLIC assimp::assimp)
