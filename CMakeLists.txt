@@ -37,6 +37,9 @@ target_sources(LTRE PUBLIC
   "src/integrator/ao.cpp"
   "src/integrator/pt.cpp"
   "src/integrator/nee.cpp"
+  "src/light/area-light.cpp"
+  "src/light/sky/ibl.cpp"
+  "src/light/sky/uniform-sky.cpp"
 )
 target_link_libraries(LTRE PUBLIC OpenMP::OpenMP_CXX)
 target_link_libraries(LTRE PUBLIC assimp::assimp)
