@@ -1,12 +1,14 @@
 # LTRE
 
-header only montecarlo raytracer for my research
+montecarlo raytracer for my research
 
 ## Features
 
 * Unidirectional Path Tracing
+* Path Tracing with Next Event Estimation 
 * BVH
 * Model Loading
+* Disney BRDF([Burley 2012](https://www.disneyanimation.com/publications/physically-based-shading-at-disney/))
 
 ## Requirements
 
@@ -27,6 +29,7 @@ cmake --build .
 
 ![](img/sponza.png)
 ![](img/salle_de_bain.png)
+![](img/disney_brdf.png)
 
 ## Externals
 
