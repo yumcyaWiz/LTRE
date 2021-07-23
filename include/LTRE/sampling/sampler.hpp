@@ -13,12 +13,12 @@ class Sampler {
 
  public:
   Sampler() {}
+
   Sampler(uint64_t seed) : rng(seed) {}
 
   void setSeed(uint64_t seed) { rng.setSeed(seed); }
 
   virtual std::unique_ptr<Sampler> clone() const = 0;
-
   virtual float getNext1D() = 0;
   virtual Vec2 getNext2D() = 0;
 };
