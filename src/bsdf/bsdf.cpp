@@ -35,19 +35,17 @@ Vec3 BSDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
   if (idx == nBxDF) idx--;
 
   // sample from that BxDF
-  const Vec3 ret = coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
+  Vec3 bxdf = coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
+
+  // add other BxDF values, pdfs
+  for (int i = 0; i < nBxDF; ++i) {
+    if (i == idx) continue;
+    bxdf += coefficients[i] * bxdfs[i]->f(wo, wi);
+    pdf += bxdfs[i]->pdf(wo, wi);
+  }
   pdf /= nBxDF;
 
-  // pbrt method
-  // NOTE: maybe wrong
-  // for (int i = 0; i < nBxDF; ++i) {
-  //   if (i != idx) {
-  //     pdf += bxdfs[i]->pdf(wo, wi);
-  //   }
-  // }
-  // pdf /= nBxDF;
-
-  return ret;
+  return bxdf;
 }
 
 }  // namespace LTRE
