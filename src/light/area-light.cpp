@@ -20,11 +20,12 @@ Vec3 AreaLight::sampleDirection(const SurfaceInfo& surfInfo, Sampler& sampler,
   float pdf_a;
   const SurfaceInfo sampledInfo = shape->samplePoint(sampler, pdf_a);
   dir = normalize(sampledInfo.position - surfInfo.position);
-  distToLight = length(sampledInfo.position - surfInfo.position);
+  distToLight = std::max(
+      length(sampledInfo.position - surfInfo.position) - RAY_EPS, 0.0f);
 
   // convert area pdf to solid angle pdf
   const float dist2 = distToLight * distToLight;
-  const float cos = abs(dot(-dir, sampledInfo.normal));
+  const float cos = std::abs(dot(-dir, sampledInfo.normal));
   pdf = pdf_a * dist2 / cos;
 
   // return black when the sampled surface is back faced
