@@ -142,6 +142,6 @@ int main() {
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(Vec3(0));
-  renderer.render(scene, 100000);
+  renderer.render(scene, 1000);
   renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }

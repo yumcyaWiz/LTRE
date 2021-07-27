@@ -24,7 +24,9 @@ int main() {
 
   const auto intersector =
       std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
-  const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr");
+  //   const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr", 0, 0,
+  //   0.5f);
+  const auto sky = std::make_shared<UniformSky>(Vec3(1));
   Scene scene(intersector, sky);
 
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
@@ -41,14 +43,22 @@ int main() {
       std::make_shared<DisneyPrincipledBRDF>(tex2, 0, 0, 1, 0, 0, 0, 0, 0, 0);
   const auto mat3 = std::make_shared<Diffuse>(tex3, 0.2);
   const auto mat4 = std::make_shared<Diffuse>(tex4, 0.2);
+
+  const auto light_shape =
+      std::make_shared<Plane>(Vec3(-1, 5, -1), Vec3(2, 0, 0), Vec3(0, 0, 2));
+  const auto light_tex = std::make_shared<UniformTexture<Vec3>>(Vec3(10));
+  const auto light = std::make_shared<AreaLight>(light_tex, light_shape);
+
   const auto prim1 = Primitive(plane, mat1);
   const auto prim2 = Primitive(sphere2, mat2);
   const auto prim3 = Primitive(sphere3, mat3);
   const auto prim4 = Primitive(sphere4, mat4);
+  const auto prim5 = Primitive(light_shape, mat1, light);
   scene.addPrimitive(prim1);
   scene.addPrimitive(prim2);
   scene.addPrimitive(prim3);
   scene.addPrimitive(prim4);
+  // scene.addPrimitive(prim5);
   scene.build();
 
   // const auto model = Model("../assets/bunny/bunny.obj");
@@ -60,7 +70,7 @@ int main() {
   // scene.build();
 
   const auto camera = std::make_shared<ThinLensCamera>(
-      Vec3(0, 1, 5), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 2.0f);
+      Vec3(0, 1, 10), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f);
   // const auto camera = std::make_shared<ThinLensCamera>(
   //     Vec3(-1000, 350, 0), Vec3(1, 0, 0), Vec2(0.025, 0.025), PI / 4.0f,
   //     0.4f);
@@ -71,6 +81,6 @@ int main() {
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(scene);
-  renderer.render(scene, 1000);
+  renderer.render(scene, 100);
   renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }
