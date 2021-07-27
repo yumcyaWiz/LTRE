@@ -10,7 +10,6 @@ struct Ray {
   Vec3 direction;
   mutable float tmin;
   mutable float tmax;
-  static constexpr float RAY_EPS = 1e-3f;
 
   Ray();
   Ray(const Vec3& origin, const Vec3& direction);
