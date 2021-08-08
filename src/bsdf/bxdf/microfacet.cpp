@@ -166,4 +166,26 @@ float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
   return pdf_wh / (4.0f * dot(wi, wh));
 }
 
+MicrofacetBTDF::MicrofacetBTDF() : fresnel(nullptr), distribution(nullptr) {}
+
+MicrofacetBTDF::MicrofacetBTDF(const Fresnel* fresnel,
+                               const MicrofacetDistribution* distribution)
+    : fresnel(fresnel), distribution(distribution) {}
+
+Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
+  const float cosThetaO = absCosTheta(wo);
+  const float cosThetaI = absCosTheta(wi);
+  if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
+
+  // compute half-vector
+  Vec3 wh = wo + wi;
+  if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
+  wh = normalize(wh);
+
+  const Vec3 F = fresnel->evaluate(dot(wo, wh));
+  const float D = distribution->D(wh);
+  const float G = distribution->G2(wo, wi);
+  return F * D * G / (4.0f * cosThetaO * cosThetaI);
+}
+
 }  // namespace LTRE
