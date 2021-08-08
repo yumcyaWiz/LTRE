@@ -1,6 +1,7 @@
 #ifndef _LTRE_DISNEY_H
 #define _LTRE_DISNEY_H
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
+#include "LTRE/bsdf/bxdf/fresnel.hpp"
 
 namespace LTRE {
 

@@ -8,46 +8,6 @@
 
 namespace LTRE {
 
-class Fresnel {
- public:
-  virtual Vec3 evaluate(float cosThetaI) const = 0;
-};
-
-class FresnelDielectric : public Fresnel {
- private:
-  float iorI_;
-  float iorT_;
-
- public:
-  FresnelDielectric(float iorI, float iorT);
-
-  Vec3 evaluate(float cosThetaI) const override;
-};
-
-// TODO: specify IOR with Vec3, then we can get colored reflectance
-class FresnelConductor : public Fresnel {
- private:
-  float iorI_;
-  float iorT_;
-  float extinctionT_;
-
- public:
-  FresnelConductor(float iorI, float iorT, float extinctionT);
-
-  Vec3 evaluate(float cosThetaI) const override;
-};
-
-class FresnelSchlick : public Fresnel {
- private:
-  Vec3 f0_;
-
- public:
-  FresnelSchlick();
-  FresnelSchlick(const Vec3& f0);
-
-  Vec3 evaluate(float cosThetaI) const override;
-};
-
 class BxDF {
  public:
   static float cosTheta(const Vec3& w);
