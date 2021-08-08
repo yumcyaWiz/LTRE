@@ -1,6 +1,7 @@
 #ifndef _LTRE_MICROFACET_H
 #define _LTRE_MICROFACET_H
 #include "LTRE/bsdf/bxdf/bxdf.hpp"
+#include "LTRE/bsdf/bxdf/fresnel.hpp"
 
 namespace LTRE {
 
@@ -77,6 +78,7 @@ class MicrofacetBRDF : public BxDF {
   float pdf(const Vec3& wo, const Vec3& wi) const override;
 };
 
+/*
 class MicrofacetBTDF : public BxDF {
  private:
   const Fresnel* fresnel;
@@ -92,6 +94,7 @@ class MicrofacetBTDF : public BxDF {
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
 };
+*/
 
 }  // namespace LTRE
 

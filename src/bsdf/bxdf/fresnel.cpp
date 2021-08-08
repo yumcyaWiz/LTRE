@@ -3,18 +3,16 @@
 
 namespace LTRE {
 
-Fresnel::Fresnel(float iorI, float iorT) : iorI_(iorI), iorT_(iorT) {}
+FresnelDielectric::FresnelDielectric(float iorI, float iorT)
+    : iorI_(iorI), iorT_(iorT) {}
 
-float Fresnel::getIOR_I(float cosThetaI) const {
+float FresnelDielectric::getIOR_I(float cosThetaI) const {
   return cosThetaI > 0 ? iorI_ : iorT_;
 }
 
-float Fresnel::getIOR_T(float cosThetaI) const {
+float FresnelDielectric::getIOR_T(float cosThetaI) const {
   return cosThetaI > 0 ? iorT_ : iorI_;
 }
-
-FresnelDielectric::FresnelDielectric(float iorI, float iorT)
-    : Fresnel(iorI, iorT) {}
 
 Vec3 FresnelDielectric::evaluate(float cosThetaI) const {
   // handle from internal case
@@ -50,7 +48,14 @@ Vec3 FresnelDielectric::evaluate(float cosThetaI) const {
 }
 
 FresnelConductor::FresnelConductor(float iorI, float iorT, float extinctionT)
-    : Fresnel(iorI, iorT), extinctionT_(extinctionT) {}
+    : iorI_(iorI), iorT_(iorT), extinctionT_(extinctionT) {}
+
+float FresnelConductor::getIOR_I([[maybe_unused]] float cosThetaI) const {
+  return 0;
+}
+float FresnelConductor::getIOR_T([[maybe_unused]] float cosThetaI) const {
+  return 0;
+}
 
 Vec3 FresnelConductor::evaluate(float cosThetaI) const {
   // handle from internal case
@@ -87,8 +92,14 @@ Vec3 FresnelConductor::evaluate(float cosThetaI) const {
 }
 
 FresnelSchlick::FresnelSchlick() {}
-
 FresnelSchlick::FresnelSchlick(const Vec3& f0) : f0_(f0) {}
+
+float FresnelSchlick::getIOR_I([[maybe_unused]] float cosThetaI) const {
+  return 0;
+}
+float FresnelSchlick::getIOR_T([[maybe_unused]] float cosThetaI) const {
+  return 0;
+}
 
 Vec3 FresnelSchlick::evaluate(float cosThetaI) const {
   const auto pow5 = [](float x) { return x * x * x * x * x; };

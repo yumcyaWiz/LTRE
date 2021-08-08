@@ -166,6 +166,7 @@ float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
   return pdf_wh / (4.0f * dot(wi, wh));
 }
 
+/*
 MicrofacetBTDF::MicrofacetBTDF() : fresnel(nullptr), distribution(nullptr) {}
 
 MicrofacetBTDF::MicrofacetBTDF(const Fresnel* fresnel,
@@ -187,5 +188,6 @@ Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
   const float G = distribution->G2(wo, wi);
   return F * D * G / (4.0f * cosThetaO * cosThetaI);
 }
+*/
 
 }  // namespace LTRE
