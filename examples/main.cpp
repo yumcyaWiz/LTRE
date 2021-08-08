@@ -39,7 +39,7 @@ int main() {
   const auto tex3 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.8, 0.2));
   const auto tex4 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.2, 0.8));
   const auto mat1 = std::make_shared<Diffuse>(tex1, 0.2);
-  const auto mat2 = std::make_shared<Metal>(tex2, 0.2);
+  const auto mat2 = std::make_shared<Glass>(1.5f, 0);
   const auto mat3 = std::make_shared<Diffuse>(tex3, 0.2);
   const auto mat4 = std::make_shared<Diffuse>(tex4, 0.2);
 
@@ -80,6 +80,6 @@ int main() {
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(scene);
-  renderer.render(scene, 1000);
+  renderer.render(scene, 100);
   renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }

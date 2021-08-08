@@ -53,6 +53,22 @@ Vec3 Metal::baseColor(const SurfaceInfo& info) const {
   return baseColor_->sample(info);
 }
 
+Glass::Glass(float ior, float roughness) : ior_(ior), roughness_(roughness) {}
+
+BSDF Glass::prepareBSDF([[maybe_unused]] const SurfaceInfo& info) const {
+  BSDF bsdf;
+  const auto F = std::make_shared<FresnelDielectric>(1.0f, ior_);
+  const auto D =
+      std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
+  const auto bxdf = std::make_shared<MicrofacetBTDF>(F.get(), D.get());
+  bsdf.add(bxdf, 1.0f);
+  return bsdf;
+}
+
+Vec3 Glass::baseColor([[maybe_unused]] const SurfaceInfo& info) const {
+  return Vec3(1);
+}
+
 DisneyPrincipledBRDF::DisneyPrincipledBRDF(
     const std::shared_ptr<Texture<Vec3>>& baseColor, float roughness,
     float subsurface, float metallic, float sheen, float sheenTint,

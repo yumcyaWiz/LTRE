@@ -45,6 +45,19 @@ class Metal : public Material {
   Vec3 baseColor(const SurfaceInfo& info) const override;
 };
 
+// TODO: add baseColor
+class Glass : public Material {
+ private:
+  const float ior_;
+  const float roughness_;
+
+ public:
+  Glass(float ior, float roughness);
+
+  BSDF prepareBSDF(const SurfaceInfo& info) const override;
+  Vec3 baseColor(const SurfaceInfo& info) const override;
+};
+
 class DisneyPrincipledBRDF : public Material {
  private:
   const std::shared_ptr<Texture<Vec3>> baseColor_;

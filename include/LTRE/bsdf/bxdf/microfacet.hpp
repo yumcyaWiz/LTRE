@@ -78,6 +78,7 @@ class MicrofacetBRDF : public BxDF {
   float pdf(const Vec3& wo, const Vec3& wi) const override;
 };
 
+// https://dl.acm.org/doi/10.5555/2383847.2383874
 class MicrofacetBTDF : public BxDF {
  private:
   const Fresnel* fresnel;
