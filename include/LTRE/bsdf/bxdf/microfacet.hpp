@@ -78,7 +78,6 @@ class MicrofacetBRDF : public BxDF {
   float pdf(const Vec3& wo, const Vec3& wi) const override;
 };
 
-/*
 class MicrofacetBTDF : public BxDF {
  private:
   const Fresnel* fresnel;
@@ -94,7 +93,6 @@ class MicrofacetBTDF : public BxDF {
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
 };
-*/
 
 }  // namespace LTRE
 

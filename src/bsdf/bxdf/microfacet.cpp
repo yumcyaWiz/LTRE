@@ -166,7 +166,6 @@ float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
   return pdf_wh / (4.0f * dot(wi, wh));
 }
 
-/*
 MicrofacetBTDF::MicrofacetBTDF() : fresnel(nullptr), distribution(nullptr) {}
 
 MicrofacetBTDF::MicrofacetBTDF(const Fresnel* fresnel,
@@ -178,16 +177,61 @@ Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
   const float cosThetaI = absCosTheta(wi);
   if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
 
+  const float iorI = fresnel->getIOR_I(cosTheta(wo));
+  const float iorT = fresnel->getIOR_T(cosTheta(wo));
+
   // compute half-vector
-  Vec3 wh = wo + wi;
+  Vec3 wh = -(iorI * wo + iorT * wi);
   if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
   wh = normalize(wh);
 
   const Vec3 F = fresnel->evaluate(dot(wo, wh));
   const float D = distribution->D(wh);
   const float G = distribution->G2(wo, wi);
-  return F * D * G / (4.0f * cosThetaO * cosThetaI);
+  const float cosThetaIH = dot(wi, wh);
+  const float cosThetaOH = dot(wo, wh);
+  const float term = iorI * cosThetaOH + iorT * cosThetaIH;
+  return std::abs(cosThetaIH) * std::abs(cosThetaOH) * iorT * iorT * (1 - F) *
+         G * D / (cosThetaI * cosThetaO * term * term);
 }
-*/
+
+Vec3 MicrofacetBTDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
+                            float& pdf) const {
+  // sample half-vector
+  float pdf_wh;
+  const Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
+
+  // compute indident direction
+  const float iorI = fresnel->getIOR_I(cosTheta(wo));
+  const float iorT = fresnel->getIOR_T(cosTheta(wo));
+  wi = BxDF::refract(wo, wh, iorI, iorT);
+
+  // convert hald-vector pdf to incident direction pdf
+  const float cosThetaIH = dot(wi, wh);
+  const float cosThetaOH = dot(wo, wh);
+  const float term = iorI * cosThetaOH + iorT * cosThetaIH;
+  pdf = pdf_wh * iorT * iorT * std::abs(cosThetaOH) / (term * term);
+
+  return f(wo, wi);
+}
+
+float MicrofacetBTDF::pdf(const Vec3& wo, const Vec3& wi) const {
+  const float iorI = fresnel->getIOR_I(cosTheta(wo));
+  const float iorT = fresnel->getIOR_T(cosTheta(wo));
+
+  // compute half-vector
+  Vec3 wh = -(iorI * wo + iorT * wi);
+  if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return 0;
+  wh = normalize(wh);
+
+  // compute half-vector pdf
+  const float pdf_wh = distribution->pdf(wh);
+
+  // convert hald-vector pdf to incident direction pdf
+  const float cosThetaIH = dot(wi, wh);
+  const float cosThetaOH = dot(wo, wh);
+  const float term = iorI * cosThetaOH + iorT * cosThetaIH;
+  return pdf_wh * iorT * iorT * std::abs(cosThetaOH) / (term * term);
+}
 
 }  // namespace LTRE
