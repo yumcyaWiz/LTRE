@@ -28,7 +28,8 @@ class BxDF {
   static float sin2Phi(const Vec3& w);
 
   static Vec3 reflect(const Vec3& v, const Vec3& n);
-  static Vec3 refract(const Vec3& v, const Vec3& n, float iorI, float iorT);
+  static bool refract(const Vec3& v, const Vec3& n, float iorI, float iorT,
+                      Vec3& t);
 
   virtual Vec3 f(const Vec3& wo, const Vec3& wi) const = 0;
   virtual Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
