@@ -185,32 +185,40 @@ Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
   if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
   wh = normalize(wh);
 
-  const Vec3 F = fresnel->evaluate(dot(wo, wh));
+  const float cosThetaOH = dot(wo, wh);
+  const float cosThetaIH = dot(wi, wh);
+  const Vec3 F = fresnel->evaluate(cosThetaOH);
   const float D = distribution->D(wh);
   const float G = distribution->G2(wo, wi);
-  const float cosThetaIH = dot(wi, wh);
-  const float cosThetaOH = dot(wo, wh);
   const float term = iorI * cosThetaOH + iorT * cosThetaIH;
-  return std::abs(cosThetaIH) * std::abs(cosThetaOH) * iorT * iorT * (1 - F) *
-         G * D / (cosThetaI * cosThetaO * term * term);
+  return std::abs(cosThetaIH) * std::abs(cosThetaOH) * iorT * iorT *
+         (1.0f - F) * G * D / (cosThetaI * cosThetaO * term * term);
 }
 
 Vec3 MicrofacetBTDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
                             float& pdf) const {
   // sample half-vector
   float pdf_wh;
-  const Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
+  Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
+
+  // flip half-vector if inside object
+  if (cosTheta(wo) < 0) {
+    wh = -wh;
+  }
 
   // compute indident direction
   const float iorI = fresnel->getIOR_I(cosTheta(wo));
   const float iorT = fresnel->getIOR_T(cosTheta(wo));
-  wi = BxDF::refract(wo, wh, iorI, iorT);
+  if (!BxDF::refract(wo, wh, iorI, iorT, wi)) {
+    // total reflection
+    return Vec3(0);
+  }
 
-  // convert hald-vector pdf to incident direction pdf
+  // convert half-vector pdf to incident direction pdf
   const float cosThetaIH = dot(wi, wh);
   const float cosThetaOH = dot(wo, wh);
   const float term = iorI * cosThetaOH + iorT * cosThetaIH;
-  pdf = pdf_wh * iorT * iorT * std::abs(cosThetaOH) / (term * term);
+  pdf = pdf_wh * iorT * iorT * std::abs(cosThetaIH) / (term * term);
 
   return f(wo, wi);
 }
@@ -231,7 +239,7 @@ float MicrofacetBTDF::pdf(const Vec3& wo, const Vec3& wi) const {
   const float cosThetaIH = dot(wi, wh);
   const float cosThetaOH = dot(wo, wh);
   const float term = iorI * cosThetaOH + iorT * cosThetaIH;
-  return pdf_wh * iorT * iorT * std::abs(cosThetaOH) / (term * term);
+  return pdf_wh * iorT * iorT * std::abs(cosThetaIH) / (term * term);
 }
 
 }  // namespace LTRE

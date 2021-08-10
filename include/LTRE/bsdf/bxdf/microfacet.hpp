@@ -5,6 +5,7 @@
 
 namespace LTRE {
 
+// TODO: sample from visible normal
 class MicrofacetDistribution {
  public:
   // half-vector distribution
