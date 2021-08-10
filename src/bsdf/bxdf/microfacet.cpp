@@ -202,13 +202,14 @@ Vec3 MicrofacetBTDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
   Vec3 wh = distribution->sample(sampler.getNext2D(), pdf_wh);
 
   // flip half-vector if inside object
-  if (cosTheta(wo) < 0) {
+  const float cosThetaO = cosTheta(wo);
+  if (cosThetaO < 0) {
     wh = -wh;
   }
 
   // compute indident direction
-  const float iorI = fresnel->getIOR_I(cosTheta(wo));
-  const float iorT = fresnel->getIOR_T(cosTheta(wo));
+  const float iorI = fresnel->getIOR_I(cosThetaO);
+  const float iorT = fresnel->getIOR_T(cosThetaO);
   if (!BxDF::refract(wo, wh, iorI, iorT, wi)) {
     // total reflection
     return Vec3(0);

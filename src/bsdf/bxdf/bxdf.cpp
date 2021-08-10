@@ -31,14 +31,8 @@ Vec3 BxDF::reflect(const Vec3& v, const Vec3& n) {
   return -v + 2.0f * dot(v, n) * n;
 }
 
-bool BxDF::refract(const Vec3& v, const Vec3& n_in, float iorI, float iorT,
+bool BxDF::refract(const Vec3& v, const Vec3& n, float iorI, float iorT,
                    Vec3& t) {
-  // flip normal if needed
-  Vec3 n = n_in;
-  if (dot(v, n_in) < 0) {
-    n = -n_in;
-  }
-
   const Vec3 t_h = -iorI / iorT * (v - dot(v, n) * n);
   // total reflection
   if (length2(t_h) > 1.0f) {
