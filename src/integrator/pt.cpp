@@ -38,7 +38,7 @@ Vec3 PT::integrate(const Ray& ray_in, const Scene& scene,
                                               sampler, wi, pdf);
 
     // update throughput
-    const float cos = std::max(dot(wi, info.surfaceInfo.normal), 0.0f);
+    const float cos = std::abs(dot(wi, info.surfaceInfo.normal));
     throughput *= bsdf * cos / pdf;
 
     // update ray
