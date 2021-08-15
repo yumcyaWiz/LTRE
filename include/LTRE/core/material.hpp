@@ -46,6 +46,8 @@ class Metal : public Material {
 };
 
 // TODO: add baseColor
+// FIXME: cause bright points when bsdf evaluation method is summation of each
+// BxDFs
 class Glass : public Material {
  private:
   const float ior_;

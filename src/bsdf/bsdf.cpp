@@ -38,11 +38,12 @@ Vec3 BSDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
   Vec3 bxdf = coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
 
   // add other BxDF values, pdfs
-  for (int i = 0; i < nBxDF; ++i) {
-    if (i == idx) continue;
-    bxdf += coefficients[i] * bxdfs[i]->f(wo, wi);
-    pdf += bxdfs[i]->pdf(wo, wi);
-  }
+  // NOTE: cause bright points on Glass Material
+  // for (int i = 0; i < nBxDF; ++i) {
+  //   if (i == idx) continue;
+  //   bxdf += coefficients[i] * bxdfs[i]->f(wo, wi);
+  //   pdf += bxdfs[i]->pdf(wo, wi);
+  // }
   pdf /= nBxDF;
 
   return bxdf;
