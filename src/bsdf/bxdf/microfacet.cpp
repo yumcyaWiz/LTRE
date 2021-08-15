@@ -225,6 +225,7 @@ Vec3 MicrofacetBTDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
   const float iorT = fresnel->getIOR_T(cosThetaO);
   if (!BxDF::refract(wo, wh, iorI, iorT, wi)) {
     // total reflection
+    pdf = 1;
     return Vec3(0);
   }
 
