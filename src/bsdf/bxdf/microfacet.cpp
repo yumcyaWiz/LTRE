@@ -2,6 +2,7 @@
 
 #include "LTRE/core/constant.hpp"
 #include "LTRE/sampling/sampling.hpp"
+#include "spdlog/spdlog.h"
 
 namespace LTRE {
 
@@ -123,6 +124,11 @@ MicrofacetBRDF::MicrofacetBRDF(const Fresnel* fresnel,
     : fresnel(fresnel), distribution(distribution) {}
 
 Vec3 MicrofacetBRDF::f(const Vec3& wo, const Vec3& wi) const {
+  // if wo, wi not lie on the same side, return 0
+  if (cosTheta(wo) * cosTheta(wi) < 0) {
+    return Vec3(0);
+  }
+
   const float cosThetaO = absCosTheta(wo);
   const float cosThetaI = absCosTheta(wi);
   if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
@@ -132,7 +138,8 @@ Vec3 MicrofacetBRDF::f(const Vec3& wo, const Vec3& wi) const {
   if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return Vec3(0);
   wh = normalize(wh);
 
-  const Vec3 F = fresnel->evaluate(dot(wo, wh));
+  const int sign = cosTheta(wo) > 0 ? 1 : -1;
+  const Vec3 F = fresnel->evaluate(sign * std::abs(dot(wo, wh)));
   const float D = distribution->D(wh);
   const float G = distribution->G2(wo, wi);
   return F * D * G / (4.0f * cosThetaO * cosThetaI);
@@ -173,6 +180,11 @@ MicrofacetBTDF::MicrofacetBTDF(const Fresnel* fresnel,
     : fresnel(fresnel), distribution(distribution) {}
 
 Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
+  // if wo, wi lie on the same side, return 0
+  if (cosTheta(wo) * cosTheta(wi) > 0) {
+    return Vec3(0);
+  }
+
   const float cosThetaO = absCosTheta(wo);
   const float cosThetaI = absCosTheta(wi);
   if (cosThetaI == 0 || cosThetaO == 0) return Vec3(0);
@@ -187,7 +199,8 @@ Vec3 MicrofacetBTDF::f(const Vec3& wo, const Vec3& wi) const {
 
   const float cosThetaOH = dot(wo, wh);
   const float cosThetaIH = dot(wi, wh);
-  const Vec3 F = fresnel->evaluate(cosThetaOH);
+  const int sign = cosTheta(wo) > 0 ? 1 : -1;
+  const Vec3 F = fresnel->evaluate(sign * std::abs(cosThetaOH));
   const float D = distribution->D(wh);
   const float G = distribution->G2(wo, wi);
   const float term = iorI * cosThetaOH + iorT * cosThetaIH;

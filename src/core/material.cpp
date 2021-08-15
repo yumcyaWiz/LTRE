@@ -60,8 +60,10 @@ BSDF Glass::prepareBSDF([[maybe_unused]] const SurfaceInfo& info) const {
   const auto F = std::make_shared<FresnelDielectric>(1.0f, ior_);
   const auto D =
       std::make_shared<GGX>(std::max(roughness_ * roughness_, 0.001f));
-  const auto bxdf = std::make_shared<MicrofacetBTDF>(F.get(), D.get());
-  bsdf.add(bxdf, 1.0f);
+  const auto brdf = std::make_shared<MicrofacetBRDF>(F.get(), D.get());
+  const auto btdf = std::make_shared<MicrofacetBTDF>(F.get(), D.get());
+  bsdf.add(brdf, 1.0f);
+  bsdf.add(btdf, 1.0f);
   return bsdf;
 }
 
