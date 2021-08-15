@@ -161,6 +161,11 @@ Vec3 MicrofacetBRDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 }
 
 float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
+  // if wo, wi not lie on the same side, return 0
+  if (cosTheta(wo) * cosTheta(wi) < 0) {
+    return 0;
+  }
+
   // compute half-vector
   Vec3 wh = wo + wi;
   if (wh[0] == 0 && wh[1] == 0 && wh[2] == 0) return 0;
@@ -239,6 +244,11 @@ Vec3 MicrofacetBTDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 }
 
 float MicrofacetBTDF::pdf(const Vec3& wo, const Vec3& wi) const {
+  // if wo, wi lie on the same side, return 0
+  if (cosTheta(wo) * cosTheta(wi) > 0) {
+    return 0;
+  }
+
   const float iorI = fresnel->getIOR_I(cosTheta(wo));
   const float iorT = fresnel->getIOR_T(cosTheta(wo));
 
