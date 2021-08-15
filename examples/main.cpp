@@ -24,9 +24,8 @@ int main() {
 
   const auto intersector =
       std::make_shared<BVH<Primitive, BVHSplitStrategy::SAH>>();
-  //   const auto sky = std::make_shared<IBL>("lythwood_field_4k.hdr", 0, 0,
-  //   0.5f);
-  const auto sky = std::make_shared<UniformSky>(Vec3(1));
+  const auto sky = std::make_shared<IBL>("PaperMill_E_3k.hdr", 0, 0, 1.0f);
+  //   const auto sky = std::make_shared<UniformSky>(Vec3(1));
   Scene scene(intersector, sky);
 
   const auto sphere2 = std::make_shared<Sphere>(Vec3(0), 1);
@@ -39,9 +38,9 @@ int main() {
   const auto tex3 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.8, 0.2));
   const auto tex4 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.2, 0.8));
   const auto mat1 = std::make_shared<Diffuse>(tex1, 0.2);
-  const auto mat2 = std::make_shared<Glass>(1.5f, 0);
-  const auto mat3 = std::make_shared<Diffuse>(tex3, 0.2);
-  const auto mat4 = std::make_shared<Diffuse>(tex4, 0.2);
+  const auto mat2 = std::make_shared<Glass>(1.5f, 0.2);
+  const auto mat3 = std::make_shared<Glass>(1.5f, 0);
+  const auto mat4 = std::make_shared<Glass>(1.5f, 0.4);
 
   const auto light_shape =
       std::make_shared<Plane>(Vec3(-1, 5, -1), Vec3(2, 0, 0), Vec3(0, 0, 2));
@@ -68,8 +67,11 @@ int main() {
   // scene.addModel(model);
   // scene.build();
 
-  const auto camera = std::make_shared<ThinLensCamera>(
-      Vec3(0, 1, 10), Vec3(0, 0, -1), Vec2(0.025, 0.025), PI / 4.0f);
+  const Vec3 camPos = Vec3(0, 3, 15);
+  const Vec3 focusPos = Vec3(0, 1, 0);
+  const Vec3 camForward = normalize(focusPos - camPos);
+  const auto camera = std::make_shared<ThinLensCamera>(camPos, camForward,
+                                                       Vec2(1, 1), PI / 4.0f);
   // const auto camera = std::make_shared<ThinLensCamera>(
   //     Vec3(-1000, 350, 0), Vec3(1, 0, 0), Vec2(0.025, 0.025), PI / 4.0f,
   //     0.4f);
@@ -80,6 +82,6 @@ int main() {
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(scene);
-  renderer.render(scene, 100);
+  renderer.render(scene, 10000);
   renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }
