@@ -9,6 +9,7 @@ montecarlo raytracer for my research
 * BVH
 * Model Loading
 * Disney BRDF([Burley 2012](https://www.disneyanimation.com/publications/physically-based-shading-at-disney/))
+* Microfacet BTDF([Walter 2007](https://dl.acm.org/doi/10.5555/2383847.2383874))
 
 ## Requirements
 
