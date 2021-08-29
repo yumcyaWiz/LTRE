@@ -47,9 +47,7 @@ Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf) {
 float samplePlanePdf(float lx, float ly) { return 1.0f / (lx * ly); }
 
 DiscreteEmpiricalDistribution1D::DiscreteEmpiricalDistribution1D(
-    const std::vector<float>& values) {
-  const std::size_t N = values.size();
-
+    const float* values, unsigned int N) {
   // sum f
   float sum = 0;
   for (std::size_t i = 0; i < N; ++i) {
@@ -63,6 +61,10 @@ DiscreteEmpiricalDistribution1D::DiscreteEmpiricalDistribution1D(
     cdf[i] = cdf[i - 1] + values[i - 1] / sum;
   }
 }
+
+DiscreteEmpiricalDistribution1D::DiscreteEmpiricalDistribution1D(
+    const std::vector<float>& values)
+    : DiscreteEmpiricalDistribution1D(values.data(), values.size()) {}
 
 unsigned int DiscreteEmpiricalDistribution1D::sample(float u,
                                                      float& pdf) const {

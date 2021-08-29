@@ -24,9 +24,11 @@ Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf);
 float samplePlanePdf(float lx, float ly);
 
 class DiscreteEmpiricalDistribution1D {
- public:
+ private:
   std::vector<float> cdf;
 
+ public:
+  DiscreteEmpiricalDistribution1D(const float* values, unsigned int N);
   DiscreteEmpiricalDistribution1D(const std::vector<float>& values);
 
   unsigned int sample(float u, float& pdf) const;
