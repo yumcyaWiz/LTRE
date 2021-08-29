@@ -10,12 +10,13 @@ TEST(DiscreteEmpirical1D, BasicAssertions) {
 
   std::vector<float> values;
   values.push_back(1);
-  values.push_back(2);
-  values.push_back(3);
+  values.push_back(1);
+  values.push_back(1);
+  values.push_back(1);
 
   DiscreteEmpiricalDistribution1D dist{values};
 
-  const float u = sampler.getNext1D();
+  const float u = 1.0f;
   float pdf;
   unsigned int x = dist.sample(u, pdf);
   spdlog::info("u: {0}, x: {1}, pdf: {2}", u, x, pdf);

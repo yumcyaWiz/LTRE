@@ -69,13 +69,16 @@ DiscreteEmpiricalDistribution1D::DiscreteEmpiricalDistribution1D(
 unsigned int DiscreteEmpiricalDistribution1D::sample(float u,
                                                      float& pdf) const {
   // inverse cdf
-  const int x = std::lower_bound(cdf.begin(), cdf.end(), u) - cdf.begin();
-  assert(x > 0 && x < cdf.size());
+  int x = std::lower_bound(cdf.begin(), cdf.end(), u) - cdf.begin();
+  if (x == 0) {
+    x++;
+  }
 
   // compute pdf
-  pdf = (x > 0) ? cdf[x] - cdf[x - 1] : 0;
+  pdf = cdf[x] - cdf[x - 1];
 
-  return x;
+  // NOTE: cdf's index is +1 from values
+  return x - 1;
 }
 
 }  // namespace LTRE
