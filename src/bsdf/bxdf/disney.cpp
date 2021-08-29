@@ -227,8 +227,8 @@ float DisneySpecular::pdf(const Vec3& wo, const Vec3& wi) const {
 
 // NOTE: assuming half-vector is equal to normal
 float DisneySpecular::reflectance(const Vec3& wo) const {
-  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
-  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  const Vec3 f = F.evaluate(dot(wo, Vec3(0, 1, 0)));
+  float luminance = Spectrum::RGB2XYZ(f)[1];
   return luminance;
 }
 
@@ -321,8 +321,8 @@ float DisneyClearcoat::pdf(const Vec3& wo, const Vec3& wi) const {
 
 // NOTE: assuming half-vector is equal to normal
 float DisneyClearcoat::reflectance(const Vec3& wo) const {
-  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
-  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  const Vec3 f = 0.25f * clearcoat * F.evaluate(dot(wo, Vec3(0, 1, 0)));
+  float luminance = Spectrum::RGB2XYZ(f)[1];
   return luminance;
 }
 
