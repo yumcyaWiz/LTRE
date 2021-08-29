@@ -38,9 +38,19 @@ int main() {
   const auto tex3 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.8, 0.2));
   const auto tex4 = std::make_shared<UniformTexture<Vec3>>(Vec3(0.2, 0.2, 0.8));
   const auto mat1 = std::make_shared<Diffuse>(tex1, 0.2);
-  const auto mat2 = std::make_shared<Glass>(1.5f, 0.2);
-  const auto mat3 = std::make_shared<Glass>(1.5f, 0);
-  const auto mat4 = std::make_shared<Glass>(1.5f, 0.4);
+
+  const auto mat2 =
+      std::make_shared<DisneyPrincipledBRDF>(tex2, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+  const auto mat3 =
+      std::make_shared<DisneyPrincipledBRDF>(tex3, 0, 0, 1, 0, 0, 0, 0, 0, 0);
+  const auto mat4 =
+      std::make_shared<DisneyPrincipledBRDF>(tex4, 0, 0, 0, 0, 0, 1, 0, 1, 1);
+
+  /*
+    const auto mat2 = std::make_shared<Glass>(1.5f, 0.2f);
+    const auto mat3 = std::make_shared<Glass>(1.5f, 0.0f);
+    const auto mat4 = std::make_shared<Glass>(1.5f, 0.4f);
+    */
 
   const auto light_shape =
       std::make_shared<Plane>(Vec3(-1, 5, -1), Vec3(2, 0, 0), Vec3(0, 0, 2));
@@ -82,6 +92,6 @@ int main() {
 
   Renderer renderer(width, height, camera, integrator, sampler);
   renderer.focus(scene);
-  renderer.render(scene, 10000);
+  renderer.render(scene, 1000);
   renderer.writePPM("output.ppm", AOVType::BEAUTY);
 }
