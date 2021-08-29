@@ -1,5 +1,8 @@
 #include "LTRE/bsdf/bsdf.hpp"
 
+#include "LTRE/sampling/sampling.hpp"
+
+//
 #include "spdlog/spdlog.h"
 
 namespace LTRE {
@@ -27,24 +30,17 @@ Vec3 BSDF::f(const Vec3& wo, const Vec3& wi) const {
   return ret;
 }
 
-// TODO: use more nice sampling strategy
 Vec3 BSDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
                   float& pdf) const {
-  // choose 1 BxDF randomly
-  int idx = sampler.getNext1D() * nBxDF;
-  if (idx == nBxDF) idx--;
+  // choose 1 BxDF
+  DiscreteEmpiricalDistribution1D dist(coefficients, nBxDF);
+  float pdf_choose_bxdf;
+  const unsigned int idx = dist.sample(sampler.getNext1D(), pdf_choose_bxdf);
 
   // sample from that BxDF
-  Vec3 bxdf = coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
-
-  // add other BxDF values, pdfs
-  // NOTE: cause bright points on Glass Material
-  // for (int i = 0; i < nBxDF; ++i) {
-  //   if (i == idx) continue;
-  //   bxdf += coefficients[i] * bxdfs[i]->f(wo, wi);
-  //   pdf += bxdfs[i]->pdf(wo, wi);
-  // }
-  pdf /= nBxDF;
+  const Vec3 bxdf =
+      coefficients[idx] * bxdfs[idx]->sample(sampler, wo, wi, pdf);
+  pdf *= pdf_choose_bxdf;
 
   return bxdf;
 }
