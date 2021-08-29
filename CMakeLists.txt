@@ -35,6 +35,7 @@ target_sources(LTRE PUBLIC
   "src/core/ray.cpp"
   "src/core/renderer.cpp"
   "src/core/scene.cpp"
+  "src/core/spectrum.cpp"
   "src/integrator/ao.cpp"
   "src/integrator/pt.cpp"
   "src/integrator/nee.cpp"
