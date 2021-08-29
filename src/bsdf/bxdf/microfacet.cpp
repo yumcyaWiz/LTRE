@@ -182,8 +182,11 @@ float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
 
 // NOTE: assuming half-vector is equal to normal
 float MicrofacetBRDF::reflectance(const Vec3& wo) const {
-  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
-  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  // evaluate fresnel reflecrance
+  const int sign = cosTheta(wo) > 0 ? 1 : -1;
+  const Vec3 F = fresnel->evaluate(sign * std::abs(dot(wo, Vec3(0, 1, 0))));
+
+  float luminance = Spectrum::RGB2XYZ(F)[1];
   return luminance;
 }
 
@@ -278,15 +281,11 @@ float MicrofacetBTDF::pdf(const Vec3& wo, const Vec3& wi) const {
 
 // NOTE: assuming half-vector is equal to normal
 float MicrofacetBTDF::reflectance(const Vec3& wo) const {
-  Vec3 wh = Vec3(0, 1, 0);
-  // flip half-vector if inside object
-  const float cosThetaO = cosTheta(wo);
-  if (cosThetaO < 0) {
-    wh = -wh;
-  }
+  // evaluate fresnel reflecrance
+  const int sign = cosTheta(wo) > 0 ? 1 : -1;
+  const Vec3 F = fresnel->evaluate(sign * std::abs(dot(wo, Vec3(0, 1, 0))));
 
-  const Vec3 wi = BxDF::reflect(wo, wh);
-  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  float luminance = Spectrum::RGB2XYZ(1.0f - F)[1];
   return luminance;
 }
 
