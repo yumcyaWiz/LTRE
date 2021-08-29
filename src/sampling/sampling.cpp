@@ -46,4 +46,34 @@ Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf) {
 }
 float samplePlanePdf(float lx, float ly) { return 1.0f / (lx * ly); }
 
+DiscreteEmpiricalDistribution1D::DiscreteEmpiricalDistribution1D(
+    const std::vector<float>& values) {
+  const std::size_t N = values.size();
+
+  // sum f
+  float sum = 0;
+  for (std::size_t i = 0; i < N; ++i) {
+    sum += values[i];
+  }
+
+  // compute cdf
+  cdf.resize(N + 1);
+  cdf[0] = 0;
+  for (std::size_t i = 1; i < N + 1; ++i) {
+    cdf[i] = cdf[i - 1] + values[i - 1] / sum;
+  }
 }
+
+unsigned int DiscreteEmpiricalDistribution1D::sample(float u,
+                                                     float& pdf) const {
+  // inverse cdf
+  const int x = std::lower_bound(cdf.begin(), cdf.end(), u) - cdf.begin();
+  assert(x > 0 && x < cdf.size());
+
+  // compute pdf
+  pdf = (x > 0) ? cdf[x] - cdf[x - 1] : 0;
+
+  return x;
+}
+
+}  // namespace LTRE

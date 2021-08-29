@@ -1,6 +1,8 @@
 #ifndef _LTRE_SAMPLING_H
 #define _LTRE_SAMPLING_H
 
+#include <vector>
+
 #include "LTRE/math/vec2.hpp"
 #include "LTRE/math/vec3.hpp"
 
@@ -20,6 +22,15 @@ float sampleDiskPdf(float R);
 
 Vec2 samplePlane(const Vec2& uv, float lx, float ly, float& pdf);
 float samplePlanePdf(float lx, float ly);
+
+class DiscreteEmpiricalDistribution1D {
+ public:
+  std::vector<float> cdf;
+
+  DiscreteEmpiricalDistribution1D(const std::vector<float>& values);
+
+  unsigned int sample(float u, float& pdf) const;
+};
 
 }  // namespace LTRE
 
