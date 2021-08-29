@@ -32,8 +32,14 @@ Vec3 BSDF::f(const Vec3& wo, const Vec3& wi) const {
 
 Vec3 BSDF::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
                   float& pdf) const {
+  // construct EmpiricalDistribution1D with coef x reflectance
+  std::vector<float> values(nBxDF);
+  for (int i = 0; i < nBxDF; ++i) {
+    values[i] = coefficients[i] * bxdfs[i]->reflectance(wo);
+  }
+  DiscreteEmpiricalDistribution1D dist(values);
+
   // choose 1 BxDF
-  DiscreteEmpiricalDistribution1D dist(coefficients, nBxDF);
   float pdf_choose_bxdf;
   const unsigned int idx = dist.sample(sampler.getNext1D(), pdf_choose_bxdf);
 
