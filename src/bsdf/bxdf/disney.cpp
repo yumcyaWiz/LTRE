@@ -1,6 +1,7 @@
 #include "LTRE/bsdf/bxdf/disney.hpp"
 
 #include "LTRE/core/constant.hpp"
+#include "LTRE/core/spectrum.hpp"
 #include "LTRE/sampling/sampling.hpp"
 
 namespace LTRE {
@@ -34,6 +35,11 @@ Vec3 DisneyDiffuse::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 float DisneyDiffuse::pdf([[maybe_unused]] const Vec3& wo,
                          const Vec3& wi) const {
   return sampleCosineHemispherePdf(wi);
+}
+
+float DisneyDiffuse::reflectance(const Vec3& wo) const {
+  const float luminance = Spectrum::RGB2XYZ(baseColor)[1];
+  return luminance;
 }
 
 DisneySubsurface::DisneySubsurface(const Vec3& baseColor, float roughness)
@@ -78,6 +84,11 @@ float DisneySubsurface::pdf([[maybe_unused]] const Vec3& wo,
   return sampleCosineHemispherePdf(wi);
 }
 
+float DisneySubsurface::reflectance(const Vec3& wo) const {
+  const float luminance = Spectrum::RGB2XYZ(baseColor)[1];
+  return luminance;
+}
+
 DisneySheen::DisneySheen(const Vec3& baseColor, float sheen, float sheenTint)
     : baseColor{baseColor}, sheen(sheen), sheenTint(sheenTint) {
   const float luminance =
@@ -107,6 +118,11 @@ Vec3 DisneySheen::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 
 float DisneySheen::pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const {
   return sampleCosineHemispherePdf(wi);
+}
+
+float DisneySheen::reflectance(const Vec3& wo) const {
+  const float luminance = Spectrum::RGB2XYZ(rho_sheen)[1];
+  return sheen * luminance;
 }
 
 float DisneySpecular::D(const Vec3& wh) const {
@@ -209,6 +225,13 @@ float DisneySpecular::pdf(const Vec3& wo, const Vec3& wi) const {
   return pdf_wh / (4.0f * dot(wi, wh));
 }
 
+// NOTE: assuming half-vector is equal to normal
+float DisneySpecular::reflectance(const Vec3& wo) const {
+  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
+  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  return luminance;
+}
+
 float DisneyClearcoat::D(const Vec3& wh) const {
   const float alpha2 = alpha_D * alpha_D;
   const float cosThetaH = BxDF::absCosTheta(wh);
@@ -294,6 +317,13 @@ float DisneyClearcoat::pdf(const Vec3& wo, const Vec3& wi) const {
 
   // convert hald-vector pdf to incident direction pdf
   return pdf_wh / (4.0f * dot(wi, wh));
+}
+
+// NOTE: assuming half-vector is equal to normal
+float DisneyClearcoat::reflectance(const Vec3& wo) const {
+  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
+  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  return luminance;
 }
 
 }  // namespace LTRE

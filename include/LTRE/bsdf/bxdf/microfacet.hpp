@@ -77,6 +77,7 @@ class MicrofacetBRDF : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 // https://dl.acm.org/doi/10.5555/2383847.2383874
@@ -94,6 +95,7 @@ class MicrofacetBTDF : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 }  // namespace LTRE

@@ -35,6 +35,7 @@ class BxDF {
   virtual Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
                       float& pdf) const = 0;
   virtual float pdf(const Vec3& wo, const Vec3& wi) const = 0;
+  virtual float reflectance(const Vec3& wo) const = 0;
 };
 
 }  // namespace LTRE

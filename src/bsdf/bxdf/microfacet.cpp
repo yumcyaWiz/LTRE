@@ -1,7 +1,9 @@
 #include "LTRE/bsdf/bxdf/microfacet.hpp"
 
 #include "LTRE/core/constant.hpp"
+#include "LTRE/core/spectrum.hpp"
 #include "LTRE/sampling/sampling.hpp"
+//
 #include "spdlog/spdlog.h"
 
 namespace LTRE {
@@ -178,6 +180,13 @@ float MicrofacetBRDF::pdf(const Vec3& wo, const Vec3& wi) const {
   return pdf_wh / (4.0f * dot(wi, wh));
 }
 
+// NOTE: assuming half-vector is equal to normal
+float MicrofacetBRDF::reflectance(const Vec3& wo) const {
+  const Vec3 wi = BxDF::reflect(wo, Vec3(0, 1, 0));
+  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  return luminance;
+}
+
 MicrofacetBTDF::MicrofacetBTDF() : fresnel(nullptr), distribution(nullptr) {}
 
 MicrofacetBTDF::MicrofacetBTDF(const Fresnel* fresnel,
@@ -265,6 +274,20 @@ float MicrofacetBTDF::pdf(const Vec3& wo, const Vec3& wi) const {
   const float cosThetaOH = dot(wo, wh);
   const float term = iorI * cosThetaOH + iorT * cosThetaIH;
   return pdf_wh * iorT * iorT * std::abs(cosThetaIH) / (term * term);
+}
+
+// NOTE: assuming half-vector is equal to normal
+float MicrofacetBTDF::reflectance(const Vec3& wo) const {
+  Vec3 wh = Vec3(0, 1, 0);
+  // flip half-vector if inside object
+  const float cosThetaO = cosTheta(wo);
+  if (cosThetaO < 0) {
+    wh = -wh;
+  }
+
+  const Vec3 wi = BxDF::reflect(wo, wh);
+  float luminance = Spectrum::RGB2XYZ(f(wo, wi))[1];
+  return luminance;
 }
 
 }  // namespace LTRE

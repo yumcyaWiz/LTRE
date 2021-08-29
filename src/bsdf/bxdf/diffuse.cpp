@@ -1,6 +1,7 @@
 #include "LTRE/bsdf/bxdf/diffuse.hpp"
 
 #include "LTRE/core/constant.hpp"
+#include "LTRE/core/spectrum.hpp"
 #include "LTRE/sampling/sampling.hpp"
 
 namespace LTRE {
@@ -20,6 +21,11 @@ Vec3 Lambert::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 
 float Lambert::pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const {
   return sampleCosineHemispherePdf(wi);
+}
+
+float Lambert::reflectance(const Vec3& wo) const {
+  const float luminance = Spectrum::RGB2XYZ(rho)[1];
+  return luminance;
 }
 
 OrenNayer::OrenNayer(const Vec3& rho, float sigma) : rho(rho), sigma(sigma) {
@@ -60,6 +66,11 @@ Vec3 OrenNayer::sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
 
 float OrenNayer::pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const {
   return sampleCosineHemispherePdf(wi);
+}
+
+float OrenNayer::reflectance(const Vec3& wo) const {
+  const float luminance = Spectrum::RGB2XYZ(rho)[1];
+  return luminance;
 }
 
 }  // namespace LTRE

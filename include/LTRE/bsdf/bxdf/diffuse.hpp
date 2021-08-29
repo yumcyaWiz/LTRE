@@ -15,6 +15,7 @@ class Lambert : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 class OrenNayer : public BxDF {
@@ -31,6 +32,7 @@ class OrenNayer : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 }  // namespace LTRE

@@ -17,6 +17,7 @@ class DisneyDiffuse : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 class DisneySubsurface : public BxDF {
@@ -31,6 +32,7 @@ class DisneySubsurface : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 class DisneySheen : public BxDF {
@@ -48,6 +50,7 @@ class DisneySheen : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf([[maybe_unused]] const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 class DisneySpecular : public BxDF {
@@ -73,6 +76,7 @@ class DisneySpecular : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 class DisneyClearcoat : public BxDF {
@@ -98,6 +102,7 @@ class DisneyClearcoat : public BxDF {
   Vec3 sample(Sampler& sampler, const Vec3& wo, Vec3& wi,
               float& pdf) const override;
   float pdf(const Vec3& wo, const Vec3& wi) const override;
+  float reflectance(const Vec3& wo) const override;
 };
 
 }  // namespace LTRE
